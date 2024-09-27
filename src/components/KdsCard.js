@@ -1,10 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
+import useAudioManager from './audioManager';
+import { enqueueSnackbar } from 'notistack';
 
 const KdsCard = ({ table, time, orderId, startTime, waiter, center, items, notes, finishedAt, hrtimestart, user, centerProduction, fetchOrder, status, productionCenter }) => {
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = sessionStorage.getItem('token');
+    const admin_id = sessionStorage.getItem('admin_id');
+  const { playNotificationSound } = useAudioManager();
 
     const handleNextStatus = async () => {
         let newStatus;
@@ -24,12 +28,13 @@ const KdsCard = ({ table, time, orderId, startTime, waiter, center, items, notes
 
         try {
             // Make an API call to update the status
-            await axios.post(`${apiUrl}/order/updateStatus`, { order_id: orderId, status: newStatus }, {
+            const response = await axios.post(`${apiUrl}/order/updateStatus`, { order_id: orderId, status: newStatus }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-
+            enqueueSnackbar(response?.data?.notification || "Estado actualizado", { variant: 'success' });
+            playNotificationSound();
             fetchOrder();
         } catch (error) {
             console.error('Error updating status:', error);

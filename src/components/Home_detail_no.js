@@ -18,6 +18,7 @@ function Home_detail_no() {
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
     const token = sessionStorage.getItem("token");
+    const admin_id = sessionStorage.getItem("admin_id");
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
     const { state } = useLocation();
@@ -61,7 +62,7 @@ function Home_detail_no() {
     const getAllOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll`, {
+            const response = await axios.post(`${apiUrl}/order/getAll`, {admin_id: admin_id},{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -80,7 +81,7 @@ function Home_detail_no() {
     const fetchCredit = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getCredit`, {
+            const response = await axios.post(`${apiUrl}/order/getCredit`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -106,7 +107,9 @@ function Home_detail_no() {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`);
+            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setItems(response.data.items);
             // setObj1(response.data.items);
             // setFilteredItemsMenu(response.data.items);

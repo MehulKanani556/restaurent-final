@@ -13,12 +13,14 @@ import Recipt from "./Recipt";
 import { MdOutlineAccessTimeFilled, MdRoomService } from "react-icons/md";
 import axios from "axios";
 import { FaCalendarAlt } from "react-icons/fa";
+import { enqueueSnackbar } from "notistack";
 
 const DeliveryPago = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = sessionStorage.getItem("token");
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = sessionStorage.getItem("userId");
+  const admin_id = sessionStorage.getItem("admin_id");
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(
     JSON.parse(localStorage.getItem("cartItems")) || []
@@ -326,7 +328,8 @@ const DeliveryPago = () => {
     const orderDetails = cartItems.map((item) => ({
       item_id: item.id,
       quantity: item.count,
-      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : ""
+      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : "",
+      admin_id: admin_id
     }));
 
 
@@ -346,15 +349,17 @@ const DeliveryPago = () => {
         reason: "",
         person: "",
         tip: tipAmount,
-        box_id: boxId?.id != 'undefined' ? boxId?.id : ''
-      }
+        box_id: boxId?.id != 'undefined' ? boxId?.id : '',
+      },
+      admin_id: admin_id,
     };
     const paymentData = {
       ...payment,
       amount: customerData.amount,
       type: selectedCheckboxes[0],
       order_master_id: orderType.orderId,
-      return: customerData.turn
+      return: customerData.turn,
+      admin_id: admin_id,
     };
 
     console.log(paymentData);
@@ -391,6 +396,7 @@ const DeliveryPago = () => {
       }
     } catch (error) {
       console.error("Error creating order : ", error);
+      enqueueSnackbar(error?.response?.data?.message, { variant: 'error' })
     }
 
     

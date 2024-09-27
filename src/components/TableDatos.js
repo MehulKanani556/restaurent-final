@@ -19,7 +19,7 @@ const TableDatos = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [token] = useState(sessionStorage.getItem("token"));
   const [role] = useState(sessionStorage.getItem("role"));
-
+  const admin_id = sessionStorage.getItem("admin_id");
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -142,7 +142,7 @@ const TableDatos = () => {
   const getTableData = async (id) => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/table/getStats/${id}`, {
+      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, {admin_id: admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -390,7 +390,9 @@ const TableDatos = () => {
   // get product
   const fetchAllItems = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setObj1(response.data.items);
     } catch (error) {
       console.error(

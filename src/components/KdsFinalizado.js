@@ -14,6 +14,7 @@ import { Modal, Spinner } from 'react-bootstrap';
 const KdsFinalizado = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = sessionStorage.getItem('token');
+    const admin_id = sessionStorage.getItem('admin_id');
     const [allOrder, setAllOrder] = useState([]);
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);
@@ -36,7 +37,7 @@ const KdsFinalizado = () => {
     const fetchOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll?finalized=yes`, {
+            const response = await axios.post(`${apiUrl}/order/getAllKds?finalized=yes`,{admin_id:admin_id}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -68,7 +69,7 @@ const KdsFinalizado = () => {
     const fetchCenter = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/production-centers`, {
+            const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -161,7 +162,7 @@ const KdsFinalizado = () => {
                                             key={sectionIndex}
                                             table={section.table_id}
                                             time={section.created_at}
-                                            orderId={section.id}
+                                            orderId={section.order_id}
                                             startTime={section.created_at}
                                             waiter={section.user_id}
                                             center={section.discount}

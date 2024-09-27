@@ -20,6 +20,8 @@ export default function Home_crear({ item }) {
     const { id } = useParams();
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
+    const admin_id = sessionStorage.getItem("admin_id");
+
     const token = sessionStorage.getItem("token");
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
@@ -266,7 +268,7 @@ export default function Home_crear({ item }) {
     const getAllorder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll`, {
+            const response = await axios.post(`${apiUrl}/order/getAll`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -314,7 +316,9 @@ export default function Home_crear({ item }) {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`);
+            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setItems(response.data.items);
             // setObj1(response.data.items);
             // setFilteredItemsMenu(response.data.items);
@@ -592,9 +596,11 @@ export default function Home_crear({ item }) {
         // Show the staticBackdrop modal if there is no pay error
         if (payError === '') {
             const creditNote = {
+                admin_id: admin_id,
                 credit_note: {
                     order_id: orderAlldata.id,                  // Assuming `order_id` should be an integer
                     payment_id: userPayment.id,
+                    admin_id: admin_id,
                     status: selectedPaytype ? "completed" : "Pending",
                     name: `${userPayment?.firstname || userPayment?.business_name || ''} ${userPayment?.lastname || ''}`.trim(),
                     email: userPayment.email,
@@ -606,9 +612,10 @@ export default function Home_crear({ item }) {
                         selectedCheckbox == 2 && selectedPaytype == "Efectivo" ? "cash" :
                         selectedCheckbox == 2 && selectedPaytype == "Tarjeta de debito" ? " debit" :
                         selectedCheckbox == 2 && selectedPaytype == "Tarjeta de credito" ? "credit" : null
-                     }`
+                     }`,
                 },
-                return_items: selectedItems
+                return_items: selectedItems,
+                    
             };
     
             console.log(creditNote);

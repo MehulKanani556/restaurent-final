@@ -24,6 +24,7 @@ function Home_Usuarios() {
     const API_URL = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
     const token = sessionStorage.getItem("token");
+    const admin_id = sessionStorage.getItem("admin_id");
 
     const [filterData, setFilterData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -180,7 +181,7 @@ function Home_Usuarios() {
     const getAllorder = async () => {
         setIsProcessing(true)
         try {
-            const response = await axios.get(`${API_URL}/order/getAll`, {
+            const response = await axios.post(`${API_URL}/order/getAll`, {admin_id: admin_id}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

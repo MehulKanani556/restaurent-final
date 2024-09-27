@@ -19,6 +19,7 @@ const Home_Pedidos = () => {
     const [sectordata, setSectordata] = useState([]);
     const [boxes, setboxes] = useState([]);
     const [orderData, setOrderData] = useState([]);
+    const admin_id = sessionStorage.getItem("admin_id");
     // const [selectedFilters, setSelectedFilters] = useState({
     //     All: false,
     //     Received: false,
@@ -55,7 +56,7 @@ const Home_Pedidos = () => {
     const getAllorder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll`,
+            const response = await axios.post(`${apiUrl}/order/getAll`, {admin_id: admin_id},
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -76,7 +77,11 @@ const Home_Pedidos = () => {
         // setIsProcessing(true);
 
         try {
-            const response = await axios.post(`${apiUrl}/sector/getWithTable`);
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id: admin_id}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             setSectordata(response.data.data);
         } catch (error) {
             console.error(

@@ -8,15 +8,18 @@ const useSocket = () => {
         window.Pusher = require('pusher-js');
         const newEcho = new Echo({
             broadcaster: "pusher",
-            key: "7ae046560a0ed83ad8c7",
+            // key: "7ae046560a0ed83ad8c7",
+            key: "GoofNBCH",
             cluster: "mt1",
             wsHost: window.location.hostname,
             wsPort: 6001,
-            forceTLS: true,
-            disableStats: true,
+            
+            // forceTLS: true,
+            forceTLS: false,
+            // disableStats: true,
+            disableStats: false,
             enabledTransports: ['ws','wss'], // Allow both unencrypted and encrypted WebSocket connections
         });
-
         setEcho(newEcho);
 
         return () => {

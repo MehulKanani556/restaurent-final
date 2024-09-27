@@ -7,18 +7,19 @@ import { Link, useNavigate } from "react-router-dom";
 import Recipt from "./Recipt";
 import { MdRoomService } from "react-icons/md";
 import axios from "axios";
+import { enqueueSnackbar } from "notistack";
 
 const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
+  const [token] =useState (sessionStorage.getItem("token"));
+  const [role] = useState (sessionStorage.getItem("role"));
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = sessionStorage.getItem("userId");
+  const admin_id = sessionStorage.getItem("admin_id");
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(
     JSON.parse(localStorage.getItem("cartItems")) || []
   );
-  const [tipError, setTipError] = useState("");
 
   const [payment, setPayment] = useState(
     JSON.parse(localStorage.getItem("payment"))
@@ -67,10 +68,7 @@ const Counter_finalP = () => {
   const [activeAccordionItem, setActiveAccordionItem] = useState("0");
   const [formErrors, setFormErrors] = useState({});
   const [show, setShow] = useState(false);
-  const handleClose = () => {
-    setShow(false);
-    setTipError("");
-  };
+  const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [lastOrder, setLastOrder] = useState('');
 
@@ -111,11 +109,11 @@ const Counter_finalP = () => {
       setCartItems(updatedCartItems);
     }
   };
-  useEffect(() => {
+  useEffect(()=>{
     if (!(role == "admin" || role == "cashier")) {
       navigate('/dashboard')
     }
-  }, [role])
+  },[role])
 
   useEffect(() => {
     // Load cart items from localStorage
@@ -240,7 +238,7 @@ const Counter_finalP = () => {
       cartItems.reduce(
         (total, item, index) => total + parseInt(item.price) * item.count,
         0
-      )
+      ) 
     );
   };
   const totalCost = getTotalCost();
@@ -249,27 +247,27 @@ const Counter_finalP = () => {
   const taxAmount = finalTotal * 0.12;
 
 
-  // ==== Get BOX Data =====
+   // ==== Get BOX Data =====
 
-  const [boxId, setBoxId] = useState('')
+   const [boxId, setBoxId] = useState('')
 
-  const fetchBoxData = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/get-boxs`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = response.data;
-      setBoxId(data.find((v) => v.user_id == userId));
-    } catch (error) {
-      console.error(
-        "Error fetching box:",
-        error.response ? error.response.data : error.message
-      );
-    }
-  }
+   const fetchBoxData = async() =>{
+     try {
+       const response = await axios.get(`${apiUrl}/get-boxs`, {
+                 headers: {
+                     Authorization: `Bearer ${token}`,
+                 },
+             });
+         
+         const data = response.data;
+       setBoxId(data.find((v)=>v.user_id == userId));
+     } catch (error) {
+       console.error(
+         "Error fetching box:",
+         error.response ? error.response.data : error.message
+       );
+     }
+   }
 
 
 
@@ -318,6 +316,11 @@ const Counter_finalP = () => {
 
   // submit
   const handleSubmit = async () => {
+    if (role !== "cashier") {
+      alert("Solo los cajeros pueden realizar pedidos.");
+      return;
+    }
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       // Display errors to user
@@ -328,10 +331,12 @@ const Counter_finalP = () => {
     const orderDetails = cartItems.map((item) => ({
       item_id: item.id,
       quantity: item.count,
-      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : ""
+      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : "",
+      admin_id: admin_id
     }));
     const orderData = {
       order_details: orderDetails,
+      admin_id: admin_id,
       order_master: {
         order_type: orderType.orderType,
         payment_type: selectedCheckboxes[0],
@@ -346,41 +351,50 @@ const Counter_finalP = () => {
         reason: "",
         person: "",
         tip: tipAmount,
-        box_id: boxId?.id != 'undefined' ? boxId?.id : '',
-        transaction_code: true
+        box_id: boxId?.id != 'undefined' ? boxId?.id : '' ,
+        transaction_code:true,
       }
     };
-    const paymentData = {
-      ...payment,
-      amount: customerData.amount,
-      type: selectedCheckboxes[0],
-      order_master_id: orderType.orderId,
-      return: customerData.turn
-    };
+    let order_master_id;
+
     setIsProcessing(true);
     try {
       const response = await axios.post(`${apiUrl}/order/place_new`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
       console.log(response.data)
+      order_master_id = response.data.details.order_master.id
+      if(response.data){
+        const paymentData = {
+          ...payment,
+          amount: customerData.amount,
+          type: selectedCheckboxes[0],
+          order_master_id: order_master_id,
+          return: customerData.turn,
+          admin_id: admin_id
+        };
+        const responsePayment = await axios.post(
+          `${apiUrl}/payment/insert`,
+          paymentData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        console.log("payemnt suc", responsePayment.data);
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("currentOrder");
+        localStorage.removeItem("payment");
+        handleShow11();
+        setIsProcessing(false);
+      }
     } catch (error) {
       console.error("Error creating order : ", error);
+      enqueueSnackbar(error?.response?.data?.message, { variant: 'error' })
+      setIsProcessing(false);
     }
-    const responsePayment = await axios.post(
-      `${apiUrl}/payment/insert`,
-      paymentData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-    console.log("payemnt suc", responsePayment.data);
-    localStorage.removeItem("cartItems");
-    localStorage.removeItem("currentOrder");
-    localStorage.removeItem("payment");
-    handleShow11();
-    setIsProcessing(false);
+   
   };
   // print recipt
   const handlePrint = () => {
@@ -502,7 +516,6 @@ const Counter_finalP = () => {
                         value={`$${price}`}
                         onChange={handleprice}
                       />
-                      {tipError && <p className="text-danger mt-2 errormessage">{tipError}</p>}
                     </div>
                   </Modal.Body>
                   <Modal.Footer className="border-0 pt-0">
@@ -510,19 +523,15 @@ const Counter_finalP = () => {
                       className="j-tbl-btn-font-1 b_btn_pop"
                       variant="primary"
                       onClick={() => {
-                        if (!price || parseFloat(price) <= 0) {
-                          setTipError("Por favor, ingrese una cantidad válida para la propina.");
-                        } else {
-                          setTipError("");
-                          handleShowCreSubSuc();
-                          handleClose();
-                        }
+                        handleShowCreSubSuc();
+                        handleClose();
                       }}
                     >
                       Aceptar
                     </Button>
                   </Modal.Footer>
                 </Modal>
+
                 <Modal
                   show={showCreSubSuc}
                   onHide={handleCloseCreSubSuc}

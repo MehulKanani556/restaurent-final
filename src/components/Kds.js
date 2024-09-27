@@ -13,6 +13,7 @@ const Kds = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
     const token = sessionStorage.getItem('token');
     const [allOrder, setAllOrder] = useState([]);
+    const admin_id = sessionStorage.getItem('admin_id');
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);
     const [allItems, setAllItems] = useState([]);
@@ -28,7 +29,7 @@ const Kds = () => {
     const fetchOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll?received=yes&prepared=yes&delivered=yes&finalized=yes`, {
+            const response = await axios.post(`${apiUrl}/order/getAllKds?received=yes&prepared=yes&delivered=yes&finalized=yes`,{admin_id:admin_id}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -94,7 +95,7 @@ const Kds = () => {
     const fetchCenter = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/production-centers`, {
+            const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -181,7 +182,7 @@ const Kds = () => {
                                                 key={sectionIndex}
                                                 table={section.table_id}
                                                 time={section.created_at}
-                                                orderId={section.id}
+                                                orderId={section.order_id}
                                                 startTime={section.created_at}
                                                 waiter={section.user_id}
                                                 center={section.discount}
@@ -212,7 +213,7 @@ const Kds = () => {
                                                     : [selectedCategory]
                                                 }
                                                 />
-                                            {/* {console.log(section)} */}
+                                            {console.log(section)}
 
                                                 </>
                                         ))}

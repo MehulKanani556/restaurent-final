@@ -27,7 +27,7 @@ export default function Homeinformation() {
   const API_URL = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
   const token = sessionStorage.getItem("token");
-
+  const admin_id = sessionStorage.getItem("admin_id");
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -51,7 +51,7 @@ export default function Homeinformation() {
         { reason: reason },
         {
           headers: {
-            Authorization: `Bearer Bearer 2852|8lkViGQ4mKuvXVzPhL2OePFX2YinQ0wwhqDnwFJs7f6a8df1`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -70,7 +70,7 @@ export default function Homeinformation() {
         { order_id: id, status: "cancelled" },
         {
           headers: {
-            Authorization: `Bearer 2777|bTI10QPJ5iJXNIX6un4UhJJn1WSZzNG3RatXNWU8d2713940`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -153,7 +153,7 @@ export default function Homeinformation() {
     getRole();
     getFamily();
     getSubFamily();
-  }, [ show12, show1Prod]);
+  }, [ show12, show1Prod,token]);
 
   useEffect(() => {
     if (orderData && items.length > 0) {
@@ -173,7 +173,7 @@ export default function Homeinformation() {
 
   const getOrder = async () => {
     try {
-      const response = await axios.get(`${API_URL}/order/getSingle/${id}`, {
+      const response = await axios.post(`${API_URL}/order/getSingle/${id}`,{admin_id: admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -190,7 +190,9 @@ export default function Homeinformation() {
   const getItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/item/getAll`);
+      const response = await axios.get(`${API_URL}/item/getAll`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setItems(response.data.items);
       setObj1(response.data.items);
       // setFilteredMenuItems(response.data.items);
@@ -207,7 +209,7 @@ export default function Homeinformation() {
   const getSector = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${API_URL}/sector/getWithTable`);
+      const response = await axios.post(`${API_URL}/sector/getWithTable`,{admin_id: admin_id});
       let sectors = response.data.data;
 
       const sectorWithTable = sectors.find(v =>
@@ -301,7 +303,7 @@ export default function Homeinformation() {
   };
 
   const handleOrderDetails = () => {
-    const details = orderData.order_details.map((orderItem) => {
+    const details = orderData[0]?.order_details?.map((orderItem) => {
       const matchingItem = items.find((item) => item.id === orderItem.item_id);
       return {
         ...orderItem,
@@ -315,7 +317,9 @@ export default function Homeinformation() {
   const getFamily = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/family/getFamily`);
+      const response = await axios.get(`${API_URL}/family/getFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setParentCheck(response.data);
     } catch (error) {
       console.error(
@@ -328,7 +332,9 @@ export default function Homeinformation() {
   const getSubFamily = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/subfamily/getSubFamily`);
+      const response = await axios.get(`${API_URL}/subfamily/getSubFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -497,7 +503,7 @@ export default function Homeinformation() {
           { notes: noteValues },
           {
             headers: {
-              Authorization: `Bearer 2816|ojbPri4TvtQKBLMDfMp3wnCaYrpUf5tpEv1UZ3dp07d9f3e0`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -521,93 +527,6 @@ export default function Homeinformation() {
   // =============end note==========
 
 
-
-  // const obj1 = {
-  //   name: "Damian Gonzales",
-  //   Paltform: "Uber",
-  // }
-  // const [data2, setData2] = useState([
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Cancelado"
-
-  //   },
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Recibido"
-
-
-  //   },
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Preparado"
-
-
-  //   },
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Entregado"
-  //   },
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Finalizado"
-  //   },
-  //   {
-  //     Date: "20/03/2024",
-  //     Hour: "08:00 am",
-  //     User: 'Cocina',
-  //     state: "Preparado"
-  //   },
-
-
-
-  //   // More orders...
-  // ]);
-
-  // const [product, setproduct] = useState([
-  //   {
-  //     id: 1,
-  //     image: pic1,
-  //     name: 'Pollo frito crujiente',
-  //     discription: 'Las esepecialidad de la casa',
-  //     price: '$10.00',
-  //     quantity: 2,
-  //     note: 'Agregar nota'
-  //   },
-  //   {
-  //     id: 1,
-  //     image: pic2,
-  //     name: 'Guitig',
-  //     discription: 'Con gas',
-  //     price: '$2.00',
-  //     quantity: 2,
-  //     note: 'Nota: Al clima'
-  //   },
-
-  //   {
-  //     id: 1,
-  //     image: pic3,
-  //     name: 'Gelatina',
-  //     discription: 'Con gas',
-  //     price: '$2.00',
-  //     quantity: 2,
-  //     note: 'Nota: Con cereza a los lados'
-  //   }
-  // ])
-  // const [date, setdate] = useState("17/03/2024")
-  // const [time, settime] = useState("08:00 am")
-  // const [order, setorder] = useState("01234")
-  // const [order1, setorder1] = useState("3")
 
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -679,8 +598,8 @@ export default function Homeinformation() {
 
 
                   <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
-                        ${orderData?.order_type.toLowerCase() === 'local' ? 'b_indigo' : orderData?.order_type.toLowerCase() === 'order now' ? 'b_ora ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'b_blue' : orderData?.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : orderData?.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>
-                    {orderData?.order_type.toLowerCase() === 'local' ? 'Local' : orderData?.order_type.toLowerCase().includes("with") ? 'Retiro ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'Entrega' : orderData?.order_type.toLowerCase() === 'uber' ? 'Uber' : orderData?.order_type}
+                        ${orderData?.[0]?.order_type?.toLowerCase() === 'local' ? 'b_indigo' : orderData?.[0]?.order_type?.toLowerCase() === 'order now' ? 'b_ora ' : orderData?.[0]?.order_type?.toLowerCase() === 'delivery' ? 'b_blue' : orderData?.[0]?.order_type?.toLowerCase() === 'uber' ? 'b_ora text-danger' : orderData?.[0]?.order_type?.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>
+                    {orderData?.[0]?.order_type?.toLowerCase() === 'local' ? 'Local' : orderData?.[0]?.order_type?.toLowerCase().includes("with") ? 'Retiro ' : orderData?.[0]?.order_type?.toLowerCase() === 'delivery' ? 'Entrega' : orderData?.[0]?.order_type?.toLowerCase() === 'uber' ? 'Uber' : orderData?.[0]?.order_type}
                   </div>
                 </div>
 
@@ -771,6 +690,7 @@ export default function Homeinformation() {
                     <div className='p-4 m_bgblack text-white'>
                       <p className='bj-delivery-text-65' style={{ marginBottom: "36px" }}>Listado</p>
                       <div className='a_deli_infolist p-4'>
+                        {console.log(orderDetails)}
                         {
                           // product.map((item) => {
                           // console.log(item)
@@ -855,8 +775,8 @@ export default function Homeinformation() {
                           Datos
                         </div>
                         <div className={`bj-delivery-text-2  b_btn1 mb-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
-                                            ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
-                          {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local'  : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
+                                            ${orderData?.[0]?.status?.toLowerCase() === 'received' ? 'b_indigo' : orderData?.[0]?.status?.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.[0]?.status?.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.[0]?.status?.toLowerCase() === 'finalized' ? 'b_green' : orderData?.[0]?.status?.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.[0]?.status?.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
+                          {orderData?.[0]?.status?.toLowerCase() === 'received' ? 'Recibido' : orderData?.[0]?.status?.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.[0]?.status?.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.[0]?.status?.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.[0]?.status?.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.[0]?.status?.toLowerCase() === 'local' ? 'Local'  : orderData?.[0]?.status?.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
                         </div>
                         {/* <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3   p-0 text-nowrap d-flex  align-items-center justify-content-center 
                         ${orderData?.order_type.toLowerCase() === 'local' ? 'b_indigo' : orderData?.order_type.toLowerCase() === 'order now' ? 'b_ora ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'b_blue' : orderData?.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : orderData?.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>
@@ -869,24 +789,25 @@ export default function Homeinformation() {
                           </div>
                           <div className='w-50'>
                             <div className='mb-3 bj-delivery-text-3'>Cantidad</div>
-                            <div className='w-75 a_bg_order  border-0 ' style={{ borderRadius: "10px" }}><span className=''>{orderDetails.length}</span></div>
+                            <div className='w-75 a_bg_order  border-0 ' style={{ borderRadius: "10px" }}><span className=''>{orderDetails?.length}</span></div>
                           </div>
                         </div>
                         <div className='p-4 a_deli_infolist  mt-3'>
                           <div className=' a_mar_summary bj-delivery-text-650'>Costo total</div>
                           <div className='d-flex justify-content-between align-items-center my-1 mb-2'>
                             <div className='bj-delivery-text-150'>Productos</div>
-                            <div className='bj-delivery-text-151'>${orderDetails.reduce((acc, v) => v.amount * v.quantity + acc, 0)}</div>
+                            {console.log("orderDetails",orderDetails)}
+                            <div className='bj-delivery-text-151'>${orderDetails?.reduce((acc, v) => v.amount * v.quantity + acc, 0)}</div>
                           </div>
                           <div className='d-flex justify-content-between align-items-center my-1'>
                             <div className='bj-delivery-text-150'>Descuentos</div>
-                            <div className='bj-delivery-text-151'>${parseInt(orderData?.discount)}</div>
+                            <div className='bj-delivery-text-151'>${parseInt(orderData?.[0]?.discount)}</div>
                           </div>
                           <hr></hr>
                           <div>
                             <div className='d-flex justify-content-between align-items-center my-1'>
                               <div className='bj-delivery-text-153'>Total</div>
-                              <div className='bj-delivery-text-153'>${orderDetails.reduce((acc, v) => v.amount * v.quantity + acc, 0) - parseInt(orderData?.discount)}</div>
+                              <div className='bj-delivery-text-153'>${orderDetails?.reduce((acc, v) => v.amount * v.quantity + acc, 0) - parseInt(orderData?.[0]?.discount)}</div>
                             </div>
                           </div>
                         </div>
@@ -1188,10 +1109,5 @@ export default function Homeinformation() {
 
       </div>
     </div >
-
-
-
-
-
   )
 }

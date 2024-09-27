@@ -21,7 +21,7 @@ const BHomeDelivery = () => {
   const [token, setToken] = useState(sessionStorage.getItem("token"));
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
-
+  const admin_id = sessionStorage.getItem("admin_id");
 
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
@@ -368,7 +368,9 @@ const BHomeDelivery = () => {
   // get family
   const fetchFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`);
+      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       const todoCategory = { id: "todo", name: "Todo" };
       setParentCheck([todoCategory, ...response.data]);
       setSelectedCategory(todoCategory); // Set "Todo" as initial category
@@ -383,7 +385,9 @@ const BHomeDelivery = () => {
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -397,7 +401,9 @@ const BHomeDelivery = () => {
   // get subfamily
   const fetchSubFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`);
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -411,7 +417,7 @@ const BHomeDelivery = () => {
 
   const fetchLastOrder = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/orders/last`, {
+      const response = await axios.post(`${apiUrl}/orders/last`,{admin_id: admin_id}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setLastOrder(response.data.order.id + 1);

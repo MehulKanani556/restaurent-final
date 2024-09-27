@@ -40,6 +40,7 @@ const Counter = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [orderType, setOrderType] = useState("");
   const [orType, setOrType] = useState([]);
+  const [admin_id, setAdminId] = useState(sessionStorage.getItem("admin_id"));
   useEffect(() => {
 
     const fetchData = async () => {
@@ -365,7 +366,7 @@ const Counter = () => {
   // get family
   const fetchFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`);
+      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers:{Authorization:`Bearer ${token}`}});
       const todoCategory = { id: "todo", name: "Todo" };
       setParentCheck([todoCategory, ...response.data]);
       setSelectedCategory(todoCategory); // Set "Todo" as initial category
@@ -379,7 +380,7 @@ const Counter = () => {
   // get product
   const fetchAllItems = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{headers:{Authorization:`Bearer ${token}`}});
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -392,7 +393,7 @@ const Counter = () => {
   // get subfamily
   const fetchSubFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`);
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers:{Authorization:`Bearer ${token}`}});
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -406,7 +407,7 @@ const Counter = () => {
 
   const fetchLastOrder = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/orders/last`, {
+      const response = await axios.post(`${apiUrl}/orders/last`,{admin_id:admin_id}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setLastOrder(response.data.order.id + 1);

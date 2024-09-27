@@ -26,6 +26,7 @@ const TablePago = () => {
   const [token] = useState(sessionStorage.getItem("token"));
   const [role] = useState(sessionStorage.getItem("role"));
   const [userId] = useState(sessionStorage.getItem("userId"));
+  const admin_id = sessionStorage.getItem("admin_id");
   // console.log(userId);
 
 
@@ -60,7 +61,7 @@ const TablePago = () => {
   const getTableData = async (id) => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/table/getStats/${id}`, {
+      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, {admin_id: admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -84,7 +85,9 @@ const TablePago = () => {
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -434,7 +437,8 @@ const TablePago = () => {
       type: selectedCheckboxes[0],
       order_master_id: tableData[0].id,
       return: customerData.turn,
-      tax: taxAmount
+      tax: taxAmount,
+      admin_id: admin_id
     };
     console.log(paymentData)
     setPaymentInfo(paymentData);
@@ -474,7 +478,8 @@ const TablePago = () => {
             try {
               const resStatus = await axios.post(`${apiUrl}/table/updateStatus`, {
                 table_id: tableData[0].table_id,
-                status: "available"
+                status: "available",
+                admin_id: admin_id
               }, {
                 headers: {
                   Authorization: `Bearer ${token}`

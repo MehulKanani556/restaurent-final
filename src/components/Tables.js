@@ -138,7 +138,7 @@ const Tables = () => {
   const getTableData = async (id) => {
     setIsProcessing(true)
     try {
-      const response = await axios.get(`${apiUrl}/table/getStats/${id}`, {
+      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, {admin_id: admin_id},{
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -545,7 +545,7 @@ const Tables = () => {
   };
   const handleShow250 = () => {
     setShow250(true);
-    getPaymentData(tableData[0].id);
+    // getPaymentData(tableData[0].id);
   };
 
   const [showCreSuc2, setShowCreSuc2] = useState(false);
@@ -1512,7 +1512,7 @@ const Tables = () => {
                           getTableData(ele.id);
                         }}
                         handleGet={() => {
-                          getPaymentData(ele.order_id);
+                          // getPaymentData(ele.order_id);
                         }}
                         getUserName={getUserName}
                         setSelectedTable={setSelectedTable}

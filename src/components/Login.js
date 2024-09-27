@@ -78,8 +78,8 @@ const Login = () => {
         email,
         password
       });
-      if (response.data.access_token)  {
-        const { email, name, access_token, role, id ,admin_id } = response.data;
+      if (response.data) {
+        const { email, name, access_token, role, id, admin_id } = response.data;
         sessionStorage.setItem("email", email);
         sessionStorage.setItem("name", name);
         sessionStorage.setItem("token", access_token);
@@ -98,20 +98,24 @@ const Login = () => {
           navigate(redirectPath);
         }, 2000);
 
-        // setEmail("");
-        // setPassword("");
-        setNotificationMessage(response.data?.notification || response.data?.alert);
-        enqueueSnackbar(response.data?.notification, { variant: 'success' })
+        // Ensure notification message is a string before calling enqueueSnackbar
+        const notificationMessage = response.data?.notification || "Login successful";
+        if (typeof notificationMessage === 'string') {
+          enqueueSnackbar(notificationMessage, { variant: 'success' });
+      playNotificationSound();
+
+        }
         
       } else {
-        setErrorMessage(response.data.message || "Credenciales inválidas");
+        setErrorMessage("Credenciales inválidas");
         setShowModal(true);
       }
     } catch (error) {
-      // Update error handling
-      const errorMessage = error.response?.data?.message || error.message || "An error occurred during login";
-      enqueueSnackbar(error.response?.data?.alert || errorMessage, { variant: 'error' });
-      setErrorMessage(errorMessage);
+      const errorMessage = error.response?.data?.alert || "An error occurred";
+      if (typeof errorMessage === 'string') {
+        enqueueSnackbar( error.response?.data?.message || errorMessage, { variant: 'error' });
+      }
+      setErrorMessage(error.response?.data?.message || "An error occurred");
       playNotificationSound();
       setShowModal(true);
     }

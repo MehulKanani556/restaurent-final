@@ -221,8 +221,7 @@ const Usuarios = () => {
     const userName = user.name.toLowerCase();
     return (
       userName.includes(searchTerm.toLowerCase()) &&
-      filterUser(user) &&
-      user.email !== "superadmin@gmail.com"
+      filterUser(user) 
     );
   });
 
@@ -397,8 +396,11 @@ const Usuarios = () => {
       await fetchUser();
       handleCloseEditProduction();
       handleShowEditProductionSuc();
-      enqueueSnackbar(response.data?.notification, { variant: 'success' })
-      playNotificationSound();
+      if (response?.data?.notification) {
+        enqueueSnackbar(response?.data?.notification, { variant: 'success' })
+        playNotificationSound();
+      }
+
 
     } catch (error) {
       console.error("Error updating user:", error);
@@ -465,7 +467,7 @@ const Usuarios = () => {
           handleShowCreSubSuc();
           handleClose();
           fetchUser();
-          enqueueSnackbar(response.data?.notification, { variant: 'success' })
+          enqueueSnackbar(response.data.notification, { variant: 'success' })
           playNotificationSound();
 
 
@@ -711,7 +713,7 @@ const Usuarios = () => {
                                       </option>
                                     ))} */}
                                     {roles.map((role) => {
-                                      if (email === 'superadmin@gmail.com' || role.name !== 'admin') {
+                                      if (role.name !== 'admin') {
                                         return (
                                           <option key={role.id} value={role.id}>
                                             {roleNamesInSpanish[role.id] || role.name}
@@ -1039,35 +1041,35 @@ const Usuarios = () => {
                   <tbody className="text-white b_btnn ">
                     {currentUsers.map(
                       (user) =>
-                        user.email !== "superadmin@gmail.com" && (
-                          <tr key={user.id} className="b_row">
-                            <td className="b_text_w">{user.name}</td>
-                            <td className="b_text_w">
-                              {roleNamesInSpanish[user.role_id] ||
-                                "Rol Desconocido"}
-                            </td>
-                            <td className="b_text_w">{user.email}</td>
-                            <td>
-                              {user.status === "Activa" ? (
-                                <button className="btn btn-success" onClick={() => handleShowEditFam(user.id)} style={{ minWidth: "120px" }}>
-                                  Activa
-                                </button>
-                              ) : (
-                                <button className="btn btn-danger" onClick={() => handleShowEditFam2(user.id)} style={{ minWidth: "120px" }} >
-                                  Suspender
-                                </button>
-                              )}
-                            </td>
-                            <td className="b_text_w ">
-                              <button
-                                className="b_edit me-5"
-                                onClick={() => handleShowEditProduction(user)}
-                              >
-                                <MdEditSquare />
+                      (
+                        <tr key={user.id} className="b_row">
+                          <td className="b_text_w">{user.name}</td>
+                          <td className="b_text_w">
+                            {roleNamesInSpanish[user.role_id] ||
+                              "Rol Desconocido"}
+                          </td>
+                          <td className="b_text_w">{user.email}</td>
+                          <td>
+                            {user.status === "Activa" ? (
+                              <button className="btn btn-success" onClick={() => handleShowEditFam(user.id)} style={{ minWidth: "120px" }}>
+                                Activa
                               </button>
-                            </td>
-                          </tr>
-                        )
+                            ) : (
+                              <button className="btn btn-danger" onClick={() => handleShowEditFam2(user.id)} style={{ minWidth: "120px" }} >
+                                Suspender
+                              </button>
+                            )}
+                          </td>
+                          <td className="b_text_w ">
+                            <button
+                              className="b_edit me-5"
+                              onClick={() => handleShowEditProduction(user)}
+                            >
+                              <MdEditSquare />
+                            </button>
+                          </td>
+                        </tr>
+                      )
                     )}
                   </tbody>
                 </table>
@@ -1158,7 +1160,7 @@ const Usuarios = () => {
                             onChange={handleChange}
                           >
                             {roles.map((role) => {
-                              if (email === 'superadmin@gmail.com' || role.name !== 'admin') {
+                              if (role.name !== 'admin') {
                                 return (
                                   <option key={role.id} value={role.id}>
                                     {roleNamesInSpanish[role.id] ||

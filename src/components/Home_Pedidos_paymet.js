@@ -22,6 +22,7 @@ export default function Home_Pedidos_paymet() {
   const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token] = useState(sessionStorage.getItem("token"));
+  const admin_id = sessionStorage.getItem("admin_id");
 
   const { id } = useParams();
 
@@ -113,7 +114,6 @@ export default function Home_Pedidos_paymet() {
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [userRole, setUserRole] = useState('');
-
   const [visibleInputId, setVisibleInputId] = useState(null);
   const [noteValues, setNoteValues] = useState('');
 
@@ -179,12 +179,12 @@ export default function Home_Pedidos_paymet() {
   const getOrder = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/order/getSingle/${id}`, {
+      const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, {admin_id: admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setOrderData(response.data);
+      setOrderData(response.data[0]);
     } catch (error) {
       console.error(
         "Error fetching OrderData:",
@@ -197,7 +197,9 @@ export default function Home_Pedidos_paymet() {
   const getItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setItems(response.data.items);
       setObj1(response.data.items);
       // setFilteredMenuItems(response.data.items);
@@ -312,7 +314,9 @@ export default function Home_Pedidos_paymet() {
 
   const getFamily = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`);
+      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setParentCheck(response.data);
     } catch (error) {
       console.error(
@@ -323,7 +327,9 @@ export default function Home_Pedidos_paymet() {
   }
   const getSubFamily = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`);
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setChildCheck(response.data);
     } catch (error) {
       console.error(

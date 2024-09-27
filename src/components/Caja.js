@@ -30,6 +30,7 @@ const Caja = () => {
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const userId = sessionStorage.getItem('userId');
+    const admin_id = sessionStorage.getItem('admin_id');
     const { playNotificationSound } = useAudioManager();
 
     // useEffect(() => {
@@ -179,6 +180,7 @@ const Caja = () => {
             const response = await axios.get(`${apiUrl}/get-users`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            console.log(response.data)
             setUsers(response.data);
             const cashiers = response.data.filter(user => user.role_id === 2 && user.admin_id == userId);
             setCashier(cashiers);
@@ -202,7 +204,9 @@ const Caja = () => {
     };
 
     const getUserName = (userId) => {
+        console.log(userId)
         const user = users.find(user => user.id === userId);
+        console.log(users)
         return user ? user.name : 'Unknown User';
     };
 
@@ -269,7 +273,6 @@ const Caja = () => {
                                                 onChange={handleInputChange}
                                             >
                                                 <option value="">Selecciona un cajero</option>
-                                                {console.log(cashier, data)}
                                                 {/* {cashier.map(user => (
                                                     <option key={user.id} value={user.id}>
                                                         {user.name}
@@ -332,8 +335,9 @@ const Caja = () => {
                             </div>
                             <div className="ssssj-card-media">
                                 <div className="row">
+                                    {console.log("data",data)}
                                     {data.length > 0 ? (
-                                        data.filter(order => order.admin_id == userId).map((order, index) => {
+                                        data.filter(order => order.admin_id == admin_id).map((order, index) => {
                                             const lastBoxRecord = getLastBoxRecord(order.id);
                                             const isClosed = lastBoxRecord && lastBoxRecord.close_amount === null;
                                             return (

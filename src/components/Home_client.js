@@ -15,6 +15,7 @@ function Home_client() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = sessionStorage.getItem("token");
   const [isProcessing, setIsProcessing] = useState(false);
+  const admin_id = sessionStorage.getItem("admin_id");
   const navigate = useNavigate()
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -159,7 +160,7 @@ function Home_client() {
   const fetchPaymentUser = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/get-payments`, {
+      const response = await axios.post(`${apiUrl}/get-payments`, { admin_id: admin_id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

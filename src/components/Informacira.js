@@ -30,7 +30,7 @@ const Informacira = () => {
     : queryString;
 
   const [bId, setBId] = useState(queryValue);
-
+  const admin_id = sessionStorage.getItem("admin_id");
   const [activeTab, setActiveTab] = useState("home");
   const [price, setPrice] = useState("200");
   const [pricesecond, setpricesecond] = useState("");
@@ -276,7 +276,7 @@ const Informacira = () => {
       if (response.status === 200) {
         // Deletion was successful
         fetchAllBox(); // Refresh the box data
-       
+
         setShowDelModal(true);
         setTimeout(() => {
           setShowDelModal(false); // Hide success modal
@@ -303,8 +303,9 @@ const Informacira = () => {
   const fetchAllOrder = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(
+      const response = await axios.post(
         `${apiUrl}/order/getAll`,
+        {admin_id:admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -361,7 +362,7 @@ const Informacira = () => {
       // enqueueSnackbar(response.data.notification, { variant: 'success' });
       // playNotificationSound();
       console.log("sdjjisdbdb", response.data)
-      
+
     } catch (error) {
       console.error("Error fetching boxes:", error);
       // enqueueSnackbar(error?.response?.data?.alert || "Error fetching boxes", { variant: 'error' });
@@ -370,7 +371,7 @@ const Informacira = () => {
   };
 
   console.log(data);
-  
+
   const fetchAllBoxReport = async () => {
     setIsProcessing(true);
     try {
@@ -383,13 +384,13 @@ const Informacira = () => {
           }
         }
       );
-      enqueueSnackbar(response.data?.notification, { variant: 'success' });
+      enqueueSnackbar(response.data.notification, { variant: 'success' });
       playNotificationSound();
-  // playNotificationSound();
+      // playNotificationSound();
     } catch (error) {
       console.error("Error fetching boxes:", error);
       // enqueueSnackbar(error?.response.data.alert, { variant: 'error' });
-      enqueueSnackbar(error?.response.data?.alert, { variant: 'error' })
+      enqueueSnackbar(error?.response.data.alert, { variant: 'error' })
       playNotificationSound();
       // playNotificationSound();
     }
@@ -493,6 +494,7 @@ const Informacira = () => {
         {
           box_id: bId, // Pass the box ID
           open_amount: openPrice,  // Pass the open amount
+          admin_id:admin_id
         },
         {
           headers: {
@@ -534,7 +536,8 @@ const Informacira = () => {
         {
           box_id: bId, // Pass the box ID
           close_amount: closePrice, // Pass the close amount
-          cash_amount: pricesecond
+          cash_amount: pricesecond,
+          admin_id:admin_id
         },
         {
           headers: {
@@ -881,7 +884,7 @@ const Informacira = () => {
 
         const orderIds = item.order_master_id.split(','); // Split by comma
         const orderDiscounts = await Promise.all(orderIds.map(async (id) => {
-          const response = await axios.get(`${apiUrl}/order/getSingle/${id}`, {
+          const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, { admin_id: admin_id }, {
             headers: {
               Authorization: `Bearer ${token}`,
             }
@@ -894,7 +897,7 @@ const Informacira = () => {
         const paymentIds = item.payment_id.split(','); // Split by comma
         const paymentDetails = await Promise.all(paymentIds.map(async (id) => {
           try {
-            const response = await axios.get(`${apiUrl}/getsinglepaymentById/${id}`, {
+            const response = await axios.post(`${apiUrl}/getsinglepaymentById/${id}`, { admin_id: admin_id }, {
               headers: {
                 Authorization: `Bearer ${token}`,
               }
@@ -1681,8 +1684,10 @@ const Informacira = () => {
                               <td>
                                 <button
                                   className="sjSky px-2 j-tbl-font-3"
-                                  onClick={() =>{const discount = getDiscountForBox(box.id); // Get the discount for the selected box
-                                    setSelectedBoxDetails({ box, discount }); handleShowDetails(box)}}
+                                  onClick={() => {
+                                    const discount = getDiscountForBox(box.id); // Get the discount for the selected box
+                                    setSelectedBoxDetails({ box, discount }); handleShowDetails(box)
+                                  }}
                                 >
                                   Ver detalles
                                 </button>
@@ -2137,8 +2142,8 @@ const Informacira = () => {
                           <button
                             type="button"
                             class="btn sjbtnskylight"
-                            onClick={() => {  setShowModal(true); handleClose17()}}
-                            // onClick={handleClose17}
+                            onClick={() => { setShowModal(true); handleClose17() }}
+                          // onClick={handleClose17}
                           >
                             Imprimir reporte
                           </button>

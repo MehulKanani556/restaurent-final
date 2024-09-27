@@ -30,7 +30,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
     const { id } = useParams();
     const { state, replace } = useLocation();
     const navigate = useNavigate();
-
+    const admin_id = sessionStorage.getItem("admin_id");
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -133,12 +133,12 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getOrder = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/order/getSingle/${id}`, {
+            const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, {admin_id: admin_id}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setOrderData(response.data);
+            setOrderData(response.data[0]);
         } catch (error) {
             console.error(
                 "Error fetching OrderData:",
@@ -149,7 +149,9 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getItems = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`);
+            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setItems(response.data.items);
             setObj1(response.data.items);
             setFilteredItemsMenu(response.data.items);
@@ -244,7 +246,9 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getFamily = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/family/getFamily`);
+            const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setParentCheck(response.data);
         } catch (error) {
             console.error(
@@ -255,7 +259,9 @@ const Home_pedidos_payment_edit = ({ item }) => {
     }
     const getSubFamily = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`);
+            const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setChildCheck(response.data);
         } catch (error) {
             console.error(

@@ -22,13 +22,10 @@ import axios from 'axios';
 
 const Homeinfomation_payment_edit = ({ item }) => {
     // create family
-
-    const API_URL = "https://shreekrishnaastrology.com/api"; // Laravel API URL
-    const API = "https://shreekrishnaastrology.com/public";
-
-    const [token, setToken] = useState(
-        "2647|bkAORMNJS6ite9xHPiGmApoi78Dfz9tV8Bzbyb6a1ca62063"
-    );
+    const API_URL = process.env.REACT_APP_API_URL;
+    const API = process.env.REACT_APP_IMAGE_URL;
+    const token = sessionStorage.getItem("token");
+    const admin_id = sessionStorage.getItem("admin_id");
 
     const { id } = useParams();
     const { state, replace } = useLocation();
@@ -134,12 +131,12 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
     const getOrder = async () => {
         try {
-            const response = await axios.get(`${API_URL}/order/getSingle/${id}`, {
+            const response = await axios.post(`${API_URL}/order/getSingle/${id}`,{admin_id: admin_id}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setOrderData(response.data);
+            setOrderData(response.data[0]);
         } catch (error) {
             console.error(
                 "Error fetching OrderData:",
@@ -150,7 +147,9 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
     const getItems = async () => {
         try {
-            const response = await axios.get(`${API_URL}/item/getAll`);
+            const response = await axios.get(`${API_URL}/item/getAll`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setItems(response.data.items);
             setObj1(response.data.items);
             setFilteredItemsMenu(response.data.items);
@@ -245,7 +244,9 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
     const getFamily = async () => {
         try {
-            const response = await axios.get(`${API_URL}/family/getFamily`);
+            const response = await axios.get(`${API_URL}/family/getFamily`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setParentCheck(response.data);
         } catch (error) {
             console.error(
@@ -256,7 +257,9 @@ const Homeinfomation_payment_edit = ({ item }) => {
     }
     const getSubFamily = async () => {
         try {
-            const response = await axios.get(`${API_URL}/subfamily/getSubFamily`);
+            const response = await axios.get(`${API_URL}/subfamily/getSubFamily`,{headers: {
+                Authorization: `Bearer ${token}`
+              }});
             setChildCheck(response.data);
         } catch (error) {
             console.error(
@@ -429,7 +432,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                     { notes: noteValues },
                     {
                         headers: {
-                            Authorization: `Bearer 2816|ojbPri4TvtQKBLMDfMp3wnCaYrpUf5tpEv1UZ3dp07d9f3e0`,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );
@@ -484,7 +487,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer 2816|ojbPri4TvtQKBLMDfMp3wnCaYrpUf5tpEv1UZ3dp07d9f3e0`,
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
@@ -527,7 +530,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer 2816|ojbPri4TvtQKBLMDfMp3wnCaYrpUf5tpEv1UZ3dp07d9f3e0`,
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );
@@ -616,386 +619,6 @@ const Homeinfomation_payment_edit = ({ item }) => {
     };
 
 
-    // const obj2 = [
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    //     {
-    //         image: img2,
-    //         name: "Jugo",
-    //         price: "2.00",
-    //         code: "0124",
-    //     },
-    // ];
-    // const checkboxs = [
-    //     {
-    //         menu: "Cocina 1",
-    //     },
-    //     {
-    //         menu: "Cocina 2",
-    //     },
-    //     {
-    //         menu: "Barra 1",
-    //     },
-    //     {
-    //         menu: "Barra 2",
-    //     },
-    // ];
-
-
-
-
-    // const handleParentChangeMenu = (parentId) => {
-    //     const newCheckedParents = {
-    //         ...checkedParents,
-    //         [parentId]: !checkedParents[parentId]
-    //     };
-    //     setCheckedParents(newCheckedParents);
-    //     setFilteredItemsMenu(
-    //         filterItems(searchTermMenu, newCheckedParents, childCheck)
-    //     );
-    // };
-
-    // const handleChildCheckboxChange = (parentKey, childKey) => {
-    //     // setCheckboxes((prevState) => ({
-    //     //     ...prevState,
-    //     //     [parentKey]: {
-    //     //         ...prevState[parentKey],
-    //     //         children: {
-    //     //             ...prevState[parentKey].children,
-    //     //             [childKey]: !prevState[parentKey].children[childKey],
-    //     //         },
-    //     //     },
-    //     // }));
-    // };
-
-    // const filterItems = (searchTerm, checkedParents, childCheck) => {
-    //     return obj1.filter((item) => {
-    //         const matchesSearch = item.name
-    //             .toLowerCase()
-    //             .includes(searchTerm.toLowerCase());
-    //         const matchesCheckbox =
-    //             checkedParents[item.family_id] ||
-    //             (childCheck &&
-    //                 Object.keys(childCheck).some(
-    //                     (key) =>
-    //                         Array.isArray(childCheck[key]) &&
-    //                         childCheck[key].some(
-    //                             (child) =>
-    //                                 child.id === item.child_id &&
-    //                                 child.family_name === item.family.name
-    //                         )
-    //                 ));
-
-    //         return (
-    //             matchesSearch &&
-    //             (Object.keys(checkedParents).every((key) => !checkedParents[key]) ||
-    //                 matchesCheckbox)
-    //         );
-    //     });
-    // };
-
-    // const handleSearchMenu = (event) => {
-    //     const term = event.target.value.toLowerCase();
-    //     setSearchTermMenu(term);
-    //     setFilteredItemsMenu(filterItems(term, checkedParents, childCheck));
-    // };
-
-    // // ------End  product filter section ---------
-
-
-
-    // const handleSaveChanges = async () => {
-    //     handleShow20();
-    // };
-
-
-
-    //    -------- Edite order Qyt ----
-    // =============end note==========
-
-
-
-    // const obj1 = {
-    //     sector: "4",
-    //     mesa: "2",
-    //     name: "Damian Gonzales",
-    //     Paltform: "5",
-    // }
-
-    // const [data2, setData2] = useState([
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Anulado"
-
-    //     },
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Recibido"
-
-
-    //     },
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Preparado"
-
-
-    //     },
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Entregado"
-    //     },
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Finalizado"
-    //     },
-    //     {
-    //         Date: "20/03/2024",
-    //         Hour: "08:00 am",
-    //         User: 'Cocina',
-    //         state: "Preparado"
-    //     },
-
-
-
-    //     // More orders...
-    // ]);
-
-    // const [product, setProduct] = useState([
-    //     {
-    //         id: 1,
-    //         image: pic1,
-    //         name: 'Pollo frito crujiente',
-    //         description: 'Las especialidad de la casa',
-    //         price: '$10.00',
-    //         quantity: 1,
-    //         note: '+ Agregar nota'
-    //     },
-    //     {
-    //         id: 2,
-    //         image: pic2,
-    //         name: 'Guitig',
-    //         description: 'con gas',
-    //         price: '$2.00',
-    //         quantity: 2,
-    //         note: 'Nota: Al clima'
-    //     },
-    //     {
-    //         id: 3,
-    //         image: pic3,
-    //         name: 'Gelatina',
-    //         description: 'con gas',
-    //         price: '$2.00',
-    //         quantity: 2,
-    //         note: 'Nota :Con cerezas a los lados'
-    //     }
-    // ]);
-
-
-    // const [editingNote, setEditingNote] = useState(null);
-    // const [noteValue, setNoteValue] = useState('');
-
-    // const handleEditNoteClick = (index, note) => {
-    //     setEditingNote(index);
-    //     setNoteValue(note.startsWith('Nota: ') ? note.substring(6) : note);
-    // };
-
-    // const handleNoteChange = (e) => {
-    //     setNoteValue(e.target.value);
-    // };
-
-    // const handleNoteKeyDown = (index, e) => {
-    //     if (e.key === 'Enter') {
-    //         const updatedProduct = [...product];
-    //         updatedProduct[index].note = `Nota: ${noteValue}`;
-    //         setProduct(updatedProduct);
-    //         setEditingNote(null);
-    //     }
-    // };
-
-
-    // const initialCounts = product.reduce((acc, item) => {
-    //     acc[item.id] = item.quantity;
-    //     return acc;
-    // }, {});
-
-    // const [counts, setCounts] = useState(item ? { [item.id]: 0 } : initialCounts)
-    // const increment = (id) => {
-    //     setCounts(prevCounts => ({
-    //         ...prevCounts,
-    //         [id]: prevCounts[id] + 1
-    //     }));
-    // };
-
-    // const decrement = (id) => {
-    //     setCounts(prevCounts => ({
-    //         ...prevCounts,
-    //         [id]: prevCounts[id] > 0 ? prevCounts[id] - 1 : 0
-    //     }));
-    // };
-
-    // const deleteProduct = (id) => {
-    //     setProduct(prevProducts => prevProducts.filter(product => product.id !== id));
-    // };
-
-
-    // const [date, setdate] = useState("17/03/2024")
-    // const [time, settime] = useState("08:00 am")
-    // const [order, setorder] = useState("01234")
-    // const [order1, setorder1] = useState("3")
-
-
-
-
-    // Add producttion
-    // const [show1Prod, setShow1Prod] = useState(false);
-    // const handleClose1Prod = () => setShow1Prod(false);
-    // const handleShow1Prod = () => setShow1Prod(true);
-
-    // create production center
-    // const [showCreate, setShowCreate] = useState(false);
-    // const handleCloseCreate = () => setShowCreate(false);
-    // const handleShowCreate = () => setShowCreate(true);
-
-    // create production success
-    // const [showCreSucProduction, setShowCreSucProduction] = useState(false);
-    // const handleCloseCreSucProduction = () => setShowCreSucProduction(false);
-    // const handleShowCreSucProduction = () => setShowCreSucProduction(true);
-
-    //  // Add producttion
-    //  const [show1Prod, setShow1Prod] = useState(false);
-    //  const handleClose1Prod = () => setShow1Prod(false);
-    //  const handleShow1Prod = () => setShow1Prod(true);
-
-    // Add product success
-    // const [show1AddSuc, setShow1AddSuc] = useState(false);
-    // const handleClose1AddSuc = () => setShow1AddSuc(false);
-    // const handleShow1AddSuc = () => {
-    //     setShow1AddSuc(true)
-    //     setTimeout(() => {
-    //         setShow1AddSuc(false)
-    //     }, 2000);
-    // };
-
-    // file upload function
-    // const [selectedFile, setSelectedFile] = useState(null);
-    // const [errorMessage, setErrorMessage] = useState(null);
-    // const fileInputRef = useRef(null);
-
-    // const handleFileChange = (event) => {
-    //     const file = event.target.files[0];
-
-    //     if (file) {
-    //         const img = new Image();
-    //         img.onload = () => {
-    //             if (img.width > 800 || img.height > 400) {
-    //                 setErrorMessage("Image dimensions should be at most 800x400 pixels");
-    //                 setSelectedFile(null);
-    //             } else {
-    //                 setErrorMessage(null);
-    //                 setSelectedFile(file);
-    //             }
-    //         };
-    //         img.src = URL.createObjectURL(file);
-    //     }
-    // };
-
-    // const handleDivClick = () => {
-    //     fileInputRef.current.click();
-    // };
-    // const [checkboxes, setCheckboxes] = useState({
-    //     Bebidas: {
-    //         isChecked: false,
-    //         children: {
-    //             Agua: false,
-    //             Colas: false,
-    //             Cervezas: false,
-    //         },
-    //     },
-    //     Snacks: {
-    //         isChecked: false,
-    //         children: {
-    //             Op1: false,
-    //             Op2: false,
-    //         },
-    //     },
-    //     Dulces: {
-    //         isChecked: false,
-    //         children: {
-    //             Op1: false,
-    //             Op2: false,
-    //         },
-    //     },
-    // });
-
-    // const handleParentCheckboxChange = (parentKey) => {
-    //     setCheckboxes((prevState) => {
-    //         const newParentCheckedState = !prevState[parentKey].isChecked;
-    //         const newChildrenState = Object.keys(
-    //             prevState[parentKey].children
-    //         ).reduce((acc, key) => {
-    //             acc[key] = newParentCheckedState;
-    //             return acc;
-    //         }, {});
-
-    //         return {
-    //             ...prevState,
-    //             [parentKey]: {
-    //                 isChecked: newParentCheckedState,
-    //                 children: newChildrenState,
-    //             },
-    //         };
-    //     });
-    // };
 
 
     return (

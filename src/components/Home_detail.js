@@ -20,6 +20,7 @@ function Home_detail() {
     const API = process.env.REACT_APP_IMAGE_URL;
     const token = sessionStorage.getItem("token");
     const [isProcessing, setIsProcessing] = useState(false);
+    const admin_id = sessionStorage.getItem("admin_id");
     // const {id} = useParams();
     // console.log(id);
 
@@ -183,7 +184,7 @@ function Home_detail() {
     const getAllOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getAll`, {
+            const response = await axios.post(`${apiUrl}/order/getAll`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -208,7 +209,7 @@ function Home_detail() {
 
     const fetchCredit = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/order/getCredit`, {
+            const response = await axios.post(`${apiUrl}/order/getCredit`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

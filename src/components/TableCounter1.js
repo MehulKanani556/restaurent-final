@@ -12,6 +12,8 @@ import { MdOutlineAccessTimeFilled, MdRoomService } from "react-icons/md";
 import Header from "./Header";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
+import useAudioManager from "./audioManager";
+import { enqueueSnackbar } from "notistack";
 
 const TableCounter1 = () => {
   const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
@@ -20,7 +22,7 @@ const TableCounter1 = () => {
   const [token] = useState(sessionStorage.getItem("token"));
   const [role] = useState(sessionStorage.getItem("role"));
   const userId = sessionStorage.getItem("userId");
-  const [isLoading, setIsLoading] = useState(false);
+  const admin_id = sessionStorage.getItem("admin_id");
   const [isProcessing, setIsProcessing] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,7 +32,8 @@ const TableCounter1 = () => {
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
   const tableStatus = queryParams.get("status");
-  console.log("tbale status", tableStatus)
+  const { playNotificationSound } = useAudioManager();
+
 
 
   const [tId, setTId] = useState(id);
@@ -391,7 +394,11 @@ const TableCounter1 = () => {
   const fetchFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`);
+      const response = await axios.get(`${apiUrl}/family/getFamily`,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const todoCategory = { id: "todo", name: "Todo" };
       setParentCheck([todoCategory, ...response.data]);
       setSelectedCategory(todoCategory);
@@ -408,7 +415,11 @@ const TableCounter1 = () => {
   const fetchSubFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`);
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setChildCheck(response.data);
 
       // Set initial subcategories for "Drinks"
@@ -429,7 +440,11 @@ const TableCounter1 = () => {
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`);
+      const response = await axios.get(`${apiUrl}/item/getAll`,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -494,11 +509,13 @@ const TableCounter1 = () => {
     const orderDetails = cartItems.map((item) => ({
       item_id: item.id,
       quantity: item.count,
-      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : ""
+      notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : "",
+      admin_id: admin_id
     }));
 
     const orderData = {
       order_details: orderDetails,
+      admin_id: admin_id,
       order_master: {
         order_type: "local",
         payment_type: "debit",
@@ -510,7 +527,7 @@ const TableCounter1 = () => {
         customer_name: customerName,
         person: person,
         reason: "",
-        transaction_code: false
+        transaction_code: false,
       }
     };
 
@@ -533,7 +550,8 @@ const TableCounter1 = () => {
           `${apiUrl}/table/updateStatus`,
           {
             table_id: parseInt(tId),
-            status: "busy" // Set the status you need
+            status: "busy", // Set the status you need
+            admin_id: admin_id
           },
           {
             headers: {
@@ -559,6 +577,8 @@ const TableCounter1 = () => {
  
     } catch (err) {
       console.error("Error creating order:", err);
+      enqueueSnackbar(err?.response?.data?.message, { variant: 'error' })
+
     } finally {
       setIsProcessing(false);
     }
