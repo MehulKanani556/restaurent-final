@@ -735,20 +735,13 @@ export default function Home_Pedidos_paymet() {
                                 </div> */}
                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
 
-                                  {v.notes === null ? (
+                                {v.notes === null ? (
                                     <div key={v.id}>
-                                      {visibleInputId !== v.id && (
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                          <span
-                                            className='j-nota-blue ms-4 text-decoration-underline'
-                                            onClick={() => toggleInput(v.id)}
-                                          >
-                                            + Nota
-                                          </span>
+                                      {visibleInputId !== v.id ? (
+                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
+                                          <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
                                         </div>
-                                      )}
-
-                                      {visibleInputId === v.id && (
+                                      ) : (
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                           <span className='j-nota-blue ms-4'>Nota:</span>
                                           <input
@@ -762,10 +755,26 @@ export default function Home_Pedidos_paymet() {
                                       )}
                                     </div>
                                   ) : (
-                                    <div className='a_home_addnote ms-4' >
-                                      {v.notes}
+                                    < div key={v.id}>
+                                  {visibleInputId != v.id ? (
+                                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
+                                      <span className='j-nota-blue ms-4'>{v.notes}</span>
+                                    </div>
+                                  ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                      <span className='j-nota-blue ms-4'>Nota:</span>
+                                      <input
+                                        type="text"
+                                        className='j-note-input'
+                                        value={noteValues}
+                                        onChange={(e) => handleNoteChange(v.id, e)}
+                                        onKeyDown={handleNoteKeyDown(v.id)}
+                                      />
                                     </div>
                                   )}
+                                </div>
+                                )}
+
 
 
                                   {/* {editingNote === index ? (

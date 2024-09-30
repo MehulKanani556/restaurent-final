@@ -44,7 +44,6 @@ const Home_pedidos_payment_edit = ({ item }) => {
             navigate(`/home_Pedidos/paymet/${id}`, { replace: true });
         }, 2000);
     };
-    console.log(state);
 
 
 
@@ -120,7 +119,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
             handleOrderDetails();
         }
         if (orderData?.user_id) {
-            console.log(orderData?.user_id);
+            // console.log(orderData?.user_id);
             getUser();
         }
     }, [orderData, items, show1Prod, deleteProductId]);
@@ -133,7 +132,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getOrder = async () => {
         try {
-            const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, {admin_id: admin_id}, {
+            const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -149,9 +148,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getItems = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-                Authorization: `Bearer ${token}`
-              }});
+            const response = await axios.get(`${apiUrl}/item/getAll`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setItems(response.data.items);
             setObj1(response.data.items);
             setFilteredItemsMenu(response.data.items);
@@ -207,7 +208,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response.data);
+            // console.log(response.data);
             setUser(response.data);
         } catch (error) {
             console.error(
@@ -225,7 +226,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response.data);
+            // console.log(response.data);
             setRoles(response.data);
         } catch (error) {
             console.error(
@@ -246,9 +247,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getFamily = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
-                Authorization: `Bearer ${token}`
-              }});
+            const response = await axios.get(`${apiUrl}/family/getFamily`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setParentCheck(response.data);
         } catch (error) {
             console.error(
@@ -259,9 +262,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
     }
     const getSubFamily = async () => {
         try {
-            const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
-                Authorization: `Bearer ${token}`
-              }});
+            const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setChildCheck(response.data);
         } catch (error) {
             console.error(
@@ -361,7 +366,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                 quantity: 1,
             }
             setSelectedItemsMenu((prevArray) => [...prevArray, obj]);
-            console.log(selectedItemsMenu);
+            // console.log(selectedItemsMenu);
             setSelectedItemsCount(selectedItemsCount + 1);
             // setItemId((prevArray) => [...prevArray, item.id]);
 
@@ -428,7 +433,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const handleNoteKeyDown = (id) => async (e) => {
         if (e.key === 'Enter') {
-            console.log(id);
+            // console.log(id);
             try {
                 const response = await axios.post(
                     `${apiUrl}/order/addNote/${id}`,
@@ -439,7 +444,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                         },
                     }
                 );
-                console.log("Note added successfully:", response.data);
+                // console.log("Note added successfully:", response.data);
 
                 // setSavedNote(noteValues);
                 setNoteValues('');
@@ -464,7 +469,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     useEffect(() => {
 
-        console.log(orderDetails);
+        // console.log(orderDetails);
         if (orderDetails) {
             const initialCounts = {};
             orderDetails.forEach(item => {
@@ -550,7 +555,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
         }
 
         const index = orderDetails.findIndex((item) => item.id === proid);
-        console.log(index);
+        // console.log(index);
 
         if (index !== -1) {
             if (orderDetails[index].quantity > 1) {
@@ -746,7 +751,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                             <div className='a_deli_infolist p-4'>
                                                 {
                                                     orderDetails.map((item, index) => {
-                                                        console.log(item)
+                                                        // console.log(item)
                                                         return (
                                                             <div key={item.id}>
                                                                 <div className="py-3 ">
@@ -896,10 +901,12 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
                             <Tab eventKey="profile" title="Detalles" className='b_border ' style={{ marginTop: "2px" }}>
                                 <div className='b-bg-color1'>
-                                    <div className='text-white ms-4 pt-4' >
-                                        <h5 className='bj-delivery-text-15'>Nota anulación</h5>
-                                        <textarea type="text" className="form-control bg-gray border-0 mt-4 py-2" id="inputPassword2" placeholder={orderData?.reason != null ? orderData?.reason : "Estaba sin sal"} style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled></textarea>
-                                    </div>
+                                    {orderData?.reason &&
+                                        <div className='text-white ms-4 pt-4' >
+                                            <h5 className='bj-delivery-text-15'>Nota anulación</h5>
+                                            <textarea type="text" className="form-control bg-gray border-0 mt-4 py-2" id="inputPassword2" placeholder={orderData?.reason != null ? orderData?.reason : "Estaba sin sal"} style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled></textarea>
+                                        </div>
+                                    }
 
                                     <div className='text-white ms-4 pt-4' >
                                         <h5 className='bj-delivery-text-15'>Información pedido</h5>

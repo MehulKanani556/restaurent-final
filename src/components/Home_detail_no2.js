@@ -241,10 +241,22 @@ function Home_detail_no2() {
                                 <label htmlFor="sCode">Código origen</label>
                                 <input type="text" className="form-control bg-gray mt-2 border-0 py-3" value={creditNote?.order_id} id="sCode" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} readOnly />
                             </div>
-                            <div className='w-100 b_search text-white mb-3'>
-                                <label htmlFor="destination">Destino</label>
-                                <input type="text" className="form-control bg-gray border-0 py-3 mt-2" value={creditNote?.destination} id="destination" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} readOnly />
-                            </div>
+                            {creditNote?.destination &&
+                                <div className='w-100 b_search text-white mb-3'>
+                                    <label htmlFor="destination">Destino</label>
+                                    <input type="text" className="form-control bg-gray border-0 py-3 mt-2" value={creditNote?.destination} id="destination" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} readOnly />
+                                </div>
+                            }
+                            {creditNote?.destination == null &&
+                                <div className='w-100 b_search text-white mb-3'>
+                                    <label htmlFor="destination">Tipos de credito</label>
+                                    <input type="text" className="form-control bg-gray border-0 py-3 mt-2" value={
+                                        creditNote?.credit_method == "cash" ? "Efectivo" :
+                                            creditNote?.credit_method == "debit" ? "Tarjeta de debito" :
+                                                creditNote?.credit_method == "credit" ? "Tarjeta de credito" : ""
+                                    } id="destination" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} readOnly />
+                                </div>
+                            }
                         </div>
                     </div>
 

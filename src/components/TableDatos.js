@@ -310,14 +310,16 @@ const TableDatos = () => {
     }
 
     // Name validation
-    if (data.receiptType !== "4") {
+    // if (data.receiptType != "4") {
+    if (data.receiptType != "3") {
       if (!data.firstname || data.firstname.trim() === "") {
         errors.fname = "Se requiere el primer nombre";
       }
     }
 
     // Business name validation for receipt type 4
-    if (data.receiptType === "4") {
+    // if (data.receiptType === "4") {
+    if (data.receiptType === "3") {
       if (!data.business_name || data.business_name.trim() === "") {
         errors.business_name = "Se requiere el nombre de la empresa";
       }
@@ -1240,7 +1242,7 @@ const TableDatos = () => {
 
                         className="btn w-100 j-btn-primary text-white j-tbl-btn-font-1"
                       >
-                        Cobrar
+                         Continuar
                       </div>
                     </div>
                   </div>

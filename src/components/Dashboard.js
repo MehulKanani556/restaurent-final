@@ -42,6 +42,8 @@ import Header from "./Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "./Loader";
+import useSocket from "../hooks/useSocket";
+import * as XLSX from "xlsx-js-style";
 // import ApexCharts from "apexcharts";
 // import ApexCharts from 'apexcharts';
 
@@ -51,8 +53,6 @@ const Dashboard = () => {
   );
 
   // chart
-
- 
 
   const delivery = {
 
@@ -117,8 +117,13 @@ const Dashboard = () => {
   const API = process.env.REACT_APP_IMAGE_URL;
   const token = sessionStorage.getItem("token");
   const admin_id = sessionStorage.getItem("admin_id");
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(sessionStorage.getItem('userId'));
+  const name = sessionStorage.getItem('name');
+  const email = sessionStorage.getItem('email')
+  const echo = useSocket();
   // month select
   const [cancelOrderDay, setCancelOrderDay] = useState('month');
   const [statisticalData, setStatisticalData] = useState('month');
@@ -144,13 +149,74 @@ const Dashboard = () => {
   const [payment, setPayement] = useState([]);
   const [loadingPayMethodData, setLoadingPayMethodData] = useState(false); // Add loading state
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [allUser, setAllUser] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [groupChats, setgroupChats] = useState([]);
 
 
   const [deliveryData, setDeliveryData] = useState({});
 
   const [boxName, setBoxName] = useState([]);
 
- 
+  useEffect(() => {
+    if (userId) {
+      // console.log(userId);
+      setupEchoListeners(userId);
+      updateActiveStatus(userId);
+
+    }
+  }, [userId])
+
+  const updateActiveStatus = async (id) => {
+    try {
+      const responce = await axios.post(
+        `${apiUrl}/update-user/${id}`,
+        {
+          activeStatus: true,
+          name: name,
+          email: email
+
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      console.log(responce);
+      setupEchoListeners(userId);
+    } catch (error) {
+      console.log("not updating user", + error.message);
+
+    }
+  }
+
+  const setupEchoListeners = (userId) => { // Accept userId as a parameter
+    if (echo) {
+      echo.channel(`online-users`)
+        .listen('Chat', () => {
+          console.log(`User ${userId} is online`);
+          fetchAllUsers();
+        });
+      console.log("Socket connection established for user online");
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/chat/user`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAllUser(response.data.users);
+      setGroups(response.data.groups);
+      setgroupChats(response.data.groupChats);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      // setIsProcessing(false);
+    }
+  };
+
 
   // api
   // useEffect(() => {
@@ -167,51 +233,51 @@ const Dashboard = () => {
   //   fetchDelivery();
   //   fetchBox();
   // }, [token, deliveryDay, selectDeliveryMonth, statisticalData, paymentsData, selectedHastaMonth, selectedRevMonth, revData, popData, selectPopMonth, selectBoxMonth, boxDay, cancelOrderDay, seleceCancelMonth])
-// api
-useEffect(() => {
-  setLoading(true);
-  fetchData();
-}, [token]);
+  // api
+  useEffect(() => {
+    setLoading(true);
+    fetchData();
+  }, [token]);
 
-useEffect(() => {
-  fetchStatical();
-}, [statisticalData]);
+  useEffect(() => {
+    fetchStatical();
+  }, [statisticalData]);
 
 
 
-useEffect(() => {
-  fetchPaymentMethos();
-  fetchPayment();
+  useEffect(() => {
+    fetchPaymentMethos();
+    fetchPayment();
 
-}, [selectedHastaMonth,paymentsData]);
+  }, [selectedHastaMonth, paymentsData]);
 
-useEffect(() => {
-  fetchTotalRevenue();
-}, [revData,selectedRevMonth]);
+  useEffect(() => {
+    fetchTotalRevenue();
+  }, [revData, selectedRevMonth]);
 
-useEffect(() => {
-  fetchSummry();
-}, [token]);
+  useEffect(() => {
+    fetchSummry();
+  }, [token]);
 
-useEffect(() => {
-  fetchPopular();
-}, [selectPopMonth,popData]);
+  useEffect(() => {
+    fetchPopular();
+  }, [selectPopMonth, popData]);
 
-useEffect(() => {
-  fetchBoxEntry();
-}, [selectBoxMonth,boxDay]);
+  useEffect(() => {
+    fetchBoxEntry();
+  }, [selectBoxMonth, boxDay]);
 
-useEffect(() => {
-  fetchCancelOrder();
-}, [cancelOrderDay, seleceCancelMonth]);
+  useEffect(() => {
+    fetchCancelOrder();
+  }, [cancelOrderDay, seleceCancelMonth]);
 
-useEffect(() => {
-  fetchDelivery();
-}, [deliveryDay, selectDeliveryMonth]);
+  useEffect(() => {
+    fetchDelivery();
+  }, [deliveryDay, selectDeliveryMonth]);
 
-useEffect(() => {
-  fetchBox();
-}, []);
+  useEffect(() => {
+    fetchBox();
+  }, []);
 
   // fetch whole dashboard
   const fetchData = async () => {
@@ -274,7 +340,7 @@ useEffect(() => {
 
       const response = await axios.post(
         `${apiUrl}/getStatisticalData`,
-        {admin_id,durationData},
+        {durationData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -294,27 +360,33 @@ useEffect(() => {
   // fetch Payment data
   const fetchPaymentMethos = async () => {
     setLoadingPayMethodData(true);
+
+    
     try {
       let durationData = {};
-
-      if (paymentsData === 'day') {
-        durationData = {
-          duration: 'day',
-          day: new Date().toISOString().split('T')[0]
-        };
-      } else if (paymentsData === 'week') {
-        durationData = {
-          duration: 'week',
-          week: '1'  // Assuming '1' represents the current week
-        };
-      } else if (paymentsData === 'month') {
-        durationData = {
-          duration: 'month',
-          month: selectedHastaMonth  // Current month (1-12)
-        };
-      } else {
+    
+      if(selectedHastaMonth == new Date().getMonth() + 1){
+        if (paymentsData === 'day') {
+          durationData = {
+            duration: 'day',
+            day: new Date().toISOString().split('T')[0]
+          };
+        } else if (paymentsData === 'week') {
+          durationData = {
+            duration: 'week',
+            week: '1'  // Assuming '1' represents the current week
+          };
+        } else if (paymentsData === 'month') {
+          durationData = {
+            duration: 'month',
+            month: selectedHastaMonth  // Current month (1-12)
+          };
+        } 
+      }else{
 
       }
+
+      
 
       const response = await axios.post(
         `${apiUrl}/getPaymentMethods`,
@@ -335,6 +407,9 @@ useEffect(() => {
       // Handle error appropriately
     }
   };
+
+
+
   // fetch Total revenue data
   const fetchTotalRevenue = async () => {
     try {
@@ -462,7 +537,7 @@ useEffect(() => {
           month: selectBoxMonth  // Current month (1-12)
         };
       }
-      const response = await axios.post(`${apiUrl}/getBoxEntry`, {admin_id,durationData}, {
+      const response = await axios.post(`${apiUrl}/getBoxEntry`,  {admin_id,durationData}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -557,7 +632,7 @@ useEffect(() => {
     try {
       const response = await axios.post(
         `${apiUrl}/get-payments`,
-        {admin_id},
+      {admin_id},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -689,6 +764,441 @@ useEffect(() => {
   // Use the transformed data in the chart
   const chartData = transformOrderDetails(totalRevenue.order_details);
 
+  console.log(chartData);
+
+
+
+
+  const paymentMethodsReport = async () => {
+    // setIsProcessing(true);
+    try {
+      const infomation = {
+        Efectivo: payMethodData?.cash,
+        Tarjeta_de_debito: payMethodData?.debit,
+        Tarjeta_de_crédito: payMethodData?.credit,
+        Transferencias: payMethodData?.transfer
+      };
+
+      const formattedData = Object.entries(
+        infomation
+      ).map(([key, value]) => ({
+        Campo: key == "Tarjeta_de_debito" ? "Tarjeta de debito" :
+          key == "Tarjeta_de_crédito" ? "Tarjeta de crédito" : key,
+        Valor: value
+      }));
+
+
+      // Create a worksheet
+      const wsi = XLSX.utils.json_to_sheet(formattedData, { origin: "A2" });
+
+      // Add a heading "Información"
+      // Merge cells for the heading
+      XLSX.utils.sheet_add_aoa(wsi, [["Métodos pago"]], { origin: "A1" });
+      wsi["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }];
+
+      // Apply styles to the heading
+      wsi["A1"].s = {
+        font: { name: "Aptos Narrow", bold: true, sz: 16 },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+
+      // Set row height for the heading
+      if (!wsi["!rows"]) wsi["!rows"] = [];
+      wsi["!rows"][0] = { hpt: 30 };
+
+      // Auto-size columns
+      const colWidthsa = [{ wch: 20 }, { wch: 30 }]; // Set widths for "Campo" and "Valor"
+      wsi["!cols"] = colWidthsa;
+
+      // Set row height for header
+      wsi["!rows"] = [{ hpt: 25 }]; // Set height of first row to 25
+
+
+      // Create a workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, wsi, "Métodos pago");
+
+      XLSX.writeFile(
+        wb,
+        `Métodos pago ${paymentsData}-${selectedHastaMonth == "1" ? "Enero" :
+          selectedHastaMonth == "2" ? "Febrero" :
+            selectedHastaMonth == "3" ? "Marzo" :
+              selectedHastaMonth == "4" ? "Abril" :
+                selectedHastaMonth == "5" ? "Mayo" :
+                  selectedHastaMonth == "6" ? "Junio" :
+                    selectedHastaMonth == "7" ? "Julio" :
+                      selectedHastaMonth == "8" ? "Agosto" :
+                        selectedHastaMonth == "9" ? "Septiembre" :
+                          selectedHastaMonth == "10" ? "Octubre" :
+                            selectedHastaMonth == "11" ? "Noviembre" :
+                              selectedHastaMonth == "12" ? "Diciembre" : " "
+        }.xlsx`
+      );
+      // console.log(selectedHastaMonth, paymentsData);
+
+    } catch (error) {
+      console.error("Error generating report:", error);
+
+    }
+  };
+
+  const totalrevenueReport = async () => {
+
+    const historia = chartData
+      .map((table, index) => {
+        if (index > 0) {
+          return {
+            Fecha: table.date,
+            totales: table.quantity,
+            cantidad: table.total,
+          };
+        }
+        return null; // Return null for index 0
+      })
+      .filter(item => item !== null);
+
+    const ws = XLSX.utils.json_to_sheet(historia.length > 0 ? historia : [{ Fecha: "", totales: "", cantidad: "" }], { origin: "A2" });
+
+    // Add a heading "Reporte de Entrega"
+    XLSX.utils.sheet_add_aoa(ws, [["Ingresos totales"]], { origin: "A1" });
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }]; // Merge cells for the heading
+
+    // Add column names only if there is data
+    if (historia.length > 0) {
+      const columnNames = ["Fecha", " totales", "cantidad"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" })
+    } else {
+      // Add column names even if there's no data
+      const columnNames = ["Fecha", " totales", "cantidad"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" });
+    }
+
+    // Apply styles to the heading
+    ws["A1"].s = {
+      font: { name: "Aptos Narrow", bold: true, sz: 16 },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Set row height for the heading
+    if (!ws["!rows"]) ws["!rows"] = [];
+    ws["!rows"][0] = { hpt: 30 };
+    ws["!rows"][1] = { hpt: 25 }; // Set height for column names
+
+    // Auto-size columns
+    const colWidths = [{ wch: 15 }, { wch: 20 }];
+    ws["!cols"] = colWidths;
+
+    // Add sorting functionality
+    if (historia.length > 0) {
+      ws['!autofilter'] = { ref: `A2:B${historia.length}` }; // Enable autofilter for the range
+    }
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ingresos totales");
+
+    XLSX.writeFile(
+      wb,
+      `Reporte de Ingresos totales ${revData}-${selectedRevMonth == "1" ? "Enero" :
+        selectedRevMonth == "2" ? "Febrero" :
+          selectedRevMonth == "3" ? "Marzo" :
+            selectedRevMonth == "4" ? "Abril" :
+              selectedRevMonth == "5" ? "Mayo" :
+                selectedRevMonth == "6" ? "Junio" :
+                  selectedRevMonth == "7" ? "Julio" :
+                    selectedRevMonth == "8" ? "Agosto" :
+                      selectedRevMonth == "9" ? "Septiembre" :
+                        selectedRevMonth == "10" ? "Octubre" :
+                          selectedRevMonth == "11" ? "Noviembre" :
+                            selectedRevMonth == "12" ? "Diciembre" : " "
+      }.xlsx`
+    );
+  }
+
+  const summaryStatesReport = async () => {
+    // setIsProcessing(true);
+    try {
+      const infomation = {
+        Recibido: summaryState?.received,
+        Preparado: summaryState?.prepared,
+       Finalizado: summaryState?.finalized,
+       Entregado: summaryState?.delivered,
+      };
+      const formattedData = Object.entries(
+        infomation
+      ).map(([key, value]) => ({
+        Campo: key,
+        Valor: value
+      }));
+
+
+      // Create a worksheet
+      const wsi = XLSX.utils.json_to_sheet(formattedData, { origin: "A2" });
+
+      // Add a heading "Información"
+      // Merge cells for the heading
+      XLSX.utils.sheet_add_aoa(wsi, [["Resumen estados"]], { origin: "A1" });
+      wsi["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }];
+
+      // Apply styles to the heading
+      wsi["A1"].s = {
+        font: { name: "Aptos Narrow", bold: true, sz: 16 },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+
+      // Set row height for the heading
+      if (!wsi["!rows"]) wsi["!rows"] = [];
+      wsi["!rows"][0] = { hpt: 30 };
+
+      // Auto-size columns
+      const colWidthsa = [{ wch: 20 }, { wch: 30 }]; // Set widths for "Campo" and "Valor"
+      wsi["!cols"] = colWidthsa;
+
+      // Set row height for header
+      wsi["!rows"] = [{ hpt: 25 }]; // Set height of first row to 25
+
+
+      // Create a workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, wsi, "Resumen estados");
+
+      XLSX.writeFile(
+        wb,
+        `Reporte de Resumen estados.xlsx`
+      );
+      // console.log(selectedHastaMonth, paymentsData);
+
+    } catch (error) {
+      console.error("Error generating report:", error);
+
+    }
+  };
+  // console.log(summaryState);
+
+
+  const PopularReport = async () => {
+
+    const historia = popularData
+      .map((table, index) => {
+
+        return {
+          // Imagen: `${API}/images/${table.image}`,
+          Nombre: table.name,
+          Padido: table.order_count,
+          cantidad: `$${table.amount}`
+        }
+      })
+      .filter(item => item !== null);
+
+    const ws = XLSX.utils.json_to_sheet(historia.length > 0 ? historia : [{ Nombre: "", Padido: "", cantidad: "" }], { origin: "A2" });
+
+    // Add a heading "Reporte de Entrega"
+    XLSX.utils.sheet_add_aoa(ws, [["Ingresos totales"]], { origin: "A1" });
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }]; // Merge cells for the heading
+
+    // Add column names only if there is data
+    if (historia.length > 0) {
+      const columnNames = ["Nombre", " Padido", "cantidad"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" })
+    } else {
+      // Add column names even if there's no data
+      const columnNames = ["Nombre", " Padido", "cantidad"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" });
+    }
+
+    // Apply styles to the heading
+    ws["A1"].s = {
+      font: { name: "Aptos Narrow", bold: true, sz: 16 },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Set row height for the heading
+    if (!ws["!rows"]) ws["!rows"] = [];
+    ws["!rows"][0] = { hpt: 30 };
+    ws["!rows"][1] = { hpt: 25 }; // Set height for column names
+
+    // Auto-size columns
+    const colWidths = [{ wch: 15 }, { wch: 10 }, { wch: 10 }];
+    ws["!cols"] = colWidths;
+
+    // Add sorting functionality
+    if (historia.length > 0) {
+      ws['!autofilter'] = { ref: `A2:C${historia.length}` }; // Enable autofilter for the range
+    }
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ingresos totales");
+
+    XLSX.writeFile(
+      wb,
+      `Reporte de Ingresos totales ${popData}-${selectPopMonth == "1" ? "Enero" :
+        selectPopMonth == "2" ? "Febrero" :
+          selectPopMonth == "3" ? "Marzo" :
+            selectPopMonth == "4" ? "Abril" :
+              selectPopMonth == "5" ? "Mayo" :
+                selectPopMonth == "6" ? "Junio" :
+                  selectPopMonth == "7" ? "Julio" :
+                    selectPopMonth == "8" ? "Agosto" :
+                      selectPopMonth == "9" ? "Septiembre" :
+                        selectPopMonth == "10" ? "Octubre" :
+                          selectPopMonth == "11" ? "Noviembre" :
+                            selectPopMonth == "12" ? "Diciembre" : " "
+      }.xlsx`
+    );
+  }
+
+  const boxEntryReport = () => {
+    const historia = boxDetails
+      .map((table, index) => {
+
+        const totalAmount = table.logs.reduce((sum, log) => {
+          const closeAmount = parseFloat(log.close_amount);
+          const openAmount = parseFloat(log.open_amount) || 0;
+          return closeAmount ? sum + (closeAmount - openAmount) : sum;
+        }, 0);
+
+
+        return {
+          caja: table.box_name,
+          CantidadTotal: (totalAmount).toFixed(0),
+        };
+      })
+      .filter(item => item !== null);
+
+    const ws = XLSX.utils.json_to_sheet(historia.length > 0 ? historia : [{ caja: "", CantidadTotal: "" }], { origin: "A2" });
+
+    // Add a heading "Reporte de Entrega"
+    XLSX.utils.sheet_add_aoa(ws, [["Ingreso de cajas"]], { origin: "A1" });
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }]; // Merge cells for the heading
+
+    // Add column names only if there is data
+    if (historia.length > 0) {
+      const columnNames = ["caja", " CantidadTotal"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" })
+    } else {
+      // Add column names even if there's no data
+      const columnNames = ["caja", " CantidadTotal"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" });
+    }
+
+    // Apply styles to the heading
+    ws["A1"].s = {
+      font: { name: "Aptos Narrow", bold: true, sz: 16 },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Set row height for the heading
+    if (!ws["!rows"]) ws["!rows"] = [];
+    ws["!rows"][0] = { hpt: 30 };
+    ws["!rows"][1] = { hpt: 25 }; // Set height for column names
+
+    // Auto-size columns
+    const colWidths = [{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+    ws["!cols"] = colWidths;
+
+    // Add sorting functionality
+    if (historia.length > 0) {
+      ws['!autofilter'] = { ref: `A2:B${historia.length}` }; // Enable autofilter for the range
+    }
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Ingreso de cajas");
+
+    XLSX.writeFile(
+      wb,
+      `Reporte de Ingreso de cajas ${boxDay}-${selectBoxMonth == "1" ? "Enero" :
+        selectBoxMonth == "2" ? "Febrero" :
+          selectBoxMonth == "3" ? "Marzo" :
+            selectBoxMonth == "4" ? "Abril" :
+              selectBoxMonth == "5" ? "Mayo" :
+                selectBoxMonth == "6" ? "Junio" :
+                  selectBoxMonth == "7" ? "Julio" :
+                    selectBoxMonth == "8" ? "Agosto" :
+                      selectBoxMonth == "9" ? "Septiembre" :
+                        selectBoxMonth == "10" ? "Octubre" :
+                          selectBoxMonth == "11" ? "Noviembre" :
+                            selectBoxMonth == "12" ? "Diciembre" : " "
+      }.xlsx`
+    );
+  }
+
+  const CancelledordersReport = () => {
+
+    const historia = cancelOrder
+      .map((table, index) => {
+
+        const box = boxName.find(box => box.id === table.box_id);
+          return {
+            Pedido: table.id,
+            Caja: box ? box.name : '',
+            Hora: new Date(table.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+            Fecha: new Date(table.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/'),
+            Estado: table.status === 'cancelled' ? 'Anulado' : table.status,
+          };
+      })
+      .filter(item => item !== null);
+
+    const ws = XLSX.utils.json_to_sheet(historia.length > 0 ? historia : [{ Pedido: "", Caja: "", Hora: "", Fecha: "", Estado: "" }], { origin: "A2" });
+
+    // Add a heading "Reporte de Entrega"
+    XLSX.utils.sheet_add_aoa(ws, [["Anulación pedidos"]], { origin: "A1" });
+    ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }]; // Merge cells for the heading
+
+    // Add column names only if there is data
+    if (historia.length > 0) {
+      const columnNames = ["Pedido", " Caja", "Hora", "Fecha", "Estado"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" })
+    } else {
+      // Add column names even if there's no data
+      const columnNames = ["Pedido", " Caja", "Hora", "Fecha", "Estado"];
+      XLSX.utils.sheet_add_aoa(ws, [columnNames], { origin: "A2" });
+    }
+
+    // Apply styles to the heading
+    ws["A1"].s = {
+      font: { name: "Aptos Narrow", bold: true, sz: 16 },
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Set row height for the heading
+    if (!ws["!rows"]) ws["!rows"] = [];
+    ws["!rows"][0] = { hpt: 30 };
+    ws["!rows"][1] = { hpt: 25 }; // Set height for column names
+
+    // Auto-size columns
+    const colWidths = [{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 },{ wch: 15 }];
+    ws["!cols"] = colWidths;
+
+    // Add sorting functionality
+    if (historia.length > 0) {
+      ws['!autofilter'] = { ref: `A2:D${historia.length}` }; // Enable autofilter for the range
+    }
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Anulación pedidos");
+
+    XLSX.writeFile(
+      wb,
+      `Reporte de Anulación pedidos ${cancelOrderDay}-${seleceCancelMonth == "1" ? "Enero" :
+        seleceCancelMonth == "2" ? "Febrero" :
+          seleceCancelMonth == "3" ? "Marzo" :
+            seleceCancelMonth == "4" ? "Abril" :
+              seleceCancelMonth == "5" ? "Mayo" :
+                seleceCancelMonth == "6" ? "Junio" :
+                  seleceCancelMonth == "7" ? "Julio" :
+                    seleceCancelMonth == "8" ? "Agosto" :
+                      seleceCancelMonth == "9" ? "Septiembre" :
+                        seleceCancelMonth == "10" ? "Octubre" :
+                          seleceCancelMonth == "11" ? "Noviembre" :
+                            seleceCancelMonth == "12" ? "Diciembre" : " "
+      }.xlsx`
+    );
+
+
+  }
+
+  // console.log(popularData);
+
+
   return (
     <div>
       <Header />
@@ -800,7 +1310,7 @@ useEffect(() => {
                   <div className="j-chart-head">
                     <p className="sjfs-16">Total ingresos</p>
                     <h3 className="text-white fw-bold sj-fs30">
-                      {stateData.total_income ? stateData.total_income.toFixed(2) : '0.00'}$
+                    $ {stateData.total_income ? stateData.total_income.toFixed(2) : '0.00'}
                     </h3>
                   </div>
                   <ResponsiveContainer width="100%" height={100}>
@@ -945,6 +1455,7 @@ useEffect(() => {
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectedHastaMonth(selectedValue);
+                          setPaymentData('month');
                           if (selectedValue === "12") {
                             const currentMonth = new Date().getMonth() + 1;
                             setSelectedHastaMonth(currentMonth); // Set to current month
@@ -952,6 +1463,7 @@ useEffect(() => {
                           }
                         }}
                         value={selectedHastaMonth}
+                        style={{fontWeight: '500', lineHeight: '21px'}}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -976,11 +1488,18 @@ useEffect(() => {
                       name="options-base1"
                       id="option4"
                       autoComplete="off"
+                      disabled={selectedHastaMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option4"
-                      onClick={() => setPaymentData('day')}
+                      onClick={() => {
+                        if(selectedHastaMonth == new Date().getMonth() + 1){
+                          setPaymentData('day')
+                        }else{
+                          setPaymentData('month')
+                        }
+                        }}
                     >
                       Día
                     </label>
@@ -990,11 +1509,18 @@ useEffect(() => {
                       name="options-base1"
                       id="option5"
                       autoComplete="off"
+                      disabled={selectedHastaMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option5"
-                      onClick={() => setPaymentData('week')}
+                      onClick={() =>{
+                        if(selectedHastaMonth == new Date().getMonth() + 1){
+                          setPaymentData('week')
+                        }else{
+                          setPaymentData('month')
+                        }
+                      }}
                     >
                       Semana
                     </label>
@@ -1005,14 +1531,14 @@ useEffect(() => {
                       id="option6"
                       autoComplete="off"
                       defaultChecked
+                      checked = {paymentsData == "month"}
+                      disabled={selectedHastaMonth > new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option6"
                       onClick={() => {
                         setPaymentData('month');
-                        const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                        setSelectedHastaMonth(currentMonth); // Set to current month
                         fetchData(); // Call fetchData to get current month data
                       }}
                     >
@@ -1078,7 +1604,7 @@ useEffect(() => {
                       </p>
                     </div>
                     <div className="d-flex align-items-center justify-content-center  col-md-6">
-                      <img src={chart2} className="ssj_img" />
+                      <img src={chart3} className="ssj_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Tarjeta debito:{" "}
                         <span className="text-white sjfs-14">{payMethodData?.debit}$ CLP</span>
@@ -1087,7 +1613,7 @@ useEffect(() => {
                   </div>
                   <div className="j-payment-foot text-white row">
                     <div className="d-flex align-items-center justify-content-center col-md-6 ">
-                      <img src={chart3} className="ss_img" />
+                      <img src={chart4} className="ss_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Tarjeta crédito:{" "}
                         <span className="text-white me-4 sjfs-14">
@@ -1096,7 +1622,7 @@ useEffect(() => {
                       </p>
                     </div>
                     <div className="d-flex align-items-center justify-content-center col-md-6">
-                      <img src={chart4} className="ssj_img" />
+                      <img src={chart2} className="ssj_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Transferencias:{" "}
                         <span className="text-white sjfs-14">{payMethodData?.transfer}$ CLP</span>
@@ -1104,7 +1630,7 @@ useEffect(() => {
                     </div>
                   </div>
                 </div>
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={paymentMethodsReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1116,7 +1642,7 @@ useEffect(() => {
                     <div className="s_dashboard-left-head  ">
                       <h2 className="text-white  sjfs-2">{Number(totalRevenue.total_revenue).toFixed(0)}$</h2>
 
-                      <p>Ingresos totales</p>
+                      <p style={{fontSize: "16px",fontWeight: "400",lineHeight: "24px", textAlign: "left"}}>Ingresos totales</p>
                     </div>
 
                     <div className="s_dashboard-right-head">
@@ -1127,6 +1653,7 @@ useEffect(() => {
                           onChange={(e) => {
                             const selectedValue = e.target.value;
                             setSelectedRevtaMonth(selectedValue);
+                            // setRevData('month')
                             if (selectedValue === "12") {
                               const currentMonth = new Date().getMonth() + 1;
                               setSelectedRevtaMonth(currentMonth); // Set to current month
@@ -1134,6 +1661,7 @@ useEffect(() => {
                             }
                           }}
                           value={selectedRevMonth}
+                          style={{fontWeight: '500', lineHeight: '21px'}}
                         >
                           <option value="1">Mes Enero</option>
                           <option value="2">Mes Febrero</option>
@@ -1156,6 +1684,7 @@ useEffect(() => {
                           name="options-base2"
                           id="option7"
                           autoComplete="off"
+                          disabled={selectedRevMonth != new Date().getMonth() + 1}
                         />
                         <label
                           className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1170,12 +1699,12 @@ useEffect(() => {
                           name="options-base2"
                           id="option8"
                           autoComplete="off"
+                          disabled={selectedRevMonth != new Date().getMonth() + 1}
                         />
                         <label
                           className="btn btn-outline-primary j-custom-label sjfs-12"
                           htmlFor="option8"
                           onClick={() => setRevData('week')}
-
                         >
                           Semana
                         </label>
@@ -1186,14 +1715,14 @@ useEffect(() => {
                           id="option9"
                           autoComplete="off"
                           defaultChecked
+                          checked= {revData == "month"}
+                          disabled={selectedRevMonth > new Date().getMonth() + 1}
                         />
                         <label
                           className="btn btn-outline-primary j-custom-label sjfs-12"
                           htmlFor="option9"
                           onClick={() => {
-                            setRevData('month');
-                            const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                            setSelectedRevtaMonth(currentMonth); // Set to current month
+                            setRevData('month'); // Set to current month
                             fetchData(); // Call fetchData to get current month data
                           }}
 
@@ -1236,7 +1765,7 @@ useEffect(() => {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={totalrevenueReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1267,23 +1796,23 @@ useEffect(() => {
                   <div className="j-summary-data2 mb-3">
                     <div className="d-flex align-items-center j-margin">
                       <img src={chart4} className="jj_img me-2" />
-                      <p className="ss_fontsize mb-0 sjfs-14">Recibido</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Recibido</p>
                     </div>
                     <div className="d-flex align-items-center j-margin">
                       <img src={chart2} className="jj_img me-2" />
-                      <p className="ss_fontsize mb-0 sjfs-14">Preparado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Preparado</p>
                     </div>
                     <div className="d-flex align-items-center j-margin">
                       <img src={chart1} className="jj_img me-2" />
-                      <p className="ss_fontsize mb-0 sjfs-14">Entregado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Finalizado</p>
                     </div>
                     <div className="d-flex align-items-center">
                       <img src={chart3} className="jj_img me-2" />
-                      <p className="ss_fontsize mb-0 sjfs-14">Finalizado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Entregado</p>
                     </div>
                   </div>
                 </div>
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={summaryStatesReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1300,6 +1829,7 @@ useEffect(() => {
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectPopMonth(selectedValue);
+                          setPopData('month');
                           if (selectedValue === "12") {
                             const currentMonth = new Date().getMonth() + 1;
                             setSelectPopMonth(currentMonth); // Set to current month
@@ -1307,6 +1837,7 @@ useEffect(() => {
                           }
                         }}
                         value={selectPopMonth}
+                        style={{fontWeight: '500', lineHeight: '21px'}}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1331,6 +1862,7 @@ useEffect(() => {
                       name="options-base3"
                       id="option10"
                       autoComplete="off"
+                      disabled={selectPopMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1345,6 +1877,7 @@ useEffect(() => {
                       name="options-base3"
                       id="option11"
                       autoComplete="off"
+                      disabled={selectPopMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1361,14 +1894,15 @@ useEffect(() => {
                       id="option12"
                       autoComplete="off"
                       defaultChecked
+                      checked= {popData == "month"}
+                      disabled={selectPopMonth > new Date().getMonth() + 1}
+
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option12"
                       onClick={() => {
                         setPopData('month');
-                        const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                        setSelectPopMonth(currentMonth); // Set to current month
                         fetchData(); // Call fetchData to get current month data
                       }}
                     >
@@ -1404,9 +1938,9 @@ useEffect(() => {
                       className="j-summary-body-data scrollbox d-flex align-items-center justify-content-between"
                     >
                       <div className="d-flex align-items-center">
-                        <div className="j-order-no">#{index + 1}</div>
+                        <div className="j-order-no" style={{width: "30px"}}>#{index + 1}</div>
                         <div className="j-order-img">
-                          <img src={`${API}/images/${item.image}`} alt={item.name} />
+                          <img src={`${API}/images/${item.image}`} alt={item.name} style={{borderRadius:"8px"}} />
                         </div>
                         <div className="j-order-data">
                           <h4 className="sjfs-16">{item.name}</h4>
@@ -1419,7 +1953,7 @@ useEffect(() => {
                     </div>
                   ))}
                 </div>
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={PopularReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1441,6 +1975,7 @@ useEffect(() => {
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectDeliveryMonth(selectedValue);
+                          setDeliveryDay('month');
                           if (selectedValue === "12") {
                             const currentMonth = new Date().getMonth() + 1;
                             setSelectDeliveryMonth(currentMonth); // Set to current month
@@ -1448,6 +1983,7 @@ useEffect(() => {
                           }
                         }}
                         value={selectDeliveryMonth}
+                        style={{fontWeight: '500', lineHeight: '21px'}}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1472,6 +2008,7 @@ useEffect(() => {
                       name="options-base4"
                       id="option13"
                       autoComplete="off"
+                      disabled={selectDeliveryMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1486,6 +2023,7 @@ useEffect(() => {
                       name="options-base4"
                       id="option14"
                       autoComplete="off"
+                      disabled={selectDeliveryMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1501,14 +2039,16 @@ useEffect(() => {
                       id="option15"
                       autoComplete="off"
                       defaultChecked
+                      checked= {deliveryDay == "month"}
+                      disabled={selectDeliveryMonth > new Date().getMonth() + 1}
+                      
+                      
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option15"
                       onClick={() => {
                         setDeliveryDay('month');
-                        const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                        setSelectDeliveryMonth(currentMonth); // Set to current month
                         fetchData(); // Call fetchData to get current month data
                       }}
                     >
@@ -1521,25 +2061,25 @@ useEffect(() => {
                   <div className="row">
                     <div className="col-6">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16">Delivery</p>
+                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Delivery</p>
                         <h5 className="sjfs-2">{deliveryData.delivery}</h5>
                       </div>
                     </div>
                     <div className="col-6">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16">Retiro</p>
+                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Retiro</p>
                         <h5 className="sjfs-2">{deliveryData.withdrawal}</h5>
                       </div>
                     </div>
                     <div className="col-6">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16">Local</p>
+                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Local</p>
                         <h5 className="sjfs-2">{deliveryData.local}</h5>
                       </div>
                     </div>
                     <div className="col-6">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16">Plataforma</p>
+                        <p className="sjfs-16"style={{fontWeight:"500", lineHeight:'21px'}}>Plataforma</p>
                         <h5 className="sjfs-2">{deliveryData.platform}</h5>
                       </div>
                     </div>
@@ -1616,6 +2156,7 @@ useEffect(() => {
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setselectBoxMonth(selectedValue);
+                          setBoxDay('month');
                           if (selectedValue === "12") {
                             const currentMonth = new Date().getMonth() + 1;
                             setselectBoxMonth(currentMonth); // Set to current month
@@ -1623,6 +2164,7 @@ useEffect(() => {
                           }
                         }}
                         value={selectBoxMonth}
+                        style={{fontWeight: '500', lineHeight: '21px'}}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1647,6 +2189,7 @@ useEffect(() => {
                       name="options-base5"
                       id="option16"
                       autoComplete="off"
+                      disabled={selectBoxMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1661,6 +2204,7 @@ useEffect(() => {
                       name="options-base5"
                       id="option17"
                       autoComplete="off"
+                      disabled={selectBoxMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1676,14 +2220,14 @@ useEffect(() => {
                       id="option18"
                       autoComplete="off"
                       defaultChecked
+                      checked={boxDay == "month"}
+                      disabled={selectBoxMonth > new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option18"
                       onClick={() => {
                         setBoxDay('month');
-                        const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                        setselectBoxMonth(currentMonth); // Set to current month
                         fetchData(); // Call fetchData to get current month data
                       }}
                     >
@@ -1712,6 +2256,9 @@ useEffect(() => {
                       }))
                     ];
 
+                    // console.log(chartData,ele.box_name,totalAmount,ele);
+
+
                     return (
                       <div className="j-chart-entry-1 d-flex align-items-center" key={ele.id}>
                         <ResponsiveContainer width={100} height={100}>
@@ -1737,7 +2284,7 @@ useEffect(() => {
 
                 </div>
 
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={boxEntryReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1759,6 +2306,7 @@ useEffect(() => {
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectCencelMonth(selectedValue);
+                          setCancelOrderDay('month');
                           if (selectedValue === "12") {
                             const currentMonth = new Date().getMonth() + 1;
                             setSelectCencelMonth(currentMonth); // Set to current month
@@ -1766,6 +2314,7 @@ useEffect(() => {
                           }
                         }}
                         value={seleceCancelMonth}
+                        style={{fontWeight: '500', lineHeight: '21px'}}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1790,6 +2339,7 @@ useEffect(() => {
                       name="options-base6"
                       id="option19"
                       autoComplete="off"
+                      disabled={seleceCancelMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -1804,11 +2354,13 @@ useEffect(() => {
                       name="options-base6"
                       id="option20"
                       autoComplete="off"
+                      disabled={seleceCancelMonth != new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option20"
                       onClick={() => setCancelOrderDay('week')}
+                      disabled={seleceCancelMonth < new Date().getMonth() + 1}
 
                     >
                       Semana
@@ -1820,14 +2372,16 @@ useEffect(() => {
                       id="option21"
                       autoComplete="off"
                       defaultChecked
+                      checked={cancelOrderDay == "month"}
+                      disabled={seleceCancelMonth > new Date().getMonth() + 1}
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option21"
                       onClick={() => {
                         setCancelOrderDay('month');
-                        const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                        setSelectCencelMonth(currentMonth); // Set to current month
+                        // const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
+                        // setSelectCencelMonth(currentMonth); // Set to current month
                         fetchData(); // Call fetchData to get current month data
                       }}
                     >
@@ -1913,7 +2467,7 @@ useEffect(() => {
                     </table>
                   </div>
                 </div>
-                <div className="j-foot-text text-end">
+                <div className="j-foot-text text-end" onClick={CancelledordersReport}>
                   <button className="sjfs-14">
                     Ver reporte <FaAngleRight />
                   </button>
@@ -1930,4 +2484,3 @@ useEffect(() => {
 
 export default Dashboard;
 
- 

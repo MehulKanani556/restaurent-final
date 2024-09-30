@@ -36,7 +36,7 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
     date: formattedDate,
     time: formattedTime,
     customer: {
-      name: payment.firstname,
+      name: payment.firstname ? payment.firstname : payment.business_name ,
       email: payment.email,
       phone: payment.phone,
       address: payment.address,

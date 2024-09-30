@@ -644,7 +644,8 @@ function Home_detail() {
                                 <div className='d-flex gap-5 mx-4 b_inputt mb-5 '>
                                     <div className=' b_search text-white a_input_size' >
                                         <label htmlFor="inputPassword2" className="">Correo</label>
-                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="ejemplo@gmail.com" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={user?.email} />
+
+                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={user?.email} />
                                     </div>
                                     <div className=' b_search text-white a_input_size'>
                                         <label htmlFor="inputPassword2" className=" ">Pedidos</label>

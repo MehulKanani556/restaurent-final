@@ -15,16 +15,13 @@ import { IoMdInformationCircle } from "react-icons/io";
 import img2 from "../Image/addmenu.jpg";
 import axios from "axios";
 import Loader from "./Loader";
-import { enqueueSnackbar } from "notistack";
-import useAudioManager from "./audioManager";
 
 export default function ProductionCenter() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token] = useState(sessionStorage.getItem("token"));
   // const [isLoading, setIsLoading] = useState(true);
-  const [admin_id] = useState(sessionStorage.getItem("admin_id"));
-const navigate = useNavigate();
+const admin_id = sessionStorage.getItem("admin_id");
   const [productionCenters, setProductionCenters] = useState([]);
   const [prodName, setProdName] = useState("");
   const [printerCode, setPrinterCode] = useState("");
@@ -49,7 +46,11 @@ const navigate = useNavigate();
   );
   const [isProcessing, setIsProcessing] = useState(false);
 
+
   const [menu, setMenu] = useState([]);
+  const [itemstoUpdate, setItemstoUpdate] = useState([])
+  const [familyFilter, setFamilyFilter] = useState([]);
+
   const [currentProdCenter, setCurrentProdCenter] = useState({
     id: null,
     name: "",
@@ -58,7 +59,7 @@ const navigate = useNavigate();
 
   const [prodNameError, setProdNameError] = useState("");
   const [printerCodeError, setPrinterCodeError] = useState("");
-  const { playNotificationSound } = useAudioManager();
+  const navigate = useNavigate();
 
   // Update these handlers
   const handleProdNameChange = (e) => {
@@ -201,86 +202,105 @@ const navigate = useNavigate();
   };
 
   // file upload function
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const fileInputRef = useRef(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [errorMessage, setErrorMessage] = useState(null);
+  // const fileInputRef = useRef(null);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
 
-    if (file) {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width > 800 || img.height > 400) {
-          setErrorMessage("Image dimensions should be at most 800x400 pixels");
-          setSelectedFile(null);
-        } else {
-          setErrorMessage(null);
-          setSelectedFile(file);
-        }
-      };
-      img.src = URL.createObjectURL(file);
-    }
-  };
+  //   if (file) {
+  //     const img = new Image();
+  //     img.onload = () => {
+  //       if (img.width > 800 || img.height > 400) {
+  //         setErrorMessage("Image dimensions should be at most 800x400 pixels");
+  //         setSelectedFile(null);
+  //       } else {
+  //         setErrorMessage(null);
+  //         setSelectedFile(file);
+  //       }
+  //     };
+  //     img.src = URL.createObjectURL(file);
+  //   }
+  // };
 
   // filter
   const [selectedFilters, setSelectedFilters] = useState([]);
-
   const [isFilterActive, setIsFilterActive] = useState(false);
 
-  // ... existing code ...
-  const handleCheckboxChange = (event) => {
-    const { name, checked, id } = event.target;
-    const updatedSelectedMenus = checked
-      ? [...selectedMenus, { id, name }] // Ensure you're adding an object
-      : selectedMenus.filter((menu) => menu.id !== id); // Filter by id
-    setSelectedMenus(updatedSelectedMenus);
 
-    // Update items based on selected menus
-    const updatedItems =
-      updatedSelectedMenus.length > 0
-        ? obj1.filter(
-          (item) =>
-            updatedSelectedMenus.some(
-              (menu) => menu.id === item.family_id.toString()
-            ) // Check if item matches any selected menu
-        )
-        : obj1; // Reset to all items when no menu is selected
-    setItems(updatedItems);
+  // ... existing code ...
+  // const handleCheckboxChange = (event) => {
+  //   const { name, checked, id } = event.target;
+  //   const updatedSelectedMenus = checked
+  //     ? [...selectedMenus, { id, name }] // Ensure you're adding an object
+  //     : selectedMenus.filter((menu) => menu.id !== id); // Filter by id
+  //   setSelectedMenus(updatedSelectedMenus);
+
+  //   // Update items based on selected menus
+  //   const updatedItems =
+  //     updatedSelectedMenus.length > 0
+  //       ? obj1.filter(
+  //         (item) =>
+  //           updatedSelectedMenus.some(
+  //             (menu) => menu.id === item.family_id.toString()
+  //           ) // Check if item matches any selected menu
+  //       )
+  //       : obj1; // Reset to all items when no menu is selected
+  //   setItems(updatedItems);
+  // };
+
+  const handleCheckboxChange = (event) => {
+    const { id, checked, name } = event.target; // Get id, checked state, and name from the event
+    setFamilyFilter(prev => {
+      if (checked) {
+        return [...prev, { id, name }]; // Add object with id and name if checked
+      } else {
+        return prev.filter(family => family.id !== id); // Remove object by id if unchecked
+      }
+    });
   };
 
+  // const handleResetFilters = () => {
+  //   setSelectedMenus([]);
+  //   setItems(obj1);
+  //   setIsFilterActive(false);
+  // };
   const handleResetFilters = () => {
-    setSelectedMenus([]);
-    setItems(obj1);
-    setIsFilterActive(false);
+    setFamilyFilter([]);
   };
 
   // Function to clear the filter
   const clearFilter = (menuId) => {
-    // Remove the menuId from selectedMenus
-    console.log("selected menu", selectedMenus);
-    const updatedMenus = selectedMenus.filter((id) => id.id !== menuId); // Assuming selectedMenus contains IDs
-    setSelectedMenus(updatedMenus);
-    console.log("updated menu", updatedMenus);
-
-    // Check if there are no selected menus
-    if (updatedMenus.length === 0) {
-      // Corrected condition
-      // Show all items if no filters are selected
-      setItems(obj1); // Reset to all items
-      console.log("no item");
-    } else {
-      // Filter items based on the updated selectedMenus
-      const updatedItems = obj1.filter(
-        (item) =>
-          updatedMenus
-            .map((menu) => menu.id)
-            .includes(item.family_id.toString()) // Ensure family_id is compared correctly
-      );
-      console.log("menu", updatedItems);
-      setItems(updatedItems);
-    }
+    const updatedMenus = familyFilter.filter((id) => id.id !== menuId);
+    setFamilyFilter(updatedMenus);
   };
+
+  // const clearFilter = (menuId) => {
+  //   // Remove the menuId from selectedMenus
+  //   console.log("selected menu", selectedMenus);
+  //   const updatedMenus = selectedMenus.filter((id) => id.id !== menuId); // Assuming selectedMenus contains IDs
+  //   setSelectedMenus(updatedMenus);
+  //   console.log("updated menu", updatedMenus);
+
+  //   // Check if there are no selected menus
+  //   if (updatedMenus.length === 0) {
+  //     // Corrected condition
+  //     // Show all items if no filters are selected
+  //     setItems(obj1); // Reset to all items
+  //     console.log("no item");
+  //   } else {
+  //     // Filter items based on the updated selectedMenus
+  //     const updatedItems = obj1.filter(
+  //       (item) =>
+  //         updatedMenus
+  //           .map((menu) => menu.id)
+  //           .includes(item.family_id.toString()) // Ensure family_id is compared correctly
+  //     );
+  //     console.log("menu", updatedItems);
+  //     setItems(updatedItems);
+  //   }
+  // };
 
   const [count, setCount] = useState(0);
 
@@ -289,6 +309,8 @@ const navigate = useNavigate();
   };
 
   // ****************************************API***************************************
+  const [productionAllData, setProductionAllData] = useState([])
+
   useEffect(
     () => {
       if (token) {
@@ -297,19 +319,57 @@ const navigate = useNavigate();
         fetchFamilyData();
         fetchSubFamilyData();
         fetchMenuData();
-
+        fetchMenuItemData();
       }
     },
     [token]
   );
 
+
+  // get menu
+  const fetchMenuData = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/item/getProducationdata`, {admin_id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      setMenu(response.data.menus);
+    } catch (error) {
+      console.error(
+        "Error fetching roles:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+  // get menu item
+  const fetchMenuItemData = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/item/getProducationdata`, {admin_id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+
+        });
+      // setItem(response.data);
+      setProductionAllData(response.data.menus);
+      console.log("=======", response.data.menus);
+    } catch (error) {
+      console.error(
+        "Error fetching roles:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
   // get family
   const fetchFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${apiUrl}/family/getFamily`,{  headers: {
+        Authorization: `Bearer ${token}`,
+      }});
       setParentCheck(response.data);
     } catch (error) {
       console.error(
@@ -324,9 +384,9 @@ const navigate = useNavigate();
   const fetchSubFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{  headers: {
+        Authorization: `Bearer ${token}`,
+      }});
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -341,7 +401,7 @@ const navigate = useNavigate();
   const getProductionCenters = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/production-centers`, { admin_id: admin_id }, {
+      const response = await axios.post(`${apiUrl}/production-centers`,{admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -357,9 +417,9 @@ const navigate = useNavigate();
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await axios.get(`${apiUrl}/item/getAll`,{  headers: {
+        Authorization: `Bearer ${token}`,
+      }});
       setObj1(response.data.items);
       setFilteredItemsMenu(response.data.items);
       setItems(response.data.items);
@@ -382,8 +442,7 @@ const navigate = useNavigate();
           `${apiUrl}/create/production-centers`,
           {
             name: prodName,
-            printer_code: printerCode,
-            admin_id: admin_id
+            printer_code: printerCode
           },
           {
             headers: {
@@ -391,66 +450,72 @@ const navigate = useNavigate();
             }
           }
         );
-        getProductionCenters();
+        console.log("Production center created:", response.data);
         handleShowCreSucProduction();
         setIsProcessing(false);
+        fetchMenuData()
+        getProductionCenters();
         setProdName("");
         setPrinterCode("");
-        if (response.data && response.data.notification) {
-          enqueueSnackbar(response.data.notification, { variant: 'success' });
-        } else {
-          enqueueSnackbar(`Centro de producción ${prodName} creado exitosamente`, { variant: 'success' });
-        }
-        playNotificationSound();
       } catch (error) {
         console.error("Error creating production center:", error);
         setIsProcessing(false);
-        enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-        playNotificationSound();
       }
     }
   };
 
   // edit production center
+  // const handleEditClick = (prodCenter) => {
+  //   setCurrentProdCenter({
+  //     ...prodCenter,
+  //     name: prodCenter.name || "",
+  //     printer_code: prodCenter.printer_code || ""
+  //   });
+  //   handleShowEditProduction();
+  // };
+
   const handleEditClick = (prodCenter) => {
+    console.log(prodCenter);
+
     setCurrentProdCenter({
-      ...prodCenter,
-      name: prodCenter.name || "",
-      printer_code: prodCenter.printer_code || ""
+      id: prodCenter.id,
+      name: prodCenter.name,
+      printer_code: prodCenter.printer_code
     });
     handleShowEditProduction();
   };
+
   // update production center
   const [editNameError, setEditNameError] = useState("");
   const [editPrinterCodeError, setEditPrinterCodeError] = useState("");
 
-  const validateEditProductionCenter = () => {
-    let isValid = true;
+  // const validateEditProductionCenter = () => {
+  //   let isValid = true;
 
-    if (
-      !currentProdCenter.name ||
-      typeof currentProdCenter.name !== "string" ||
-      !currentProdCenter.name.trim()
-    ) {
-      setEditNameError("El nombre es requerido");
-      isValid = false;
-    } else {
-      setEditNameError("");
-    }
+  //   if (
+  //     !currentProdCenter.name ||
+  //     typeof currentProdCenter.name !== "string" ||
+  //     !currentProdCenter.name.trim()
+  //   ) {
+  //     setEditNameError("El nombre es requerido");
+  //     isValid = false;
+  //   } else {
+  //     setEditNameError("");
+  //   }
 
-    if (
-      !currentProdCenter.printer_code ||
-      typeof currentProdCenter.printer_code !== "string" ||
-      !currentProdCenter.printer_code.trim()
-    ) {
-      setEditPrinterCodeError("El código de impresora es requerido");
-      isValid = false;
-    } else {
-      setEditPrinterCodeError("");
-    }
+  //   if (
+  //     !currentProdCenter.printer_code ||
+  //     typeof currentProdCenter.printer_code !== "string" ||
+  //     !currentProdCenter.printer_code.trim()
+  //   ) {
+  //     setEditPrinterCodeError("El código de impresora es requerido");
+  //     isValid = false;
+  //   } else {
+  //     setEditPrinterCodeError("");
+  //   }
 
-    return isValid;
-  };
+  //   return isValid;
+  // };
 
   // const updateProductionCenter = async () => {
   //   if (validateEditProductionCenter()) {
@@ -492,7 +557,7 @@ const navigate = useNavigate();
 
       const response = await axios.post(
         `${apiUrl}/update/production-centers/${currentProdCenter.id}`,
-        updatedData,
+        {updatedData},
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -500,18 +565,12 @@ const navigate = useNavigate();
         }
       );
       console.log("Production center updated:", response.data);
+      fetchMenuData()
+      fetchMenuItemData();
       getProductionCenters();
       handleShowEditProductionSuc();
-      if (response.data && response.data.notification) {
-        enqueueSnackbar(response.data.notification, { variant: 'success' });
-      } else {
-        enqueueSnackbar(`Centro de producción ${currentProdCenter.name} actualizado exitosamente`, { variant: 'success' });
-      }
-      playNotificationSound();
     } catch (error) {
       console.error("Error updating production center:", error);
-      enqueueSnackbar(error?.response?.data?.alert || 'Error al actualizar el centro de producción', { variant: 'error' });
-      playNotificationSound();
     } finally {
       setIsProcessing(false);
     }
@@ -519,17 +578,36 @@ const navigate = useNavigate();
 
 
   // Function to handle adding an item
-  const handleAddItem = (item) => {
-    if (!selectedItemsMenu.has(item)) {
-      setSelectedItemsMenu(new Set(selectedItemsMenu).add(item));
-      setSelectedItemsCount(selectedItemsCount + 1);
-      setItemId((prevArray) => [...prevArray, item]);
+  // const handleAddItem = (item) => {
+  //   if (!selectedItemsMenu.has(item)) {
+  //     setSelectedItemsMenu(new Set(selectedItemsMenu).add(item));
+  //     setSelectedItemsCount(selectedItemsCount + 1);
+  //     setItemId((prevArray) => [...prevArray, item]);
 
-      // Perform any other action here when adding an item
-      console.log(`Added item ${item.id}`);
-    } else {
-      console.log(`Item ${item.id} already added`);
-    }
+  //     // Perform any other action here when adding an item
+  //     console.log(`Added item ${item.id}`);
+  //   } else {
+  //     console.log(`Item ${item.id} already added`);
+  //   }
+  // };
+
+  const handleAddItem = (item) => {
+    setItemstoUpdate((prevArray) => {
+      const itemExists = prevArray[0].item_ids.some((id) => id == item);
+      if (itemExists) {
+        // Remove the item if it already exists
+        return [{
+          item_ids: prevArray[0].item_ids.filter((id) => id != item),
+          production_id: prevArray[0].production_id // Keep the production_id unchanged
+        }];
+      } else {
+        // Add the item if it doesn't exist
+        return [{
+          item_ids: [...prevArray[0].item_ids, item],
+          production_id: prevArray[0].production_id // Keep the production_id unchanged
+        }];
+      }
+    });
   };
 
   //  delete production center
@@ -538,7 +616,7 @@ const navigate = useNavigate();
     setIsProcessing(true); // Then show the loader
 
     try {
-      const response = await axios.get(`${apiUrl}/delete/production-centers/${id}`, {
+      await axios.get(`${apiUrl}/delete/production-centers/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -553,19 +631,12 @@ const navigate = useNavigate();
 
       // Update the items list to remove items from the deleted production center
       setItems(prev => prev.filter(item => item.production_center_id !== id));
-
+      fetchMenuData()
+      fetchMenuItemData();
       getProductionCenters();
       handleShowEditProductionDel();
-      if (response.data && response.data.notification) {
-        enqueueSnackbar(response.data.notification, { variant: 'success' });
-      } else {
-        enqueueSnackbar(`Centro de producción eliminado exitosamente`, { variant: 'success' });
-      }
-      playNotificationSound();
     } catch (error) {
       console.error("Error deleting production center:", error);
-      enqueueSnackbar(error?.response?.data?.alert || 'Error al eliminar el centro de producción', { variant: 'error' });
-      playNotificationSound();
     } finally {
       setIsProcessing(false);
     }
@@ -578,6 +649,9 @@ const navigate = useNavigate();
       : obj1;
     setItems(filteredItems);
   }, [selectedProductionCenters, obj1]);
+
+
+
   // filter based on production centers
   const handleProductionCenterChange = (productionCenterId) => {
     setSelectedMenus(prev => {
@@ -607,69 +681,34 @@ const navigate = useNavigate();
         ? obj1.filter(item => updatedSelectedMenus.includes(item.production_center_id))
         : obj1;
     });
+
+
+    setItemstoUpdate(prev => {
+      const isInUpdate = itemstoUpdate.some((v) => v.production_id == productionCenterId); // Check if productionCenterId is in selectedItemsIds
+      if (isInUpdate) {
+        // Remove productionCenterId if it exists
+        return prev.filter(v => v.production_id != productionCenterId);
+      } else {
+        const add = {
+          item_ids: menu.find(v => v.id === productionCenterId)?.items.map(item => item.id) || [],
+          production_id: productionCenterId
+        };
+        // Add productionCenterId if it does not exist
+        return [...prev, add];
+      }
+    });
+
   };
+
+  console.log(itemstoUpdate[0]);
+  
   // ...
 
-  // const handleAddMenu = async () => {
-  //   setIsProcessing(true);
-  //   try {
-  //     const response = await axios.post(
-  //       `${apiUrl}/item/addToMenu`,
-  //       {
-  //         item_ids: itemId,
-  //         menu_id: menuId
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json"
-  //         },
-  //         maxBodyLength: Infinity
-  //       }
-  //     );
-
-  //     console.log("API Response:", response.data);
-
-  //     if (response.data.success) {
-  //       // Handle UI updates
-  //       handleClose1();
-  //       handleShow1AddMenuSuc();
-
-  //       // Clear item IDs
-  //       setItemId([]);
-
-  //       window.location.reload();
-  //     } else {
-  //       console.error("Failed to add items to menu");
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Error adding items to menu:",
-  //       error.response ? error.response.data : error.message
-  //     );
-  //   } finally {
-  //     setIsProcessing(false);
-  //   }
-  // };
   const handleAddMenu = async () => {
     setIsProcessing(true);
     try {
-      // Assuming you have a state variable for the selected production center
-      const selectedProductionCenter = selectedProductionCenters[0]; // Get the first selected production center
-  
-      if (!selectedProductionCenter) {
-        enqueueSnackbar('Por favor, seleccione un centro de producción', { variant: 'warning' });
-        setIsProcessing(false);
-        return;
-      }
-  
       const response = await axios.post(
-        `${apiUrl}/item/addToproducation`,
-        {
-          item_ids: itemId,
-          // menu_id: menuId,
-          production_id: selectedProductionCenter.id // Add the production_id to the request
-        },
+        `${apiUrl}/item/updateProduction`, itemstoUpdate[0],
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -678,43 +717,32 @@ const navigate = useNavigate();
           maxBodyLength: Infinity
         }
       );
-  
+
       console.log("API Response:", response.data);
-  
+
       if (response.data.success) {
         // Handle UI updates
-        handleClose1();
-        handleShow1AddMenuSuc();
-  
+        setIsProcessing(false);
+        handleClose1Prod();
+        handleShow1AddSuc();
+        getProductionCenters();
+        fetchMenuItemData();
+        setFamilyFilter([])
+
+        // Handle UI updates
+
         // Clear item IDs
         setItemId([]);
-  
-        // Show success message
-       
-        playNotificationSound();
-        if (response.data && response.data.notification) {
-          enqueueSnackbar(response.data.notification, { variant: 'success' });
-        } else {
-          enqueueSnackbar('Artículos agregados exitosamente', { variant: 'success' });
-        }
-        playNotificationSound();
-        // Refresh the data instead of reloading the page
-        getProductionCenters();
-        fetchAllItems();
+
+        // window.location.reload();
       } else {
         console.error("Failed to add items to menu");
-        enqueueSnackbar('Error al agregar artículos', { variant: 'error' });
-
-        playNotificationSound();
       }
     } catch (error) {
       console.error(
         "Error adding items to menu:",
         error.response ? error.response.data : error.message
       );
-      enqueueSnackbar(error?.response?.data?.alert || 'Error al agregar artículos', { variant: 'error' });
-
-      playNotificationSound();
     } finally {
       setIsProcessing(false);
     }
@@ -810,20 +838,6 @@ const navigate = useNavigate();
 
   // filter
 
-  // get menu
-  const fetchMenuData = async () => {
-    try {
-      const response = await axios.post(`${apiUrl}/menu/get`, {},{headers: {
-        Authorization: `Bearer ${token}`
-      }});
-      setMenu(response.data.menus);
-    } catch (error) {
-      console.error(
-        "Error fetching roles:",
-        error.response ? error.response.data : error.message
-      );
-    }
-  };
   // Add state for confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
@@ -838,21 +852,22 @@ const navigate = useNavigate();
     setShowDeleteConfirm(true);
     handleCloseEditProduction();
   };
-  const handleClick = async(id, image,name,price,code) => {
+
+  const handleClick = async (id, image, name, price, code) => {
     console.log("asasd");
-    
-    localStorage.setItem("cartItems", JSON.stringify([{image,price,name,code,id,count:1,isEditing:false,note:""}]));
+
+    localStorage.setItem("cartItems", JSON.stringify([{ image, price, name, code, id, count: 1, isEditing: false, note: "" }]));
     try {
       const response = await axios.get(`${apiUrl}/orders/last`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       // console.log(response.data);
-      if(response.status == 200){
+      if (response.status == 200) {
         localStorage.setItem("lastOrder", JSON.stringify(response.data.order.id + 1));
         navigate("/counter");
       }
-      
+
     } catch (error) {
       console.error(
         "Error fetching subfamilies:",
@@ -1020,8 +1035,10 @@ const navigate = useNavigate();
                               <input
                                 type="checkbox"
                                 className="me-2 custom-checkbox"
-                                onChange={() =>
-                                  handleProductionCenterChange(item.id)}
+                                onChange={() => {
+                                  handleProductionCenterChange(item.id);
+                                  setMenuId(item.id);
+                                }}
                               />
                               <p className="text-white mb-0">{item.name}</p>
                             </label>
@@ -1085,7 +1102,7 @@ const navigate = useNavigate();
                             type="text"
                             className="form-control m_input"
                             id="exampleFormControlInput1"
-                            placeholder="045"
+                            placeholder={currentProdCenter.printer_code}
                             value={currentProdCenter.printer_code}
                             onChange={handleEditPrinterCodeChange}
                           />
@@ -1263,18 +1280,20 @@ const navigate = useNavigate();
                               className="px-3 py-1 d-flex gap-2 align-items-center fw-500"
                               key={ele.id}
                               style={{
-                                opacity: selectedMenus.some(
+                                opacity: familyFilter.some(
                                   (menu) => String(menu.id) === String(ele.id) // Ensure both IDs are compared as strings
                                 )
                                   ? 1
                                   : 0.7
                               }}
                             >
+                              {/* {console.log(familyFilter.some((menu) => String(menu.id) === String(ele.id)))}
+                              {console.log(familyFilter)} */}
                               <input
                                 type="checkbox"
                                 className="j-change-checkbox j_check_white"
                                 name={ele.name}
-                                checked={selectedMenus.some((menu) => String(menu.id) === String(ele.id))}
+                                checked={familyFilter.some((menu) => String(menu.id) === String(ele.id))}
                                 onChange={handleCheckboxChange}
                                 id={ele.id}
                               />
@@ -1284,17 +1303,19 @@ const navigate = useNavigate();
                         </Dropdown.Menu>
                       </Dropdown>
                     </div>
-                    <div>
                       {/* add product */}
-                      <Button
-                        variant="primary text-nowrap"
-                        className="b_btn_pop"
-                        style={{ fontSize: "12px" }}
-                        onClick={handleShow1Prod}
-                      >
-                        + &nbsp; Agregar
-                      </Button>
-                    </div>
+                      {selectedMenus.length == 1 &&
+                      <div>
+                        <Button
+                          variant="primary text-nowrap"
+                          className="b_btn_pop"
+                          style={{ fontSize: "12px" }}
+                          onClick={handleShow1Prod}
+                        >
+                          + &nbsp; Agregar
+                        </Button>
+                      </div>
+                    }
 
                     <Modal
                       show={show1Prod}
@@ -1440,7 +1461,7 @@ const navigate = useNavigate();
                                         bg="light"
                                         className="ms-2 text-success rounded-circle m12"
                                       >
-                                        {selectedItemsCount}
+                                        {itemstoUpdate.length > 0 && itemstoUpdate[0].item_ids?.length}
                                       </Badge>
                                       <span className="visually-hidden">
                                         unread messages
@@ -1452,8 +1473,9 @@ const navigate = useNavigate();
                             </div>
                             <div className="row p-2">
                               {filteredItemsMenu.length > 0 ? (
-                                filteredItemsMenu.map((ele, index) => (
-                                  <div
+                                filteredItemsMenu.map((ele, index) => {
+                                  const isAdded = itemstoUpdate.length > 0 ? itemstoUpdate[0].item_ids.some((item) => item == ele.id) : "false";
+                                  return (<div
                                     className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                                     key={ele.id} // Corrected from 'keys' to 'key'
                                   >
@@ -1478,14 +1500,15 @@ const navigate = useNavigate();
                                           <div
                                             onClick={() =>
                                               handleAddItem(ele.id)}
-                                            className="btn w-100 btn-primary text-white"
+                                            className="btn w-100  text-white"
+                                            style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
                                           >
                                             <Link
                                               className="text-white text-decoration-none"
                                               style={{ fontSize: "14px" }}
                                             >
                                               <span className="ms-1">
-                                                Añadir{" "}
+                                                {isAdded ? 'Agregado' : 'Agregar al menú'}
                                               </span>
                                             </Link>
                                           </div>
@@ -1516,7 +1539,8 @@ const navigate = useNavigate();
                                       </div>
                                     </div>
                                   </div>
-                                ))
+                                  );
+                                })
                               ) : (
                                 <div className="col-12 text-center text-white mt-5">
                                   <h5 className="opacity-75 m-0">
@@ -1570,111 +1594,104 @@ const navigate = useNavigate();
                 </div>
 
                 <div className="p-3 pt-0 m_bgblack d-flex align-items-center">
-                  {selectedMenus.length > 0 &&
-                    selectedProductionCenters.length === 0 && (
-                      <div className="d-flex align-items-center">
-                        {console.log(
-                          "menus",
-                          selectedMenus,
-                          selectedProductionCenters
-                        )}
-                        <span className="text-white m14">Filtros:</span>
-                        {selectedMenus.map((menu) => (
-                          // Find the corresponding menu name from parentCheck
-                          // const menuItem = parentCheck.find(
-                          //   (item) => item.id.toString() === menu.id
-                          // );
-                          <div
-                            key={menu.id}
-                            className="d-inline-block ms-2 d-flex align-items-center m12"
+                  {familyFilter.length > 0 &&
+                    // selectedProductionCenters.length === 0 && (
+                    <div className="d-flex align-items-center">
+                      {console.log(
+                        "menus",
+                        selectedMenus,
+                        selectedProductionCenters
+                      )}
+                      <span className="text-white m14">Filtros:</span>
+                      {familyFilter.map((menu) => (
+                        // Find the corresponding menu name from parentCheck
+                        // const menuItem = parentCheck.find(
+                        //   (item) => item.id.toString() === menu.id
+                        // );
+                        <div
+                          key={menu.id}
+                          className="d-inline-block ms-2 d-flex align-items-center m12"
+                        >
+                          {console.log(menu.name)}
+                          <Button
+                            variant="light"
+                            size="sm"
+                            onClick={() => clearFilter(menu.id)} // Pass the ID to clearFilter
+                            className="rounded-3 m12"
+                            style={{ fontWeight: "500" }}
                           >
-                            {console.log(menu.name)}
-                            <Button
-                              variant="light"
-                              size="sm"
-                              onClick={() => clearFilter(menu.id)} // Pass the ID to clearFilter
-                              className="rounded-3 m12"
-                              style={{ fontWeight: "500" }}
-                            >
-                              {menu.name} &nbsp;{" "}
-                              <span className="m16">
-                                <MdClose />
-                              </span>
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                            {menu.name} &nbsp;{" "}
+                            <span className="m16">
+                              <MdClose />
+                            </span>
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  }
                 </div>
 
                 <div className="row p-2">
-                  {items.length > 0 ? (
-                    items.map((ele, index) => (
-                      <div
-                        className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
-                        key={ele.id}
-                      >
-                        <div>
-                          <div class="card m_bgblack text-white position-relative">
-                            <img
-                              src={`${API}/images/${ele.image}`}
-                              class="card-img-top object-fit-cover rounded"
-                              alt="..."
-                              style={{ height: "162px" }}
-                            />
-                            <div class="card-body">
-                              <h6 class="card-title">{ele.name}</h6>
-                              <h6 class="card-title">$ {ele.sale_price}</h6>
-                              <p
-                                class="card-text"
-                                style={{ fontSize: "14px" }}
-                              >
-                                Codigo: {ele.code}
-                              </p>
-                              <div
-                                class="btn w-100 btn-primary text-white b_ttt"
-                                style={{ backgroundColor: "#147BDE" }}
-                              >
-                               <a
-                                  className="text-white text-decoration-none "
-                                  style={{ fontSize: "14px" }} 
-                                  onClick={()=>handleClick(ele.id, ele.image,ele.name,ele.sale_price,ele.code)}
-                                >
-                                  <FaCartPlus />{" "}
-                                  <span className="ms-1  ">
-                                    Añadir al contador
-                                  </span>
-                                </a>
-                              </div>
+                  {productionAllData.length > 0 ? (
+                    productionAllData
+                      .filter(menu => selectedMenus.length === 0 || selectedMenus.includes(menu.id)) // Filter based on selectedMenus
+                      .map((menu) => (
+                        <div key={menu.id}>
+                          <h6 className="mb-0 mt-3 ps-2" style={{ color: "white" }}>{menu.name}</h6>
+                          {menu.items.length > 0 ? (
+                            <div className="row">
+                              {menu.items
+                                .filter(item =>
+                                  familyFilter.length === 0 || familyFilter.some(family => family.id == item.family_id) // Filter based on familyFilter
+                                )
+                                .reduce((uniqueItems, currentItem) => {
+                                  // Check if the item is already in the uniqueItems array
+                                  if (!uniqueItems.some(item => item.id === currentItem.id)) {
+                                    uniqueItems.push(currentItem);
+                                  }
+                                  return uniqueItems;
+                                }, [])
+                                .map((ele) => (
+
+                                  <div className="col-md-4 col-xl-3 col-sm-6 col-12 g-3" key={ele.id}>
+                                    <div className="card m_bgblack text-white position-relative">
+                                      <img
+                                        src={`${API}/images/${ele.image}`}
+                                        className="card-img-top object-fit-cover rounded"
+                                        alt={ele.name}
+                                        style={{ height: "162px", objectFit: "cover" }}
+                                      />
+                                      <div className="card-body">
+                                        <h6 className="card-title">{ele.name}</h6>
+                                        <h6 className="card-title">$ {ele.sale_price}</h6>
+                                        <p className="card-text" style={{ fontSize: "14px" }}>
+                                          Codigo: {ele.code}
+                                        </p>
+                                        <div className="btn w-100 btn-primary text-white b_ttt" style={{ backgroundColor: "#147BDE" }}>
+                                          <a
+                                            className="text-white text-decoration-none"
+                                            style={{ fontSize: "14px" }}
+                                            onClick={() => handleClick(ele.id, ele.image, ele.name, ele.sale_price, ele.code)}
+                                          >
+                                            <FaCartPlus />{" "}
+                                            <span className="ms-1">Añadir al contador</span>
+                                          </a>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
                             </div>
-                            <div
-                              className="position-absolute "
-                              style={{ cursor: "pointer" }}
-                            >
-                              <Link
-                                to={`/articles/singleatricleproduct/${ele.id}`}
-                                className="text-white text-decoration-none"
-                              >
-                                <p
-                                  className=" px-1  rounded m-2"
-                                  style={{ backgroundColor: "#374151" }}
-                                >
-                                  <IoMdInformationCircle />{" "}
-                                  <span style={{ fontSize: "12px" }}>
-                                    Ver información
-                                  </span>
-                                </p>
-                              </Link>
+                          ) : (
+                            <div className="col-12 text-center text-white mt-3">
+                              <p className="opacity-75">No hay productos disponibles en este menú</p>
                             </div>
-                          </div>
+                          )}
                         </div>
-                      </div>
-                    ))
+                      ))
                   ) : (
                     <div className="col-12 text-center mt-4">
-                      <p className="text-white">
-                        No hay productos disponibles.
-                      </p>
+                      <p className="text-white">No hay productos disponibles.</p>
                     </div>
                   )}
                 </div>

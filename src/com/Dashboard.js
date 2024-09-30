@@ -15,7 +15,7 @@ import {
   YAxis,
   CartesianGrid
 } from "recharts";
-import Sidenav from "../components/Sidenav";
+import Sidenav from "./Sidenav";
 import ApexCharts from "apexcharts";
 
 import { BiSolidDashboard, BiSolidMessageSquareDetail } from "react-icons/bi";
@@ -36,12 +36,12 @@ import order2 from "../Image/order2.png";
 import order3 from "../Image/order3.png";
 import Chart from "react-apexcharts";
 import green from "../Image/green.png";
-import Aa from "../components/Aa";
-import Sa from "../components/Sa";
-import Header from "../components/Header";
+import Aa from "./Aa";
+import Sa from "./Sa";
+import Header from "./Header";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Loader from "../components/Loader";
+import Loader from "./Loader";
 // import ApexCharts from "apexcharts";
 // import ApexCharts from 'apexcharts';
 
@@ -116,6 +116,7 @@ const Dashboard = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
   const token = sessionStorage.getItem("token");
+  const admin_id = sessionStorage.getItem("admin_id");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   // month select
@@ -217,7 +218,7 @@ useEffect(() => {
     try {
       const response = await axios.post(
         `${apiUrl}/dashboard`,
-        {}, // You can pass any data here if needed
+        {admin_id}, // You can pass any data here if needed
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -273,7 +274,7 @@ useEffect(() => {
 
       const response = await axios.post(
         `${apiUrl}/getStatisticalData`,
-        durationData,
+        {admin_id,durationData},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -317,7 +318,7 @@ useEffect(() => {
 
       const response = await axios.post(
         `${apiUrl}/getPaymentMethods`,
-        durationData,
+        {durationData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -360,7 +361,7 @@ useEffect(() => {
 
       const response = await axios.post(
         `${apiUrl}/getTotalRevenue`,
-        durationData,
+        {admin_id,durationData},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -382,7 +383,7 @@ useEffect(() => {
     try {
       const response = await axios.post(
         `${apiUrl}/getStatusSummary`,
-        {}, // You can pass any data here if needed
+        {admin_id}, // You can pass any data here if needed
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -422,7 +423,7 @@ useEffect(() => {
 
       const response = await axios.post(
         `${apiUrl}/getPopularProducts`,
-        durationData,
+        {admin_id,durationData},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -461,7 +462,7 @@ useEffect(() => {
           month: selectBoxMonth  // Current month (1-12)
         };
       }
-      const response = await axios.post(`${apiUrl}/getBoxEntry`, durationData, {
+      const response = await axios.post(`${apiUrl}/getBoxEntry`, {admin_id,durationData}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -498,7 +499,7 @@ useEffect(() => {
       }
       const response = await axios.post(
         `${apiUrl}/getdelivery`,
-        durationData,
+        {admin_id,durationData},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -535,7 +536,7 @@ useEffect(() => {
       }
       const response = await axios.post(
         `${apiUrl}/cancelOrders`,
-        durationData,
+        {admin_id,durationData},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -554,9 +555,9 @@ useEffect(() => {
   // get payment
   const fetchPayment = async () => {
     try {
-      const response = await axios.get(
+      const response = await axios.post(
         `${apiUrl}/get-payments`,
-
+        {admin_id},
         {
           headers: { Authorization: `Bearer ${token}` },
         }

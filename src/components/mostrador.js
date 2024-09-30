@@ -56,15 +56,22 @@ const Mostrador = () => {
   };
 
   const handleAddNoteClick = (index) => {
-    const updatedIsEditing = [...isEditing];
-    updatedIsEditing[index] = true;
-    setIsEditing(updatedIsEditing);
-    const updatedCartItems = [...cartItems];
-    if (!updatedCartItems[index].note) {
-      updatedCartItems[index].note = "Nota: ";
-      setCartItems(updatedCartItems);
-    }
-  };
+    // const updatedIsEditing = [...isEditing];
+    // updatedIsEditing[index] = true;
+    // setIsEditing(updatedIsEditing);
+    // const updatedCartItems = [...cartItems];
+    // if (!updatedCartItems[index].note) {
+    //   updatedCartItems[index].note = "Nota: ";
+    //   setCartItems(updatedCartItems);
+    // }
+    const updatedCartItems = cartItems.map(
+      (item, i) =>
+        i === index
+          ? { ...item, isEditing: true, note: item.note || "Nota: " }
+          : item
+    );
+    setCartItems(updatedCartItems);
+  };  
 
   useEffect(()=>{
     if (!(role == "admin" || role == "cashier")) {
@@ -159,7 +166,12 @@ const Mostrador = () => {
 
   const [showEditFamDel, setShowEditFamDel] = useState(false);
   const handleCloseEditFamDel = () => setShowEditFamDel(false);
-  const handleShowEditFamDel = () => setShowEditFamDel(true);
+  const handleShowEditFamDel = () => {
+    setShowEditFamDel(true);
+    setTimeout(() => {
+      setShowEditFamDel(false);
+    }, 2000); // 2000 milliseconds = 2 seconds
+  };
 
   const [showEditFam, setShowEditFam] = useState(false);
   const handleCloseEditFam = () => setShowEditFam(false);
@@ -319,9 +331,10 @@ const Mostrador = () => {
     }
 
     // Tour validation
+  
     if (!data.tour || data.tour.trim() === "") {
-      errors.tour = "Se requiere tour";
-    }
+      errors.tour = "Se requiere el Giro";
+    } 
 
     // Address validation
     if (!data.address || data.address.trim() === "") {
@@ -331,6 +344,40 @@ const Mostrador = () => {
 
     return errors;
   };
+  const [paymentData, setPaymentData] = useState(null);
+
+  const [activeA, setActiveA] = useState(null)
+
+  useEffect(()=>{
+    const storedPayment = JSON.parse(localStorage.getItem("payment"));
+    if(storedPayment){
+      setPaymentData(storedPayment);
+    }
+  },[])
+
+  useEffect(()=>{
+    
+    if(paymentData){
+      setFormData({
+        fname: paymentData.firstname,
+        lname: paymentData.lastname,
+        tour: paymentData.tour,
+        address: paymentData.address,
+        email: paymentData.email,
+        number: paymentData.phone,
+        bname: paymentData.business_name,
+        ltda: paymentData.ltda,
+        tipoEmpresa: paymentData.receiptType === "4"? paymentData.ltda : "0",
+        rut: paymentData.receiptType == "1"? paymentData.rut : paymentData.receiptType == "2"? paymentData.rut : paymentData.rut,
+      })
+      setActiveAccordionItem(paymentData.receiptType); // {{ edit_1 }}
+      paymentData.receiptType == "1"? setRut1(paymentData.rut) : paymentData.receiptType == "2" ? setRut2(paymentData.rut) : setRut3(paymentData.rut)
+      handleAccordionClick(paymentData.receiptType);
+      setSelectedRadio(paymentData.receiptType);
+      setActiveA(paymentData.receiptType);
+    }
+  },[paymentData])
+
   const handleSubmit = () => {
     setIsProcessing(true);
     const collectedData = collectAccordionData();
@@ -409,8 +456,8 @@ const Mostrador = () => {
                 <p className="mb-2">Datos cliente</p>
                 <p>Tipos de comprobantes</p>
                 <hr className="sj_bottom" />
-                <Accordion defaultActiveKey={["0"]} className="sj_accordion">
-                  <Accordion.Item eventKey="0" className="mb-2">
+                <Accordion activeKey={activeAccordionItem} className="sj_accordion">
+                  <Accordion.Item eventKey="1" className="mb-2">
                     <Accordion.Header>
                       <div
                         onClick={() => handleAccordionClick("1")}
@@ -971,7 +1018,7 @@ const Mostrador = () => {
                       <Modal.Body className="border-0">
                         <div className="text-center">
                           <img
-                            className="j-trash-img-late"
+                            // className="j-trash-img-late"
                             src={require("../Image/trash-outline-secondary.png")}
                             alt=""
                           />
@@ -1003,7 +1050,7 @@ const Mostrador = () => {
                         </Button>
                       </Modal.Footer>
                     </Modal>
-                    <Modal
+                    {/* <Modal
                       show={showEditFamDel}
                       onHide={handleCloseEditFamDel}
                       backdrop={true}
@@ -1025,7 +1072,7 @@ const Mostrador = () => {
                           </p>
                         </div>
                       </Modal.Body>
-                    </Modal>
+                    </Modal> */}
                   </div>
                 )}
                 <Modal

@@ -100,7 +100,7 @@ const Tables = () => {
   const getSector = async () => {
     setIsProcessing(true)
     try {
-      const response = await axios.post(`${apiUrl}/sector/getAll`,{admin_id:admin_id});
+      const response = await axios.post(`${apiUrl}/sector/getAll`, { admin_id: admin_id });
       if (response.data.success) {
         setCheckboxes(response.data.sectors);
         setsectors(response.data.sectors);
@@ -119,7 +119,7 @@ const Tables = () => {
   const fetchAllItems = async () => {
     setIsProcessing(true)
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -138,7 +138,7 @@ const Tables = () => {
   const getTableData = async (id) => {
     setIsProcessing(true)
     try {
-      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, {admin_id: admin_id},{
+      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, { admin_id: admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -187,7 +187,7 @@ const Tables = () => {
   const getSectorTable = async () => {
     setIsProcessing(true)
     try {
-      const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id:admin_id});
+      const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id: admin_id });
       if (response.data) {
         setSecTab(response.data.data);
       } else {
@@ -259,7 +259,7 @@ const Tables = () => {
         {
           sector_id: newTable.sectorName,
           noOfTables: newTable.noOfTables,
-          admin_id:admin_id
+          admin_id: admin_id
 
         },
         {
@@ -1481,14 +1481,17 @@ const Tables = () => {
                       <p className="j-table-color  j-tbl-font-6">Ocupado</p>
                     </div>
                   </div>
-                  <div className="">
+                  <button
+                    data-bs-theme="dark"
+                    className="j-canvas-btn2 j-tbl-font-3  btn bj-btn-outline-primary"
+                  >
                     <p
-                      className="j-table-all-color  j-tbl-font-6"
+                      className="j-tbl-font-6 mb-0"
                       onClick={() => handleFilterChange("")}
                     >
                       Reiniciar
                     </p>
-                  </div>
+                  </button>
                 </div>
 
                 <div className="j-table-bgcolor row p-4">
@@ -1643,7 +1646,7 @@ const Tables = () => {
               />
               <p className="mb-0 mt-3 h6">
                 {" "}
-                ¿Seguro deseas eliminar este pedido?
+                ¿Seguro deseas eliminar este Sector?
               </p>
             </div>
           </Modal.Body>
@@ -1809,7 +1812,7 @@ const Tables = () => {
                 onClick={handleEditClick}
               >
                 <div className="d-flex align-items-center">
-                  <svg
+                  {!isEditing && <svg
                     className="j-canvas-btn-i"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
@@ -1828,8 +1831,8 @@ const Tables = () => {
                       d="M19.846 4.318a2.148 2.148 0 0 0-.437-.692 2.014 2.014 0 0 0-.654-.463 1.92 1.92 0 0 0-1.544 0 2.014 2.014 0 0 0-.654.463l-.546.578 2.852 3.02.546-.579a2.14 2.14 0 0 0 .437-.692 2.244 2.244 0 0 0 0-1.635ZM17.45 8.721 14.597 5.7 9.82 10.76a.54.54 0 0 0-.137.27l-.536 2.84c-.07.37.239.696.588.622l2.682-.567a.492.492 0 0 0 .255-.145l4.778-5.06Z"
                       clip-rule="evenodd"
                     />
-                  </svg>
-                  Editar
+                  </svg>}
+                  {isEditing ? "Ahorrar" : "Editar"}
                 </div>
               </button>
 

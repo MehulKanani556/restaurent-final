@@ -204,6 +204,8 @@ const Informacira = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
   const [showDelModal, setShowDelModal] = useState(false); // State for delete confirmation modal
   const [isProcessing, setIsProcessing] = useState(false);
+  const [allpayments, setAllpayments] =useState([]);
+
   const navigate = useNavigate();
   const handleEdit = (box) => {
     setSelectedBox(box[0]);
@@ -244,8 +246,10 @@ const Informacira = () => {
         fetchAllBox();
 
         getBox();
-        enqueueSnackbar(response.data?.notification, { variant: 'success' });
-        playNotificationSound();
+        if (response.data && response.data.notification) {
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
+          playNotificationSound();
+        }
         console.log("Update Successfully");
       } else {
         // Handle error
@@ -282,8 +286,10 @@ const Informacira = () => {
           setShowDelModal(false); // Hide success modal
           navigate('/caja'); // Navigate to caja page
         }, 2000);
-        enqueueSnackbar(response.data?.notification, { variant: 'success' });
-        playNotificationSound();
+        if (response.data && response.data.notification) {
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
+          playNotificationSound();
+        }
         console.log("Box deleted successfully");
         // navigate('/caja');
       } else {
@@ -305,7 +311,7 @@ const Informacira = () => {
     try {
       const response = await axios.post(
         `${apiUrl}/order/getAll`,
-        {admin_id:admin_id},
+        { admin_id: admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -320,6 +326,25 @@ const Informacira = () => {
     }
     setIsProcessing(false);
   };
+  const fetchAllpayment = async() =>{
+    setIsProcessing(true);
+    try {
+      const response = await axios.post(
+        `${apiUrl}/get-payments`,{admin_id:admin_id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      setAllpayments(response.data.result);
+
+    } catch (error) {
+      console.error("Error fetching boxes:", error);
+    }
+    setIsProcessing(false);
+  }
+
   const fetchAllTable = async () => {
     setIsProcessing(true);
     try {
@@ -384,7 +409,10 @@ const Informacira = () => {
           }
         }
       );
-      enqueueSnackbar(response.data.notification, { variant: 'success' });
+      if (response.data && response.data.notification) {
+        enqueueSnackbar(response.data.notification, { variant: 'success' });
+        playNotificationSound();
+      }
       playNotificationSound();
       // playNotificationSound();
     } catch (error) {
@@ -410,7 +438,8 @@ const Informacira = () => {
           fetchAllBoxReport();
           fetchAllOrder();
           fetchAllTable();
-          // getUser();
+          getUser();
+          fetchAllpayment();
         }
       }
     },
@@ -494,7 +523,7 @@ const Informacira = () => {
         {
           box_id: bId, // Pass the box ID
           open_amount: openPrice,  // Pass the open amount
-          admin_id:admin_id
+          admin_id: admin_id
         },
         {
           headers: {
@@ -508,7 +537,10 @@ const Informacira = () => {
         fetchAllBox(); // Refresh box data
         console.log("open box successfully")
         handleClose16();
-        enqueueSnackbar(response.data?.notification, { variant: 'success' });
+        if (response.data && response.data.notification) {
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
+          playNotificationSound();
+        }
         playNotificationSound();
       } else {
         console.error('Failed to open box');
@@ -537,7 +569,7 @@ const Informacira = () => {
           box_id: bId, // Pass the box ID
           close_amount: closePrice, // Pass the close amount
           cash_amount: pricesecond,
-          admin_id:admin_id
+          admin_id: admin_id
         },
         {
           headers: {
@@ -551,7 +583,10 @@ const Informacira = () => {
         handleClose11();
         fetchAllBox(); // Refresh box data
         console.log("Box closed successfully");
-        enqueueSnackbar(response.data?.notification, { variant: 'success' });
+        if (response.data && response.data.notification) {
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
+          playNotificationSound();
+        }
         playNotificationSound();
 
       } else {
@@ -953,6 +988,27 @@ const Informacira = () => {
     const discountData = results.find(result => result.id === boxId);
     return discountData ? { discount: discountData.totalDiscount, tax: discountData.totalTax, type: discountData.totalPaymentByType } : { discount: 0, tax: 0 }; // Return discount and tax or 0 if not found
   };
+  const [showpay ,setShowpay] = useState(false);
+
+  const handleClosepay = () =>{
+    setShowpay(true);
+    setTimeout(() => {
+      setShowpay(false);
+    }, 2000);
+    
+  }
+
+  const handleorderRecipt = (data) => {
+
+    const payament = allpayments.some((v)=>v.order_master_id == data.id)
+    console.log(payament);
+    if(payament){
+      setShowModalOrder(true)
+    }else{
+      handleClosepay()
+    }
+  }
+
   return (
     <section>
       <div className="s_bg_dark">
@@ -1065,7 +1121,29 @@ const Informacira = () => {
                           </div>
                         </Modal.Body>
                       </Modal>
+                      <Modal
+                        show={showpay}
+                        onHide={handleClosepay}
+                        backdrop={true}
+                        keyboard={false}
+                        className="m_modal jay-modal"
+                      >
+                        <Modal.Header closeButton className="border-0" onClick={() => { setShowpay(false) }} />
+                        <Modal.Body>
+                          <div className="text-center">
+                            {/* <img
+                              src={require("../Image/check-circle.png")}
+                              alt=""
+                            /> */}
+                            <p className="mb-0 mt-2 h6 j-tbl-pop-1">
 
+                            </p>
+                            <p className="opacity-75 j-tbl-pop-2">
+                              Panding de pago para este pedid
+                            </p>
+                          </div>
+                        </Modal.Body>
+                      </Modal>
                       <button
                         className="j-canvas-btn2 btn j-tbl-font-3  bj-btn-outline-primary"
                         onClick={handleShow15}
@@ -2192,7 +2270,7 @@ const Informacira = () => {
                   style={{ backgroundColor: "#1F2A37" }}
                   className="py-2"
                 >
-                  <div className="text-white px-3 py-3">
+                  {/* <div className="text-white px-3 py-3">
                     <div>
                       <label htmlFor="caja" className="w-50 mx-2">
                         Nombre caja
@@ -2242,8 +2320,79 @@ const Informacira = () => {
                         disabled
                       />
                     </div>
+                  </div> */}
+                    <div className="j-table-information-body">
+                    <form className="j_ti_form">
+                      <div className="row">
+                        <div className="col-6 mb-3 ">
+                          <label
+                            htmlFor="exampleFormControlInput1"
+                            className="form-label text-white j-tbl-font-11"
+                          >
+                            Nombre caja
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control j-tbl-information-input"
+                            id="exampleFormControlInput1"
+                            placeholder="Damian Lopez"
+                            value={boxName[0]?.name}
+                            readOnly
+                          />
+                        </div>
+                        <div className="col-6 mb-3">
+                          <label
+                            htmlFor="exampleFormControlInput1"
+                            className="form-label text-white j-tbl-font-11"
+                          >
+                            Fecha creación
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control j-tbl-information-input"
+                            id="exampleFormControlInput1"
+                            placeholder="20/03/2024"
+                            value={boxName[0]?.created_at ? new Date(boxName[0]?.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}
+                            readOnly
+                          />
+                        </div>
+                        <div className="col-6 ">
+                          <label
+                            htmlFor="exampleFormControlInput1"
+                            className="form-label text-white j-tbl-font-11"
+                          >
+                           Cuantas aperturas
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control j-tbl-information-input"
+                            id="exampleFormControlInput1"
+                            placeholder="4"
+                            value={data.filter(item => item.open_amount !== null).length}
+                            readOnly
+                          />
+                        </div>
+                        <div className="col-6">
+                          <label
+                            htmlFor="exampleFormControlInput1"
+                            className="form-label text-white j-tbl-font-11"
+                          >
+                            Cuantos cierres
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control j-tbl-information-input"
+                            id="exampleFormControlInput1"
+                            placeholder="1"
+                            value={data.filter(item => item.close_amount !== null).length}
+                            readOnly
+                          />
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 </Tab>
+                
 
                 <Tab
                   eventKey="longer-tab"
@@ -2327,7 +2476,7 @@ const Informacira = () => {
                                   {user.status === "delivered" ? (
                                     <>
 
-                                      <button className="bg-transparent border-0" onClick={() => { setShowModalOrder(true); setSelectedOrder(user) }}> {/* Update to show modal */}
+                                      <button className="bg-transparent border-0" onClick={() => {setSelectedOrder(user);handleorderRecipt(user) }}> {/* Update to show modal */}
                                         <svg
                                           className="sj-button-xise"
                                           aria-hidden="true"

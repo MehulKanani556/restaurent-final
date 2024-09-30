@@ -6,6 +6,7 @@ import { MdDateRange, MdEditSquare } from "react-icons/md";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaPrint } from 'react-icons/fa';
 import img1 from '../Image/Image.jpg'
+import img2 from '../Image/check-circle.png'
 import { FiClock } from 'react-icons/fi';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -51,7 +52,7 @@ function Home_detail_no() {
     const [destination, setDestination] = useState();
     const [error, setError] = useState(null);
     const [orderAlldata, setOrderAlldata] = useState([]);
-
+    const [showcreditfinal, setShowcreditfinal] = useState(false)
 
     useEffect(() => {
         fetchCredit();
@@ -62,7 +63,7 @@ function Home_detail_no() {
     const getAllOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/order/getAll`, {admin_id: admin_id},{
+            const response = await axios.post(`${apiUrl}/order/getAll`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -107,9 +108,11 @@ function Home_detail_no() {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-                Authorization: `Bearer ${token}`
-              }});
+            const response = await axios.get(`${apiUrl}/item/getAll`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setItems(response.data.items);
             // setObj1(response.data.items);
             // setFilteredItemsMenu(response.data.items);
@@ -124,7 +127,7 @@ function Home_detail_no() {
 
     useEffect(() => {
         handleReturnDetails();
-    }, [items,creditNote])
+    }, [items, creditNote])
 
 
     const handleReturnDetails = () => {
@@ -150,15 +153,57 @@ function Home_detail_no() {
     const handleDestination = (event) => {
         let notes = event.target.value
         console.log(notes);
-        
+
         setDestination(notes)
         setError(null)
     }
 
     console.log(destination);
-    
 
 
+
+    // const handleReturn = () => {
+    //     if (!destination) {
+    //         setError('Ingrese la dirección de retorno');
+    //         return;
+    //     }
+
+    //     if (!(orderAlldata.some((v) => v.id == destination))) {
+    //         setError('No se encontró la orden de compra');
+    //         return;
+    //     }
+
+
+    //     setIsProcessing(true);
+    //     axios
+    //         .post(
+    //             `${apiUrl}/order/getCreditUpdate/${creditNote.id}`,
+    //             {
+    //                 status: "Completed",
+    //                 destination: destination
+    //             },
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         )
+    //         .then((response) => {
+    //             console.log(response.data);
+    //             setIsProcessing(false);
+    //             navigate('/home/client/detail', {
+    //                 replace: true,
+    //                 state,
+    //             }); 
+    //         })
+    //         .catch((error) => {
+    //             console.error(error);
+    //             setIsProcessing(false);
+    //             setError('Hubo un error al intentar realizar el retorno');
+    //         });
+
+    //         setError(null)
+    // }
     const handleReturn = () => {
         if (!destination) {
             setError('Ingrese la dirección de retorno');
@@ -169,7 +214,6 @@ function Home_detail_no() {
             setError('No se encontró la orden de compra');
             return;
         }
-
 
         setIsProcessing(true);
         axios
@@ -188,18 +232,23 @@ function Home_detail_no() {
             .then((response) => {
                 console.log(response.data);
                 setIsProcessing(false);
-                navigate('/home/client/detail', {
-                    replace: true,
-                    state,
-                }); 
+
+                setShowcreditfinal(true);
+                setTimeout(() => {
+                    setShowcreditfinal(false);
+                    navigate('/home/client/detail', {
+                        replace: true,
+                        state,
+                    });
+                }, 2000);
+
             })
             .catch((error) => {
                 console.error(error);
                 setIsProcessing(false);
                 setError('Hubo un error al intentar realizar el retorno');
             });
-
-            setError(null)
+        setError(null)
     }
 
 
@@ -221,7 +270,7 @@ function Home_detail_no() {
         destination: "-"
     }
 
-    const handleNavigate = () =>{
+    const handleNavigate = () => {
 
         navigate("/home/client/detail", { state });
 
@@ -297,7 +346,7 @@ function Home_detail_no() {
                             {returnDetails &&
                                 returnDetails?.map((item, index) => (
                                     console.log(item),
-                                    
+
 
                                     <div className='ms-4 d-flex text-white b_borderrr py-3 '>
                                         <div>
@@ -387,7 +436,24 @@ function Home_detail_no() {
                             <p className="mt-2">Procesando solicitud...</p>
                         </Modal.Body>
                     </Modal>
+                    {/* {====== credit modal =======} */}
 
+                    <Modal
+                        show={showcreditfinal}
+                        onHide={() => setShowcreditfinal(false)}
+                        backdrop="static"
+                        keyboard={false}
+                        className="m_modal"
+                    >
+                        <Modal.Header closeButton className="border-0" />
+                        <Modal.Body className="text-center" style={{ backgroundColor: "#1F2A37" }}>
+                            <div className='m-auto'>
+                                <img src={img2} height={100} width={100} alt="" />
+                            </div>
+                            <h4 className='j-tbl-pop-1 mb-0'>nota de crédito atualizada</h4>
+                            <p className='j-tbl-pop-2'>crédito aplicado con éxito al {destination} pedido</p>
+                        </Modal.Body>
+                    </Modal>
 
                 </div>
             </div>

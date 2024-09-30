@@ -31,7 +31,7 @@ import { Link, useLocation } from "react-router-dom";
 import { AiFillPieChart } from "react-icons/ai";
 import artical from "../Image/Artical.png"
 
-const Sidenav = ({ children }) => {
+const Sidenav = ({ children ,onNavigate}) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isClose, setIsClose] = useState(false);
@@ -161,7 +161,7 @@ const Sidenav = ({ children }) => {
           <div className="j-sidebar-content m_bgblack">
             {menuItem.map((item, index) => (
               <Link
-                to={item.path}
+              to= {onNavigate ? "#" : item.path } 
                 key={index}
                 // className={`j-link ${location.pathname === item.path ? 'j-active' : ''}`}
                 // className={`j-link ${location.includes(pathname) && pathname === item.path ? 'j-active' : ''}`}
@@ -183,7 +183,7 @@ const Sidenav = ({ children }) => {
         <div className="j-sidebar-content">
           {menuItem.map((item, index) => (
             <Link
-              to={item.path}
+            to= {onNavigate ? "#" : item.path } 
               key={index}
               // className={`j-link ${location.includes(pathname) === item.path ? 'j-active' : ''}`}
               // className={`j-link ${location.includes(pathname) && pathname === item.path ? 'j-active' : ''}`}

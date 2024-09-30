@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidenav from "./Sidenav";
 import { HiOutlineArrowLeft } from "react-icons/hi";
-import { Button, Modal, Tab, Tabs } from "react-bootstrap";
+import { Button, Modal, Spinner, Tab, Tabs } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa6";
@@ -18,6 +18,7 @@ const TableInformation = () => {
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token] = useState(sessionStorage.getItem("token"));
   const [role] = useState(sessionStorage.getItem("role"));
+  const admin_id = sessionStorage.getItem("admin_id") 
 
   const [tId, setTId] = useState(location.state?.selectedTable);
   console.log(tId);
@@ -124,59 +125,7 @@ const TableInformation = () => {
       estado: "Recibido"
     },
 
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Recibido"
-    },
-
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Preparado"
-    },
-
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Entregado"
-    },
-
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Finalizado"
-    },
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Preparado"
-    },
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Recibido"
-    },
-
-    {
-      pedido: "01234",
-      fecha: "24/05/2023",
-      hora: "11:00 AM",
-      cliente: "Damian Gonzales",
-      estado: "Finalizado"
-    }
+    
   ]);
 
   const [activeTab, setActiveTab] = useState("home");
@@ -337,8 +286,9 @@ const TableInformation = () => {
 
   const fetchData = async (tableId) => {
     try {
-      const response = await axios.get(
+      const response = await axios.post(
         `${apiUrl}/table/getStats/${tableId}?from_month=${selectedDesdeMonth}&to_month=${selectedHastaMonth}`,
+        {admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -501,8 +451,8 @@ const TableInformation = () => {
 
       //  // =============== Historial =============
 
-      const response = await axios.get(
-        `${apiUrl}/table/getStats/${tableid}?from_month=${selectedDesdeMonthReport}&to_month=${selectedHastaMonthReport}`,
+      const response = await axios.post(
+        `${apiUrl}/table/getStats/${tableid}?from_month=${selectedDesdeMonthReport}&to_month=${selectedHastaMonthReport}`,{admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -559,7 +509,7 @@ const TableInformation = () => {
 
       // Add sorting functionality
       if (historia.length > 0) {
-      ws['!autofilter'] = { ref: `A2:E${historia.length}` }; // Enable autofilter for the range
+        ws['!autofilter'] = { ref: `A2:E${historia.length}` }; // Enable autofilter for the range
       }
       // Create a workbook
       XLSX.utils.book_append_sheet(wb, ws, "Historial");
@@ -582,6 +532,126 @@ const TableInformation = () => {
       );
     }
   };
+  const [showEdittable, setShowEdittable] = useState(false);
+
+  const handleCloseEdittable = () => setShowEdittable(false);
+  const handleShowEdittable = () => setShowEdittable(true);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const [showEditFamDel, setShowEditFamDel] = useState(false);
+  const handleCloseEditFamDel = () => setShowEditFamDel(false);
+
+  const handleShowEditFamDel = () => {
+    setShowEditFamDel(true);
+    setTimeout(() => {
+      setShowEditFamDel(false);
+      navigate("/table")
+    }, 2000);
+  };
+
+  // edit table Success
+  const [showEditFamSuc, setShowEditFamSuc] = useState(false);
+  const handleCloseEditFamSuc = () => setShowEditFamSuc(false);
+  const handleShowEditFamSuc = () => {
+    setShowEditFamSuc(true);
+    setTimeout(() => {
+      setShowEditFamSuc(false);
+    }, 2000);
+  };
+
+  const [tableName, setTableName] = useState(null);
+  const [editErrorName, setEditErrorsName] = useState('');
+  //edit table
+  const handleEditChange = (e) => {
+    const name = e.target.value;
+    setTableName(name);
+    if (name) {
+      setEditErrorsName('');
+    }
+  };
+
+  const handleEditSubmit = async () => {
+
+    if (!tableName) {
+      setEditErrorsName("Debe ingresar un nombre de mesa.");
+      return
+    }
+
+    handleCloseEdittable();
+    setIsProcessing(true)
+    try {
+      const response = await axios.post(
+        `${apiUrl}/table/updateTableName`,
+        {
+          table_id: tId,
+          name: tableName
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+
+      );
+      if (response.status == 200) {
+        setTableName(null)
+        setIsProcessing(false);
+        handleShowEditFamSuc();
+        gettableData();
+        // getSector();
+        // getSectorTable(); 
+      }
+    } catch (error) {
+      console.error("Error updating sector:", error);
+      alert("Failed to update sector. Please try again.");
+    }
+  }
+
+  const handleDeleteClick = () => {
+    console.log(tId);
+    setShowDeleteConfirm(true); // Show confirmation modal
+    handleCloseEdittable();
+  }
+
+  const handleDeleteConfirmation = async () => {
+
+    if (tId) {
+      setIsProcessing(true)
+      try {
+        const response = await axios.delete(
+          // `${apiUrl}/order/deleteSingle/${itemToDelete}`,
+          `${apiUrl}/table/delete/${tId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        if (response.status == 200) {
+          setIsProcessing(false);
+          setShowDeleteConfirm(false);
+          handleShowEditFamDel();
+        }
+
+
+        // getSector();
+        // getSectorTable();
+        // handleShowEditFamDel();
+        // setShowDeleteConfirm(false);
+      } catch (error) {
+        console.error(
+          "Error Delete OrderData:",
+          error.response ? error.response.data : error.message
+        );
+      }
+      setIsProcessing(false);
+    }
+
+  }
+
 
   // console.log(tableData);
 
@@ -647,6 +717,7 @@ const TableInformation = () => {
                       className="j-canvas-btn2 j-tbl-font-3 b_border_out"
                       style={{ borderRadius: "8px" }}
                       variant="outline-primary"
+                      onClick={() => setShowEdittable(true)}
                     >
                       <div className="d-flex align-items-center">
                         <svg
@@ -685,7 +756,7 @@ const TableInformation = () => {
               >
                 <Tab
                   eventKey="home"
-                  title="information"
+                 title="Información"
                   className=" text-white m_bgblack mt-2 rounded"
                 >
                   <div className="j-table-information-body">
@@ -735,7 +806,8 @@ const TableInformation = () => {
                             className="form-control j-tbl-information-input"
                             id="exampleFormControlInput1"
                             placeholder="4"
-                            value={tableData?.sector_id}
+                            // value={tableData?.sector_id}
+                            value={userTableData?.name}
                             readOnly
                           />
                         </div>
@@ -873,7 +945,7 @@ const TableInformation = () => {
 
                             datatab.map((order) => (
                               console.log(order.status),
-                              
+
                               <tr key={order.id} className="b_row">
                                 <Link to={`/home_Pedidos/paymet/${order.id}`}>
                                   <div
@@ -905,17 +977,17 @@ const TableInformation = () => {
                                 >
                                   {order.status}
                                 </td> */}
-                                <td  className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
+                                <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                         ${order.status.toLowerCase() === 'received' ? 'b_indigo' : order.status.toLowerCase() === 'prepared' ? 'b_ora' : order.status.toLowerCase() === 'delivered' ? 'b_blue' : order.status.toLowerCase() === 'finalized' ? 'b_green' : order.status.toLowerCase() === 'withdraw' ? 'b_indigo' : order.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
-                                                    {order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : order.status.toLowerCase() === 'cancelled' ? 'cancelado' : ' '}
-                                                </td>
+                                  {order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : order.status.toLowerCase() === 'cancelled' ? 'cancelado' : ' '}
+                                </td>
                                 <td>
                                   <Link to={`/home_Pedidos/paymet/${order.id}`}>
                                     <td
                                       style={{ fontSize: "12px" }}
                                       className="b_idbtn j-btn-primary text-nowrap j-tbl-font-3 "
                                     >
-                                      ver details
+                                        Ver detalles
                                     </td>
                                   </Link>
                                 </td>
@@ -1053,7 +1125,7 @@ const TableInformation = () => {
           ) : (
 
             <div>No Table Data Found</div>
-          
+
           )}
 
 
@@ -1192,7 +1264,156 @@ const TableInformation = () => {
               </div>
             </Modal.Body>
           </Modal>
+          {/* {/ Edit Tables/} */}
+          <Modal
+            show={showEdittable}
+            onHide={handleCloseEdittable}
+            backdrop={true}
+            keyboard={false}
+            className="m_modal jay-modal"
+          >
+            <Modal.Header
+              closeButton
+              className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
+            >
+              <Modal.Title className="j-tbl-text-12">Editar mesa</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="border-0">
+              <div className="mb-3">
+                <label
+                  htmlFor="exampleFormControlInput1"
+                  className="form-label j-tbl-btn-font-1"
+                >
+                  Nombre
+                </label>
+                <input
+                  type="text"
 
+                  className="form-control j-table_input"
+                  id="exampleFormControlInput1"
+                  placeholder={tableData?.name}
+                  value={tableName}
+                  name="name"
+                  onChange={handleEditChange}
+                />
+                {editErrorName && (
+                  <div className="text-danger errormessage">
+                    {editErrorName}
+                  </div>
+                )}
+              </div>
+            </Modal.Body>
+            <Modal.Footer className="border-0">
+              <Button
+                className="j-tbl-btn-font-1 b_btn_close  "
+                variant="danger"
+                onClick={() => {
+                  handleDeleteClick();
+                }}
+              >
+                Eliminar
+              </Button>
+              <Button
+                className="j-tbl-btn-font-1 b_btn_pop"
+                variant="primary"
+                onClick={handleEditSubmit}
+              >
+                Guardar cambios
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* delete confirm */}
+          <Modal
+            show={showDeleteConfirm}
+            onHide={() => setShowDeleteConfirm(false)}
+            backdrop={true}
+            keyboard={false}
+            className="m_modal jay-modal"
+          >
+            <Modal.Header closeButton className="border-0" onClick={() => setShowDeleteConfirm(false)} />
+            <Modal.Body className="border-0">
+              <div className="text-center">
+                <img
+                  src={require("../Image/trash-outline-secondary.png")}
+                  alt=" "
+                />
+                <p className="mb-0 mt-3 h6">
+                  {" "}
+                  ¿Está seguro de que desea eliminar esta mesa?
+                </p>
+              </div>
+            </Modal.Body>
+            <Modal.Footer className="border-0 ">
+              <Button
+                className="j-tbl-btn-font-1 b_btn_close"
+                variant="danger"
+                onClick={handleDeleteConfirmation} // Confirm deletion
+              >
+                Sí, seguro
+              </Button>
+              <Button
+                className="j-tbl-btn-font-1"
+                variant="secondary"
+                onClick={() => { setShowDeleteConfirm(false) }} // Cancel deletion
+              >
+                No, cancelar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* {/ edit Table eliminate /} */}
+          <Modal
+            show={showEditFamDel}
+            onHide={handleCloseEditFamDel}
+            backdrop={true}
+            keyboard={false}
+            className="m_modal jay-modal"
+          >
+            <Modal.Header closeButton className="border-0" />
+            <Modal.Body>
+              <div className="j-modal-trash text-center">
+                <img src={require("../Image/trash-outline.png")} alt="" />
+                <p className="mb-0 mt-3 h6 j-tbl-pop-1">Mesa eliminado</p>
+                <p className="opacity-75 j-tbl-pop-2">
+                  El Mesa ha sido eliminado correctamente
+                </p>
+              </div>
+            </Modal.Body>
+          </Modal>
+
+          {/* {/ edit family success /}  */}
+          <Modal
+            show={showEditFamSuc}
+            onHide={handleCloseEditFamSuc}
+            backdrop={true}
+            keyboard={false}
+            className="m_modal jay-modal"
+          >
+            <Modal.Header closeButton className="border-0" onClick={() => { setShowEditFamSuc(false) }} />
+            <Modal.Body>
+              <div className="text-center">
+                <img src={require("../Image/check-circle.png")} alt="" />
+                <p className="mb-0 mt-2 h6 j-tbl-pop-1">Cambios Mesa</p>
+                <p className="opacity-75 j-tbl-pop-2">
+                  Se ha modificado exitosamente
+                </p>
+              </div>
+            </Modal.Body>
+          </Modal>
+
+          {/* processing */}
+          <Modal
+            show={isProcessing}
+            keyboard={false}
+            backdrop={true}
+            className="m_modal  m_user "
+          >
+            <Modal.Body className="text-center">
+              <Spinner animation="border" role="status" style={{ height: '85px', width: '85px', borderWidth: '6px' }} />
+              <p className="mt-2">Procesando solicitud...</p>
+            </Modal.Body>
+          </Modal>
 
         </div>
       </div>

@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import ApexCharts from "apexcharts"; // Make sure to install ApexCharts
 
 export default function Sa({ data }) {
-  const getChartOptions = () => {
+  const getChartOptions = () => {    
     return {
       series: [
         data.received || 0,
         data.prepared || 0,
-        data.delivered || 0,
-        data.finalized || 0
+        data.finalized || 0,
+        data.delivered || 0
       ],
-      colors: ["#6875F5", "#FF8A4C", "#0E9F6E", "#147BDE"],
+      colors: ["#6875F5", "#FF8A4C", "#147BDE", "#16bdca"],
       chart: {
         height: 320,
         width: "100%",

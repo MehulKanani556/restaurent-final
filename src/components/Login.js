@@ -78,7 +78,7 @@ const Login = () => {
         email,
         password
       });
-      if (response.data) {
+      if (response.data.access_token) {
         const { email, name, access_token, role, id, admin_id } = response.data;
         sessionStorage.setItem("email", email);
         sessionStorage.setItem("name", name);
@@ -99,13 +99,13 @@ const Login = () => {
         }, 2000);
 
         // Ensure notification message is a string before calling enqueueSnackbar
-        const notificationMessage = response.data?.notification || "Login successful";
+        const notificationMessage = response.data?.notification || "iniciar sesión exitosamente";
         if (typeof notificationMessage === 'string') {
           enqueueSnackbar(notificationMessage, { variant: 'success' });
-      playNotificationSound();
+          playNotificationSound();
 
         }
-        
+
       } else {
         setErrorMessage("Credenciales inválidas");
         setShowModal(true);
@@ -113,7 +113,7 @@ const Login = () => {
     } catch (error) {
       const errorMessage = error.response?.data?.alert || "An error occurred";
       if (typeof errorMessage === 'string') {
-        enqueueSnackbar( error.response?.data?.message || errorMessage, { variant: 'error' });
+        enqueueSnackbar(error.response?.data?.message || errorMessage, { variant: 'error' });
       }
       setErrorMessage(error.response?.data?.message || "An error occurred");
       playNotificationSound();

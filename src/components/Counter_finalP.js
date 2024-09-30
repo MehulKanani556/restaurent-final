@@ -11,8 +11,8 @@ import { enqueueSnackbar } from "notistack";
 
 const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] =useState (sessionStorage.getItem("token"));
-  const [role] = useState (sessionStorage.getItem("role"));
+  const [token] = useState(sessionStorage.getItem("token"));
+  const [role] = useState(sessionStorage.getItem("role"));
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = sessionStorage.getItem("userId");
   const admin_id = sessionStorage.getItem("admin_id");
@@ -68,7 +68,12 @@ const Counter_finalP = () => {
   const [activeAccordionItem, setActiveAccordionItem] = useState("0");
   const [formErrors, setFormErrors] = useState({});
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
+  const [tipError, setTipError] = useState("");
+
+  const handleClose = () => {
+    setShow(false);
+    setTipError("");
+  };
   const handleShow = () => setShow(true);
   const [lastOrder, setLastOrder] = useState('');
 
@@ -109,11 +114,11 @@ const Counter_finalP = () => {
       setCartItems(updatedCartItems);
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
     if (!(role == "admin" || role == "cashier")) {
       navigate('/dashboard')
     }
-  },[role])
+  }, [role])
 
   useEffect(() => {
     // Load cart items from localStorage
@@ -155,7 +160,7 @@ const Counter_finalP = () => {
   const handleCheckboxChange = (value) => {
     if (selectedCheckboxes.includes(value)) {
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
-      setCustomerData(initialCustomerData);
+      // setCustomerData(initialCustomerData);
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
     }
@@ -238,7 +243,7 @@ const Counter_finalP = () => {
       cartItems.reduce(
         (total, item, index) => total + parseInt(item.price) * item.count,
         0
-      ) 
+      )
     );
   };
   const totalCost = getTotalCost();
@@ -247,27 +252,27 @@ const Counter_finalP = () => {
   const taxAmount = finalTotal * 0.12;
 
 
-   // ==== Get BOX Data =====
+  // ==== Get BOX Data =====
 
-   const [boxId, setBoxId] = useState('')
+  const [boxId, setBoxId] = useState('')
 
-   const fetchBoxData = async() =>{
-     try {
-       const response = await axios.get(`${apiUrl}/get-boxs`, {
-                 headers: {
-                     Authorization: `Bearer ${token}`,
-                 },
-             });
-         
-         const data = response.data;
-       setBoxId(data.find((v)=>v.user_id == userId));
-     } catch (error) {
-       console.error(
-         "Error fetching box:",
-         error.response ? error.response.data : error.message
-       );
-     }
-   }
+  const fetchBoxData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/get-boxs`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = response.data;
+      setBoxId(data.find((v) => v.user_id == userId));
+    } catch (error) {
+      console.error(
+        "Error fetching box:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
 
 
 
@@ -313,6 +318,26 @@ const Counter_finalP = () => {
 
     return errors;
   };
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [navigationPath, setNavigationPath] = useState('');
+
+  const navigationPage = () => {
+    console.log(navigationPath);
+    if (navigationPath) {
+      navigate(navigationPath);
+    }
+    // Replace with the actual path you want to navigate to
+  };
+
+  const handleLinkNavigation = (path) => {
+    if (!isSubmitted) {
+      setNavigationPath(path); // Store the path to navigate after confirmation
+      setShowDeleteConfirmation(true); // Show confirmation modal
+    } else {
+      navigate(path); // Navigate directly if submitted
+    }
+  };
 
   // submit
   const handleSubmit = async () => {
@@ -351,8 +376,8 @@ const Counter_finalP = () => {
         reason: "",
         person: "",
         tip: tipAmount,
-        box_id: boxId?.id != 'undefined' ? boxId?.id : '' ,
-        transaction_code:true,
+        box_id: boxId?.id != 'undefined' ? boxId?.id : '',
+        transaction_code: true,
       }
     };
     let order_master_id;
@@ -364,7 +389,7 @@ const Counter_finalP = () => {
       })
       console.log(response.data)
       order_master_id = response.data.details.order_master.id
-      if(response.data){
+      if (response.data) {
         const paymentData = {
           ...payment,
           amount: customerData.amount,
@@ -386,6 +411,7 @@ const Counter_finalP = () => {
         localStorage.removeItem("cartItems");
         localStorage.removeItem("currentOrder");
         localStorage.removeItem("payment");
+        setIsSubmitted(true);
         handleShow11();
         setIsProcessing(false);
       }
@@ -394,7 +420,7 @@ const Counter_finalP = () => {
       enqueueSnackbar(error?.response?.data?.message, { variant: 'error' })
       setIsProcessing(false);
     }
-   
+
   };
   // print recipt
   const handlePrint = () => {
@@ -445,7 +471,7 @@ const Counter_finalP = () => {
       <div className="s_bg_dark">
         <div className="j-flex">
           <div>
-            <Sidenav />
+          <Sidenav onNavigate={handleLinkNavigation} />
           </div>
           <div className="flex-grow-1 sidebar j-position-sticky text-white">
             <div className="j-counter-header j_counter_header_last_change" >
@@ -516,6 +542,7 @@ const Counter_finalP = () => {
                         value={`$${price}`}
                         onChange={handleprice}
                       />
+                      {tipError && <p className="text-danger mt-2 errormessage">{tipError}</p>}
                     </div>
                   </Modal.Body>
                   <Modal.Footer className="border-0 pt-0">
@@ -523,14 +550,20 @@ const Counter_finalP = () => {
                       className="j-tbl-btn-font-1 b_btn_pop"
                       variant="primary"
                       onClick={() => {
-                        handleShowCreSubSuc();
-                        handleClose();
+                        if (!price || parseFloat(price) <= 0) {
+                          setTipError("Por favor, ingrese una cantidad válida para la propina.");
+                        } else {
+                          setTipError("");
+                          handleShowCreSubSuc();
+                          handleClose();
+                        }
                       }}
                     >
                       Aceptar
                     </Button>
                   </Modal.Footer>
                 </Modal>
+
 
                 <Modal
                   show={showCreSubSuc}
@@ -644,10 +677,32 @@ const Counter_finalP = () => {
                       </div>
                     </Accordion.Header>
                     {selectedCheckboxes.includes("debit") && (
+                      // <Accordion.Body>
+                      //   <div className="sj_gay_border px-3 py-4 mt-2">
+                      //     <form>
+                      //       <label className="mb-2 sjfs-16">Cantidad</label>
+                      //       <br />
+                      //       <input
+                      //         type="text"
+                      //         id="name"
+                      //         name="amount"
+                      //         value={`$${customerData.amount || ""}`}
+                      //         onChange={handleChange}
+                      //         className="sj_bg_dark sj_width_input px-4 py-2 text-white"
+                      //       />
+                      //       {formErrors.amount && (
+                      //         <p className="errormessage text-danger">
+                      //           {formErrors.amount}
+                      //         </p>
+                      //       )}
+                      //     </form>
+                      //   </div>
+                      // </Accordion.Body>
                       <Accordion.Body>
-                        <div className="sj_gay_border px-3 py-4 mt-2">
-                          <form>
-                            <label className="mb-2 sjfs-16">Cantidad</label>
+                      <div className="sj_gay_border px-3 py-4 mt-2">
+                        <form className="j_payment_flex">
+                          <div className=" flex-grow-1 j_paymemnt_margin">
+                            <label className="mb-2">Cantidad</label>
                             <br />
                             <input
                               type="text"
@@ -655,16 +710,17 @@ const Counter_finalP = () => {
                               name="amount"
                               value={`$${customerData.amount || ""}`}
                               onChange={handleChange}
-                              className="sj_bg_dark sj_width_input px-4 py-2 text-white"
+                              className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
                             />
                             {formErrors.amount && (
                               <p className="errormessage text-danger">
                                 {formErrors.amount}
                               </p>
                             )}
-                          </form>
-                        </div>
-                      </Accordion.Body>
+                          </div>
+                        </form>
+                      </div>
+                    </Accordion.Body>
                     )}
                   </Accordion.Item>
                   <Accordion.Item eventKey="2" className="mb-2">

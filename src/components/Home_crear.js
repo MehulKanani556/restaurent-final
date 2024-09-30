@@ -48,9 +48,9 @@ export default function Home_crear({ item }) {
     //     }
     // };
 
-    const [selectedCheckbox, setSelectedCheckbox] = useState(null);
+    const [selectedCheckbox, setSelectedCheckbox] = useState('1');
     const [selectedPaytype, setSelectedPaytype] = useState(null);
-    const [activeKey, setActiveKey] = useState(null);
+    const [activeKey, setActiveKey] = useState('0');
     const handleCheckboxChange = (value) => {
         if (selectedCheckbox === value) {
             setSelectedCheckbox(null);
@@ -218,7 +218,7 @@ export default function Home_crear({ item }) {
     const [itemsError, setItemsError] = useState('');
 
     const [payError, setPayError] = useState('');
-   
+
 
     console.log(userPayment);
 
@@ -236,7 +236,7 @@ export default function Home_crear({ item }) {
         getAllorder();
         getItems();
         fetchUserPayment();
-       
+
     }, [id, visibleInputId, deleteProductId]);
 
     useEffect(() => {
@@ -316,9 +316,11 @@ export default function Home_crear({ item }) {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-                Authorization: `Bearer ${token}`
-              }});
+            const response = await axios.get(`${apiUrl}/item/getAll`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setItems(response.data.items);
             // setObj1(response.data.items);
             // setFilteredItemsMenu(response.data.items);
@@ -331,7 +333,7 @@ export default function Home_crear({ item }) {
         setIsProcessing(false);
     };
 
-    
+
     // console.log(user,orderAlldata);
 
     const handleOrderDetails = () => {
@@ -581,18 +583,18 @@ export default function Home_crear({ item }) {
             setPayError('Seleccione el tipo de pago'); // Set error message
             return; // Exit the function
         }
-        
-    
+
+
         // Check if selectedCheckbox is 2 and selectedPaytype is null
         if (selectedCheckbox == 2 && selectedPaytype == null) {
             console.log("vascas");
-            
+
             setPayError('Seleccione el tipo de pago'); // Set error message
             return; // Exit the function
         } else if (selectedCheckbox === 1) {
             setPayError(''); // Clear error if checkbox 1 is selected
         }
-    
+
         // Show the staticBackdrop modal if there is no pay error
         if (payError === '') {
             const creditNote = {
@@ -608,25 +610,25 @@ export default function Home_crear({ item }) {
                     code: generateUniqueCreditNoteNumber(),
                     destination: null,
                     payment_status: selectedPaytype || "futura compra",
-                    credit_method: `${selectedCheckbox == 1 ? "future purchase" : 
+                    credit_method: `${selectedCheckbox == 1 ? "future purchase" :
                         selectedCheckbox == 2 && selectedPaytype == "Efectivo" ? "cash" :
-                        selectedCheckbox == 2 && selectedPaytype == "Tarjeta de debito" ? " debit" :
-                        selectedCheckbox == 2 && selectedPaytype == "Tarjeta de credito" ? "credit" : null
-                     }`,
+                            selectedCheckbox == 2 && selectedPaytype == "Tarjeta de debito" ? " debit" :
+                                selectedCheckbox == 2 && selectedPaytype == "Tarjeta de credito" ? "credit" : null
+                        }`,
                 },
                 return_items: selectedItems,
-                    
+
             };
-    
+
             console.log(creditNote);
-    
+
             try {
                 const response = await axios.post(`${apiUrl}/order/creditNote`, creditNote, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-    
+
                 console.log(response);
-    
+
                 if (response.data.success) {
                     setShowcreditfinal(true);
                     setTimeout(() => {
@@ -641,7 +643,7 @@ export default function Home_crear({ item }) {
             }
         }
     };
-    
+
 
     return (
         <div className="m_bg_black">
@@ -793,6 +795,7 @@ export default function Home_crear({ item }) {
                                                                                 checked={selectedCheckbox === "1"}
                                                                                 onChange={() => handleCheckboxChange("1")}
                                                                                 className="me-2 j-change-checkbox"
+                                                                                defaultChecked
                                                                             />
                                                                             <p className="d-inline px-3 caja-pajo-title">Usar para futura compra</p>
                                                                         </div>
@@ -895,7 +898,7 @@ export default function Home_crear({ item }) {
                                                                     </div>
                                                                     <div className="w-50">
                                                                         <div>Correo electrónico</div>
-                                                                        <div className="w-75 a_bg_order border-0 mt-2" style={{ borderRadius: "10px" }}><span className="">{userPayment?.email ? userPayment.email : "Null"}</span></div>
+                                                                        <div className="w-75 a_bg_order border-0 mt-2" style={{ borderRadius: "10px" }}><span className="">{userPayment?.email ? userPayment.email : "-"}</span></div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="mt-4">
@@ -970,7 +973,7 @@ export default function Home_crear({ item }) {
                                                                     </div>
                                                                     <div className="w-50">
                                                                         <div className='mb-2'>Correo electrónico</div>
-                                                                        <div className="w-75 a_bg_order  border-0 overflow-auto" style={{ borderRadius: "10px" }}><span className="">{userPayment?.email ? userPayment.email : "Null"}</span></div>
+                                                                        <div className="w-75 a_bg_order  border-0 overflow-auto" style={{ borderRadius: "10px" }}><span className="">{userPayment?.email ? userPayment.email : "-"}</span></div>
                                                                     </div>
                                                                 </div>
                                                                 <div className="mt-4">
@@ -1009,12 +1012,22 @@ export default function Home_crear({ item }) {
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    <div className='b_bborder my-3 p-4'>
+                                                                    {/* <div className='b_bborder my-3 p-4'>
                                                                         <h5>Tipos de pago</h5>
                                                                         <div className='d-flex justify-content-between'>
                                                                             <div className='mt-3'>
                                                                                 {orderAlldata.payment_type == "cash" ? "Efectivo" :
                                                                                     orderAlldata.payment_type == "dabit" ? "Débito" : "crédito"}
+                                                                            </div>
+                                                                            <div>${selectedItems?.reduce((total, v) => total + v.amount * v.quantity, 0)}</div>
+                                                                        </div>
+                                                                    </div> */}
+                                                                     <div className='b_bborder my-3 p-4'>
+                                                                        <h5>Tipos de pago</h5>
+                                                                        <div className='d-flex justify-content-between'>
+                                                                            <div className='mt-3'>
+                                                                                {selectedCheckbox == "1" ? "Futura Compra" :
+                                                                                    selectedCheckbox == "2" && selectedPaytype ? selectedPaytype : ""}
                                                                             </div>
                                                                             <div>${selectedItems?.reduce((total, v) => total + v.amount * v.quantity, 0)}</div>
                                                                         </div>

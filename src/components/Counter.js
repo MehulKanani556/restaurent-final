@@ -569,10 +569,6 @@ const Counter = () => {
               </ul>
             </div>
           </div>
-
-
-
-
           <div className="j-counter-body">
             {renderItems().length > 0 ? (
               <div className="j-card-item-1 j-border-bottom">
@@ -589,9 +585,6 @@ const Counter = () => {
               <p className="no-products-found text-white text-center">No se encontró ningún producto</p>
             )}
           </div>
-
-
-
         </div>
         <div
           className="j-counter-price position-sticky"
@@ -686,7 +679,7 @@ const Counter = () => {
                                 <RiDeleteBin6Fill />
                               </button>
                             </div>
-                          </div>
+                          </div>                          
                           <div className="text-white j-order-count-why">
                             {item.isEditing ? (
                               <div>
@@ -707,7 +700,7 @@ const Counter = () => {
                             ) : (
                               <div>
                                 {item.note ? (
-                                  <p className="j-nota-blue">{item.note}</p>
+                                  <p className="j-nota-blue" style={{cursor: "pointer"}}  onClick={() => handleAddNoteClick(index)}>{item.note}</p>
                                 ) : (
                                   <button
                                     className="j-note-final-button"
@@ -816,14 +809,15 @@ const Counter = () => {
                 className="m_modal jay-modal"
               >
                 <Modal.Header closeButton className="border-0" />
+               
                 <Modal.Body>
                   <div className="j-modal-trash text-center">
                     <img src={require("../Image/trash-outline.png")} alt="" />
                     <p className="mb-0 mt-3 h6 j-tbl-pop-1">
-                      Order eliminado
+                    Pedido eliminado
                     </p>
                     <p className="opacity-75 j-tbl-pop-2">
-                      El Order ha sido eliminado correctamente
+                      El Pedido ha sido eliminado correctamente
                     </p>
                   </div>
                 </Modal.Body>
