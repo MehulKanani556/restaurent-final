@@ -34,7 +34,7 @@ const Mostrador = () => {
   };
   const [countsoup, setCountsoup] = useState(1);
   const [selectedRadio, setSelectedRadio] = useState("1");
-  const [activeAccordionItem, setActiveAccordionItem] = useState("0");
+  const [activeAccordionItem, setActiveAccordionItem] = useState("1");
   const [itemToDelete, setItemToDelete] = useState(null);
 
   // note
@@ -162,6 +162,7 @@ const Mostrador = () => {
   };
   const handleAccordionClick = (value) => {
     setSelectedRadio(value);
+    setActiveAccordionItem(value)
   };
 
   const [showEditFamDel, setShowEditFamDel] = useState(false);

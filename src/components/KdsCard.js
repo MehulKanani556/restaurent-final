@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import useAudioManager from './audioManager';
-import { enqueueSnackbar } from 'notistack';
+// import { //enqueueSnackbar  } from 'notistack';
 
 const KdsCard = ({ table, time, orderId, startTime, waiter, center, items, notes, finishedAt, hrtimestart, user, centerProduction, fetchOrder, status, productionCenter }) => {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -33,8 +33,8 @@ const KdsCard = ({ table, time, orderId, startTime, waiter, center, items, notes
                     Authorization: `Bearer ${token}`
                 }
             });
-            enqueueSnackbar(response?.data?.notification || "Estado actualizado", { variant: 'success' });
-            playNotificationSound();
+            //enqueueSnackbar (response?.data?.notification || "Estado actualizado", { variant: 'success' });
+            // playNotificationSound();;
             fetchOrder();
         } catch (error) {
             console.error('Error updating status:', error);

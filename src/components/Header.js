@@ -1,21 +1,70 @@
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState, useRef } from "react";
 import { Button, Dropdown, Offcanvas, Toast } from "react-bootstrap";
 import { FaUserLarge } from "react-icons/fa6";
 import { IoCloudUpload, IoNotifications } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
+import useSocket from "../hooks/useSocket";
+import useAudioManager from "./audioManager";
 
 export default function Header() {
 
   const [email] = useState(sessionStorage.getItem("email"));
   const [role] = useState(sessionStorage.getItem("role"));
   const [token] = useState(sessionStorage.getItem("token"));
-
+  const admin_id = sessionStorage.getItem("admin_id");
+  const user_id = sessionStorage.getItem("userId");
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [name] = useState(sessionStorage.getItem("name"));
   const [show, setShow] = useState(false);
   const [showA, setShowA] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const echo = useSocket();
+  const { playNotificationSound } = useAudioManager();
+  const [prevNotificationCount, setPrevNotificationCount] = useState(0);
+  const [isFetching, setIsFetching] = useState(false); // Add a state to track fetching status
+
+  const fetchNotifications = async () => {
+    if (isFetching) return; // Prevent multiple fetches
+    setIsFetching(true); // Set fetching status to true
+    try {
+      const response = await axios.post(`${apiUrl}/notification/getAll`, { admin_id: admin_id, user_id: user_id }, { headers: { Authorization: `Bearer ${token}` } });
+      // console.log(response.data);
+      const newCount = response.data.length;
+      setNotifications(response.data.reverse());
+      setNotificationCount(newCount);
+
+      // Check if the notification count has increased
+      if (newCount > prevNotificationCount) {
+        playNotificationSound(); // Play sound if count increased
+      }
+      setPrevNotificationCount(newCount); // Update previous count
+      // console.log(newCount, prevNotificationCount);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      return null;
+    } finally {
+      setIsFetching(false); // Reset fetching status
+    }
+  };
+
+  const debounceFetchNotifications = useRef(null); // Create a ref for debounce
+
+  if (echo) {
+    echo.channel('notifications')
+      .listen('NotificationMessage', (event) => {
+        // console.log('New notification received:', event.notification);
+        if (debounceFetchNotifications.current) clearTimeout(debounceFetchNotifications.current); // Clear previous timeout
+        debounceFetchNotifications.current = setTimeout(fetchNotifications, 1000); // Set a new timeout
+        // playNotificationSound();; // Play sound when a new notification is received
+      });
+    // console.log("Socket connection established")
+  }
   useEffect(() => {
+    fetchNotifications();
     const token = sessionStorage.getItem("token");
     if (!token) {
       navigate('/', { state: { from: location } });
@@ -26,17 +75,38 @@ export default function Header() {
   }
 
 
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
 
   const toggleShowA = () => setShowA(!showA);
-  const handleLogout = () => {
-    sessionStorage.removeItem("email");
-    sessionStorage.removeItem("role");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("name");
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      const responce = await axios.post(
+        `${apiUrl}/update-user/${user_id}`,
+        {
+          activeStatus: "0",
+          name: name,
+          email: email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      if (responce.status == 200) {
+        echo.leaveChannel(`chat.${user_id}`);
+        sessionStorage.removeItem("email");
+        sessionStorage.removeItem("role");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("name");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.log("not updating user", + error.message);
+    }
   };
   const roleTranslations = {
     admin: "Admin",
@@ -45,6 +115,46 @@ export default function Header() {
     kitchen: "Cocina"
   };
   const translatedRole = roleTranslations[role] || role;
+
+  // Function to format date as DD/MM/YYYY
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+  };
+
+  // New function to group notifications by date
+  const groupNotificationsByDate = (notifications) => {
+    const grouped = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to midnight for date comparison
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    notifications.forEach(notification => {
+      const notificationDate = new Date(notification.created_at);
+      notificationDate.setHours(0, 0, 0, 0); // Set to midnight for comparison
+      const dateKey = notificationDate.getTime();
+
+      let dateString;
+      if (notificationDate.getTime() === today.getTime()) {
+        dateString = 'Hoy';
+      } else if (notificationDate.getTime() === tomorrow.getTime()) {
+        dateString = 'Mañana';
+      } else {
+        dateString = formatDate(notificationDate);
+      }
+
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = {
+          dateString: dateString,
+          notifications: []
+        };
+      }
+      grouped[dateKey].notifications.push(notification);
+    });
+    return Object.entries(grouped).sort(([a], [b]) => b - a); // Sort by date, most recent first
+  };
+
   return (
     <section className="m_bgblack m_borbot position-sticky top-0 z-3">
       <div className=" p-3 d-flex align-items-center justify-content-between ">
@@ -52,13 +162,33 @@ export default function Header() {
           <img src={require("../Image/logo.png")} alt="" />
         </div>
         <div className="m_header d-flex align-items-center ">
-          <div className="m_bell">
+          <div className="m_bell position-relative">
             <span
-              className="m_grey "
+              className="m_grey"
               onClick={handleShow}
               style={{ cursor: "pointer" }}
             >
               <IoNotifications />
+              {notificationCount > 0 && (
+                <span
+                  className="position-absolute translate-middle badge rounded-pill bg-danger"
+                  style={{
+                    fontSize: '0.6rem',
+                    padding: '0.25em 0.4em',
+                    top: '7px',
+                    right: '-15px',
+                    border: '2px solid #282828', // Adjust the color to match your background
+                    minWidth: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {notificationCount}
+                  <span className="visually-hidden">unread notifications</span>
+                </span>
+              )}
             </span>
           </div>
           <Offcanvas
@@ -74,349 +204,59 @@ export default function Header() {
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <p className="j-canvas-text">Hoy</p>
-              <div className="offcanvas-box-1 mb-3">
-                <div className="j-canvas-icon-data mb-2">
-                  <svg
-                    class="j-canvas-icon-small me-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <h5 className="j-canvas-data-h2 mb-0">Pedido actulizado</h5>
-                </div>
-                <p className="j-canvas-data-p ms-1">
-                  El pedido de la mesa 4, con el codigo 0123 a sido actualizado
-                  exitosamente
-                </p>
-                <div className="j-canvas-date-time">
-                  <div className="j-time me-4">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
+              {notifications && groupNotificationsByDate(notifications).map(([dateKey, { dateString, notifications }]) => (
+                <React.Fragment key={dateKey}>
+                  <p className="j-canvas-text mb-3">{dateString}</p>
+                  {notifications.map(notification => (
+                    <div 
+                      className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`} 
+                      style={{ height: "auto" }} 
+                      key={notification.id}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    hace 5 min
-                  </div>
-                  <div className="j-time">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M6 5V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v2H3V7a2 2 0 0 1 2-2h1ZM3 19v-8h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm5-6a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    23/032024
-                  </div>
-                </div>
-                <div className="j-canvas-var-button mt-2">
-                  <button>
-                    <svg
-                      class="j-data-icon3 me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Ver cambio
-                  </button>
-                </div>
-              </div>
-              <div className="offcanvas-box-1 mb-3">
-                <div className="j-canvas-icon-data mb-2">
-                  <svg
-                    class="j-canvas-icon-small me-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <h5 className="j-canvas-data-h2 mb-0">Pedido actulizado</h5>
-                </div>
-                <p className="j-canvas-data-p ms-1">
-                  El pedido de la mesa 4, con el codigo 0123 a sido actualizado
-                  exitosamente
-                </p>
-                <div className="j-canvas-date-time">
-                  <div className="j-time me-4">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    hace 5 min
-                  </div>
-                </div>
-                <div className="j-canvas-var-button mt-2">
-                  <button>
-                    <svg
-                      class="j-data-icon3 me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Ver cambio
-                  </button>
-                </div>
-              </div>
-              <div className="offcanvas-box-2 mb-3">
-                <div className="j-canvas-icon-data text-white mb-2">
-                  <svg
-                    class="j-canvas-icon-small me-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <h5 className="j-canvas-data-h2  mb-0">Pedido actulizado</h5>
-                </div>
-                <p className="j-canvas-data-p ms-1 text-white">
-                  El pedido de la mesa 4, con el codigo 0123 a sido actualizado
-                  exitosamente
-                </p>
-                <div className="j-canvas-date-time-3">
-                  <div className="j-time-3 me-4">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    hace 5 min
-                  </div>
-                </div>
-                <div className="j-canvas-var-button mt-2">
-                  <button>
-                    <svg
-                      class="j-data-icon3 me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Ver cambio
-                  </button>
-                </div>
-              </div>
+                      <div className="j-canvas-icon-data mb-2">
+                        <svg
+                          className="j-canvas-icon-small me-1"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <h5 className="j-canvas-data-h2 mb-0">{notification.notification_type == "notification" ? "Notificación" : "Alerta"}</h5>
 
-              <p className="j-canvas-text mb-3">Ayer</p>
-
-              <div className="offcanvas-box-2 mb-3">
-                <div className="j-canvas-icon-data text-white mb-2">
-                  <svg
-                    class="j-canvas-icon-small me-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <h5 className="j-canvas-data-h2  mb-0">Pedido actulizado</h5>
-                </div>
-                <p className="j-canvas-data-p ms-1 text-white">
-                  El pedido de la mesa 4, con el codigo 0123 a sido actualizado
-                  exitosamente
-                </p>
-                <div className="j-canvas-date-time-3">
-                  <div className="j-time-3 me-4">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    hace 5 min
-                  </div>
-                </div>
-                <div className="j-canvas-var-button mt-2">
-                  <button>
-                    <svg
-                      class="j-data-icon3 me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Ver cambio
-                  </button>
-                </div>
-              </div>
-
-              <div className="offcanvas-box-2 mb-3">
-                <div className="j-canvas-icon-data text-white mb-2">
-                  <svg
-                    class="j-canvas-icon-small me-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <h5 className="j-canvas-data-h2  mb-0">Pedido actulizado</h5>
-                </div>
-                <p className="j-canvas-data-p ms-1 text-white">
-                  El pedido de la mesa 4, con el codigo 0123 a sido actualizado
-                  exitosamente
-                </p>
-                <div className="j-canvas-date-time-3">
-                  <div className="j-time-3 me-4">
-                    <svg
-                      class="j-date-icon me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    hace 5 min
-                  </div>
-                </div>
-                <div className="j-canvas-var-button mt-2">
-                  <button>
-                    <svg
-                      class="j-data-icon3 me-1"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Ver cambio
-                  </button>
-                </div>
-              </div>
+                      </div>
+                      <p className="j-canvas-data-p ms-1">{notification.notification}</p>
+                      <div className="j-canvas-date-time">
+                        <div className="j-time me-4">
+                          <svg
+                            className="j-date-icon me-1"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
             </Offcanvas.Body>
           </Offcanvas>
 

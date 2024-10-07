@@ -577,7 +577,9 @@ function Home_detail() {
                                             orderAlldata.map((order) => (
                                                 <tr key={order.id} className='b_row'>
 
-                                                    <td onClick={() => handleCredit(order.id, order.status)}><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.id}</div></td>
+                                                    {/* <td onClick={() => handleCredit(order.id, order.status)}><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.id}</div></td> */}
+                                                    <td><Link to={`/home_Pedidos/paymet/${order.id}`}><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.id}</div></Link></td>
+                                                    
 
                                                     <td >
                                                         <div style={{ borderRadius: "10px" }} className={`b_idbtn bj-delivery-text-2 b_idbtn_s m-0 ${order.status.toLowerCase() === 'received' ? 'b_indigo' : order.status.toLowerCase() === 'prepared' ? 'b_ora ' : order.status.toLowerCase() === 'delivered' ? 'b_blue' : order.status.toLowerCase() === 'finalized' ? 'b_green' : order.status.toLowerCase() === 'withdraw' ? 'b_indigo' : order.status.toLowerCase() === 'local' ? 'b_purple' : 'text-danger'}`}>

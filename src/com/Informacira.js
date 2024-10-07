@@ -200,7 +200,7 @@ const Informacira = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
   const [showDelModal, setShowDelModal] = useState(false); // State for delete confirmation modal
   const [isProcessing, setIsProcessing] = useState(false);
-  const [allpayments, setAllpayments] = useState([]);
+  const [allpayments, setAllpayments] =useState([]);
 
   const navigate = useNavigate();
   const handleEdit = (box) => {
@@ -322,11 +322,11 @@ const Informacira = () => {
     }
     setIsProcessing(false);
   };
-  const fetchAllpayment = async () => {
+  const fetchAllpayment = async() =>{
     setIsProcessing(true);
     try {
       const response = await axios.post(
-        `${apiUrl}/get-payments`, { admin_id: admin_id },
+        `${apiUrl}/get-payments`,{admin_id:admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -345,7 +345,7 @@ const Informacira = () => {
     setIsProcessing(true);
     try {
       const response = await axios.post(
-        `${apiUrl}/sector/getWithTable`,{admin_id: admin_id},
+        `${apiUrl}/sector/getWithTable`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -434,7 +434,7 @@ const Informacira = () => {
           fetchAllBoxReport();
           fetchAllOrder();
           fetchAllTable();
-          // getUser();
+          getUser();
           fetchAllpayment();
         }
       }
@@ -914,52 +914,60 @@ const Informacira = () => {
         // const orderIds = item.order_master_id.split(','); // Split by comma
 
         const orderIds = item.order_master_id.split(','); // Split by comma
-        const orderDiscounts = orderIds.map(id => {
-          // console.log(id);
-
-          const order = allOrder.find(order => order.id == id); // Find order in allOrder
-          // console.log(id, order);
-
-          return { id, discount: order?.discount ? parseFloat(order?.discount) : 0 }; // Ensure discount is a number
-        });
-        totalDiscount = orderDiscounts.reduce((sum, v) => sum + v.discount, 0) ? orderDiscounts.reduce((sum, v) => sum + v.discount, 0) : 0; // Sum all discounts
-        // console.log(orderIds,orderDiscounts,totalDiscount);
-
+        const orderDiscounts = await Promise.all(orderIds.map(async (id) => {
+          const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, { admin_id: admin_id }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          });
+          return { id, discount: parseFloat(response.data.discount) || 0 }; // Ensure discount is a number
+        }));
+        totalDiscount = orderDiscounts.reduce((sum, order) => sum + order.discount, 0); // Sum all discounts
       }
       if (item.payment_id) {
         const paymentIds = item.payment_id.split(','); // Split by comma
-        const paymentDetails = paymentIds.map(id => {
-          const payment = allpayments.find(payment => payment.id == parseInt(id)); // Find payment in allpayments
-          if (payment) {
-            const tax = parseFloat(payment.tax) || 0; // Ensure tax is a number
-            totalTax += tax; // Sum the tax
-            // console.log(totalTax);
+        const paymentDetails = await Promise.all(paymentIds.map(async (id) => {
+          try {
+            const response = await axios.post(`${apiUrl}/getsinglepaymentById/${id}`, { admin_id: admin_id }, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              }
+            });
 
-            // Store type and amount from the payment
-            const paymentType = payment.type; // Store the payment type
-            const paymentAmount = parseFloat(payment.amount); // Store the payment amount as a number
-            // console.log(paymentType,paymentAmount);
+            // Check if response data is valid
+            if (response.data && response.data.data) {
+              const tax = parseFloat(response.data.data.tax) || 0; // Ensure tax is a number
+              totalTax += tax; // Sum the tax
 
+              // Store type and amount from the response
+              const paymentType = response.data.data.type; // Store the payment type
+              const paymentAmount = parseFloat(response.data.data.amount); // Store the payment amount as a number
+              console.log(paymentType, paymentAmount);
 
-            // Create or update the total for the payment type
-            if (!totalPaymentByType[paymentType]) {
-              totalPaymentByType[paymentType] = 0; // Initialize if it doesn't exist
+              // Create or update the total for the payment type
+              if (!totalPaymentByType[paymentType]) {
+                totalPaymentByType[paymentType] = 0; // Initialize if it doesn't exist
+              }
+              totalPaymentByType[paymentType] += paymentAmount; // Accumulate the total
+            } else {
+              console.error(`Invalid response for payment ID ${id}:`, response.data);
             }
-            totalPaymentByType[paymentType] += paymentAmount; // Accumulate the total
+          } catch (error) {
+            console.error(`Error fetching payment details for ID ${id}:`, error);
           }
-        });
+        }));
 
         // Return the accumulated results for this item
-        return { id: item.id, totalTax, totalPaymentByType };
+        return { id: item.id, totalDiscount, totalTax, totalPaymentByType };
       }
 
-      return { id: item.id, totalDiscount: totalDiscount ? totalDiscount : 0, totalTax, totalPaymentByType };
+      return { id: item.id, totalDiscount, totalTax: totalTax }; // Return totalTax even if no payment_id
     });
 
     try {
       const results = await Promise.all(discountPromises);
-      // const filteredResults = results.filter(result => result.totalTax > 0 || result.totalDiscount > 0); // Filter out items with no tax and no discount
-      setResults(results); // Set results in state
+      const filteredResults = results.filter(result => result.totalTax > 0 || result.totalDiscount > 0); // Filter out items with no tax and no discount
+      setResults(filteredResults); // Set results in state
     } catch (error) {
       console.error("Error fetching discounts:", error);
     }
@@ -976,23 +984,23 @@ const Informacira = () => {
     const discountData = results.find(result => result.id === boxId);
     return discountData ? { discount: discountData.totalDiscount, tax: discountData.totalTax, type: discountData.totalPaymentByType } : { discount: 0, tax: 0 }; // Return discount and tax or 0 if not found
   };
-  const [showpay, setShowpay] = useState(false);
+  const [showpay ,setShowpay] = useState(false);
 
-  const handleClosepay = () => {
+  const handleClosepay = () =>{
     setShowpay(true);
     setTimeout(() => {
       setShowpay(false);
     }, 2000);
-
+    
   }
 
   const handleorderRecipt = (data) => {
 
-    const payament = allpayments.some((v) => v.order_master_id == data.id)
+    const payament = allpayments.some((v)=>v.order_master_id == data.id)
     console.log(payament);
-    if (payament) {
+    if(payament){
       setShowModalOrder(true)
-    } else {
+    }else{
       handleClosepay()
     }
   }
@@ -1352,14 +1360,9 @@ const Informacira = () => {
                               onChange={(e) => setEditedCashierId(e.target.value)}
                             >
                               <option value="0">Cajero asignado</option>
-                              {/* {cashier.map(user => (
+                              {cashier.map(user => (
                                 <option key={user.id} value={user.id}>
                                   {user.name}
-                                </option>
-                              ))} */}
-                              {cashier.filter(user => !data.some(d => d.user_id === user.id)).map(order => (
-                                <option key={order.id} value={order.id}>
-                                  {order.name}
                                 </option>
                               ))}
                             </select>
@@ -2314,7 +2317,7 @@ const Informacira = () => {
                       />
                     </div>
                   </div> */}
-                  <div className="j-table-information-body">
+                    <div className="j-table-information-body">
                     <form className="j_ti_form">
                       <div className="row">
                         <div className="col-6 mb-3 ">
@@ -2354,7 +2357,7 @@ const Informacira = () => {
                             htmlFor="exampleFormControlInput1"
                             className="form-label text-white j-tbl-font-11"
                           >
-                            Cuantas aperturas
+                           Cuantas aperturas
                           </label>
                           <input
                             type="text"
@@ -2385,7 +2388,7 @@ const Informacira = () => {
                     </form>
                   </div>
                 </Tab>
-
+                
 
                 <Tab
                   eventKey="longer-tab"
@@ -2469,7 +2472,7 @@ const Informacira = () => {
                                   {user.status === "delivered" ? (
                                     <>
 
-                                      <button className="bg-transparent border-0" onClick={() => { setSelectedOrder(user); handleorderRecipt(user) }}> {/* Update to show modal */}
+                                      <button className="bg-transparent border-0" onClick={() => {setSelectedOrder(user);handleorderRecipt(user) }}> {/* Update to show modal */}
                                         <svg
                                           className="sj-button-xise"
                                           aria-hidden="true"

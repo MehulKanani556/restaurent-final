@@ -1243,13 +1243,13 @@ const admin_id = sessionStorage.getItem("admin_id");
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="m14  m_filter">
-                          <p
+                          {/* <p
                             className="px-3 py-1 fw-500 mb-0 text-end"
                             style={{ color: "#2D8EEC", cursor: "pointer" }}
                             onClick={handleResetFilters}
                           >
                             Restaurar
-                          </p>
+                          </p> */}
 
                           {/* {parentCheck.map((ele) => (
                               <div
@@ -1674,7 +1674,7 @@ const admin_id = sessionStorage.getItem("admin_id");
                                             onClick={() => handleClick(ele.id, ele.image, ele.name, ele.sale_price, ele.code)}
                                           >
                                             <FaCartPlus />{" "}
-                                            <span className="ms-1">Añadir al contador</span>
+                                            <span className="ms-1">Agregar al mostrador</span>
                                           </a>
                                         </div>
                                       </div>

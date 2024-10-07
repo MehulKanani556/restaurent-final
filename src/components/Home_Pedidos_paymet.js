@@ -16,6 +16,7 @@ import img2 from "../Image/addmenu.jpg";
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BsCalculatorFill } from 'react-icons/bs';
 
 export default function Home_Pedidos_paymet() {
 
@@ -154,7 +155,6 @@ export default function Home_Pedidos_paymet() {
   useEffect(() => {
     getOrder();
     getItems();
-    getSector();
     getOrderStatus();
     getRole();
     getFamily();
@@ -164,6 +164,7 @@ export default function Home_Pedidos_paymet() {
   useEffect(() => {
     if (orderData && items.length > 0) {
       handleOrderDetails();
+      getSector();
     }
     if (orderData?.user_id) {
       getUser();
@@ -216,16 +217,22 @@ export default function Home_Pedidos_paymet() {
   const getSector = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/sector/getWithTable`);
+      const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id: admin_id}, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
       let sectors = response.data.data;
 
       const sectorWithTable = sectors.find(v =>
-        v.tables.some(a => a.order_id == id)
+        v.tables.some(a => a.id == orderData.table_id)
       );
 
+     
+      
       if (sectorWithTable) {
         setSector(sectorWithTable);
-        setTable(sectorWithTable.tables.find(a => a.order_id == id));
+        setTable(sectorWithTable.tables.find(a => a.id == orderData.table_id));
       }
     } catch (error) {
       console.error(
@@ -555,6 +562,13 @@ export default function Home_Pedidos_paymet() {
     }
   };
 
+  const handleCredit = () => {
+    if (orderData?.status == 'delivered') {
+      navigate(`/home/client/crear/${id}`, { replace: true })
+    } else {
+      alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
+    }
+  }
 
 
   // =============== End ============
@@ -573,29 +587,29 @@ export default function Home_Pedidos_paymet() {
               <Link to="/home_Pedidos" className='d-flex text-decoration-none' >
                 <div className='btn btn-outline-primary text-nowrap py-2 d-flex mt-2 ms-3' style={{ borderRadius: "10px" }}> <FaArrowLeft className='me-2 mt-1' />Regresar</div>
               </Link>
+
               <div className='d-flex justify-content-between align-items-center flex-wrap'>
                 <div className='text-white ms-3 my-4' style={{ fontSize: "18px" }}>
                   {/* Pedido : {order} */}
                   Pedido : {id}
                 </div>
-
-
-
-
-
-
                 <div className='d-flex flex-wrap me-4'>
                   {showCancelOrderButton ? (
+                    !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") &&
                     <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
                   ) : (
-                    <Link className='text-decoration-none' 
-                    to={`/home_Pedidos/payment_edit/${id}`}
+                    !(orderData?.status == "cancelled") && <>
+                    <Link className='text-decoration-none'
+                      to={`/home_Pedidos/payment_edit/${id}`}
                     >
                       <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
                     </Link>
+                    <div className='btn btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1' />Agregar Producto</div>
+                    </>
                   )}
-                  {/* <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div> */}
-                  <div className='btn btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1' />Agregar Producto</div>
+                {showCancelOrderButton &&
+                  <div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
+                }
                 </div>
 
                 {/* cancel order modal */}
@@ -868,7 +882,7 @@ export default function Home_Pedidos_paymet() {
 
               </Tab>
 
-              <Tab eventKey="profile" title="Informaction del cliente" className='b_border ' style={{ marginTop: "2px" }}>
+              <Tab eventKey="profile" title="Información del cliente" className='b_border ' style={{ marginTop: "2px" }}>
                 <div className='b-bg-color1'>
                   <div className='text-white ms-4 pt-4' >
                     <h5>Información pedido</h5>
@@ -877,21 +891,21 @@ export default function Home_Pedidos_paymet() {
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Sector</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name} id="inputPassword2" placeholder="Uber" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={`${table?.name}  (${table?.id})`} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                   </div>
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Cliente</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Personas</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="Uber" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                   </div>
 
