@@ -13,7 +13,7 @@ import Recipt from "./Recipt";
 import { MdOutlineAccessTimeFilled, MdRoomService } from "react-icons/md";
 import axios from "axios";
 import { FaCalendarAlt } from "react-icons/fa";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 const DeliveryPago = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -49,11 +49,10 @@ const DeliveryPago = () => {
     const regex = allowDecimal ? /^\d*\.?\d{0,2}$/ : /^\d*$/;
     return regex.test(value) ? value : "";
   };
-  const [tipError,setTipError] = useState('')
 
   const handleprice = (event) => {
     let value = event.target.value.replace("$", "");
-    value = validateNumericInput(value);
+    value = validateNumericInput(value == "" ? 0 : value);
     const numericValue = parseFloat(value) || 0;
 
     // Assuming a maximum tip of 100% of the total cost
@@ -61,11 +60,8 @@ const DeliveryPago = () => {
     if (numericValue > maxTip) {
       value = maxTip.toFixed(2);
     }
-    if(value){
-      setTipError('');
-      setPrice(value);
-      setTipAmount(parseFloat(value));
-    }
+    setPrice(value);
+    // setTipAmount(parseFloat(value));
   };
 
   const [showAllItems, setShowAllItems] = useState(false);
@@ -84,7 +80,6 @@ const DeliveryPago = () => {
   const handleClose = () => {
     setShow(false);
     setPrice('');
-    setTipError('');
   }
   const handleShow = () => setShow(true);
   const [lastOrder, setLastOrder] = useState('');           // change
@@ -181,8 +176,7 @@ const DeliveryPago = () => {
     value = value.replace(/[^0-9/./]/g, "");
     setCustomerData((prevState) => ({
       ...prevState,
-      [name]: value,
-      turn: value ? ((parseInt(value) - (finalTotal + taxAmount + tipAmount).toFixed(2))).toFixed(2) : 0
+      [name]: value
     }));
     setFormErrors((prevState) => ({
       ...prevState,
@@ -255,7 +249,7 @@ const DeliveryPago = () => {
   const totalCost = getTotalCost();
   const discount = 1.0;
   const finalTotal = totalCost - discount;
-  const taxAmount = finalTotal * 0.19;
+  const taxAmount = finalTotal * 0.12;
 
 
   // ==== Get BOX Data =====
@@ -402,7 +396,7 @@ const DeliveryPago = () => {
       }
     } catch (error) {
       console.error("Error creating order : ", error);
-      //enqueueSnackbar (error?.response?.data?.message, { variant: 'error' })
+      enqueueSnackbar(error?.response?.data?.message, { variant: 'error' })
     }
 
     
@@ -531,9 +525,6 @@ const DeliveryPago = () => {
                         value={`$${price}`}
                         onChange={handleprice}
                       />
-                      {tipError && (
-                        <p className="errormessage text-danger">{tipError}</p>
-                      )}
                     </div>
                   </Modal.Body>
                   <Modal.Footer className="border-0 pt-0">
@@ -541,10 +532,6 @@ const DeliveryPago = () => {
                       className="j-tbl-btn-font-1 b_btn_pop"
                       variant="primary"
                       onClick={() => {
-                        if (!price) {
-                          setTipError('Ingrese una cantidad')
-                          return
-                        }
                         handleShowCreSubSuc();
                         handleClose();
                       }}
@@ -803,7 +790,7 @@ const DeliveryPago = () => {
 
                   <div className="b-date-time b_date_time2 d-flex align-items-center justify-content-end text-white">
                     <FaCalendarAlt />
-                    <p className="mb-0 ms-2 me-3">{new Date().toLocaleDateString('en-GB')}</p>
+                    <p className="mb-0 ms-2 me-3">{new Date().toDateString()}</p>
                     <MdOutlineAccessTimeFilled />
                     <p className="mb-0 ms-2">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>

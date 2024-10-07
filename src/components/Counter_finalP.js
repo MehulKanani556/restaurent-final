@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Recipt from "./Recipt";
 import { MdRoomService } from "react-icons/md";
 import axios from "axios";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -323,7 +323,7 @@ const Counter_finalP = () => {
   const [navigationPath, setNavigationPath] = useState('');
 
   const navigationPage = () => {
-    console.log(navigationPath,"asgaysg ");
+    console.log(navigationPath);
     if (navigationPath) {
       navigate(navigationPath);
     }
@@ -331,7 +331,6 @@ const Counter_finalP = () => {
   };
 
   const handleLinkNavigation = (path) => {
-    console.log("sbhdj",isSubmitted)
     if (!isSubmitted) {
       setNavigationPath(path); // Store the path to navigate after confirmation
       setShowDeleteConfirmation(true); // Show confirmation modal
@@ -388,16 +387,13 @@ const Counter_finalP = () => {
       const response = await axios.post(`${apiUrl}/order/place_new`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
-     
-      order_master_id = response.data.kdsOrder.order_id
-      console.log("order_master_id", response.data.kdsOrder.id);
-      // alert("sdv");
+      console.log(response.data)
+      order_master_id = response.data.details.order_master.id
       if (response.data) {
-
         const paymentData = {
           ...payment,
           amount: customerData.amount,
-          type: selectedCheckboxes,
+          type: selectedCheckboxes[0],
           order_master_id: order_master_id,
           return: customerData.turn,
           admin_id: admin_id
@@ -418,13 +414,11 @@ const Counter_finalP = () => {
         setIsSubmitted(true);
         handleShow11();
         setIsProcessing(false);
-        handlePrint();
       }
     } catch (error) {
       console.error("Error creating order : ", error);
-      //enqueueSnackbar (error?.response?.data?.message, { variant: 'error' })
+      enqueueSnackbar(error?.response?.data?.message, { variant: 'error' })
       setIsProcessing(false);
-      setIsSubmitted(false);
     }
 
   };
@@ -589,49 +583,6 @@ const Counter_finalP = () => {
                     </div>
                   </Modal.Body>
                 </Modal>
-                 {/* ========= Delete confirmation Modal =========== */}
-              <Modal
-                show={showDeleteConfirmation}
-                onHide={() => setShowDeleteConfirmation(false)}
-                backdrop={true}
-                keyboard={false}
-                className="m_modal jay-modal"
-              >
-                <Modal.Header closeButton className="border-0" />
-
-                <Modal.Body>
-                  <div className="text-center">
-                    {/* <img
-                        src={require("../Image/trash-outline-secondary.png")}
-                        alt=" "
-                      /> */}
-                    <p className="mb-0 mt-3 h6">
-                      {" "}
-
-                      ¿Estás segura de que quieres abandonar este pedido?
-                    </p>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer className="border-0 ">
-                  <Button
-                    className="j-tbl-btn-font-1 b_btn_close"
-                    variant="danger"
-                    onClick={() => {
-                      setShowDeleteConfirmation(false);
-                      navigationPage()
-                    }}
-                  >
-                    Si, seguro
-                  </Button>
-                  <Button
-                    className="j-tbl-btn-font-1 "
-                    variant="secondary"
-                    onClick={() => setShowDeleteConfirmation(false)}
-                  >
-                    No, abandonar
-                  </Button>
-                </Modal.Footer>
-              </Modal>
 
                 <p className="j-final-p sjfs-14 pb-3">
                   Puedes seleccionar uno o mas

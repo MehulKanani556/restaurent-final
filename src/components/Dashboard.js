@@ -183,7 +183,7 @@ const Dashboard = () => {
           },
         }
       )
-      // console.log(responce);
+      console.log(responce);
       setupEchoListeners(userId);
     } catch (error) {
       console.log("not updating user", + error.message);
@@ -580,7 +580,7 @@ const Dashboard = () => {
         }
       );
       setDeliveryData(response.data.delivery_methods || {}); // Ensure deliveryData is an object
-      // console.log("delivery", response.data.delivery_methods)
+      console.log("delivery", response.data.delivery_methods)
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -764,7 +764,7 @@ const Dashboard = () => {
   // Use the transformed data in the chart
   const chartData = transformOrderDetails(totalRevenue.order_details);
 
-  // console.log(chartData);
+  console.log(chartData);
 
 
 
@@ -1932,7 +1932,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                   ))} */}
-                  {popularData?.map((item, index) => (
+                  {popularData.map((item, index) => (
                     <div
                       key={item.id} // Ensure each item has a unique key
                       className="j-summary-body-data scrollbox d-flex align-items-center justify-content-between"

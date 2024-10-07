@@ -13,7 +13,7 @@ import Header from "./Header";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
 import useAudioManager from "./audioManager";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 const TableCounter1 = () => {
   const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
@@ -577,7 +577,7 @@ const TableCounter1 = () => {
  
     } catch (err) {
       console.error("Error creating order:", err);
-      //enqueueSnackbar (err?.response?.data?.message, { variant: 'error' })
+      enqueueSnackbar(err?.response?.data?.message, { variant: 'error' })
 
     } finally {
       setIsProcessing(false);

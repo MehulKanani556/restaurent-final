@@ -19,7 +19,7 @@ import echo from "../echo";
 import Echo from "laravel-echo";
 import { io } from 'socket.io-client';
 import useAudioManager from "./audioManager";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 const Tables = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -277,18 +277,18 @@ const Tables = () => {
         setIsProcessing(false);
         setNewTable({ sectorName: "", noOfTables: "" });
         if (response.data && response.data.notification) {
-          //enqueueSnackbar (response.data.notification, { variant: 'success' });
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
         } else {
-          //enqueueSnackbar (`número de tabla ${newTable.noOfTables} agregado exitosamente`, { variant: 'success' });
+          enqueueSnackbar(`número de tabla ${newTable.noOfTables} agregado exitosamente`, { variant: 'success' });
         }
-        // playNotificationSound();;
+        playNotificationSound();
       } else {
         console.error("Error updating sector:", response.data);
       }
     } catch (error) {
       console.error("Error updating sector:", error);
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+      playNotificationSound();
     }
     setIsProcessing(false);
   };
@@ -338,17 +338,17 @@ const Tables = () => {
         getSectorTable();
         setIsProcessing(false);
         if (response.data && response.data.notification) {
-          //enqueueSnackbar (response.data.notification, { variant: 'success' });
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
         } else {
-          //enqueueSnackbar (`Sector ${selectedFamily.name} actualizado exitosamente`, { variant: 'success' });
+          enqueueSnackbar(`Sector ${selectedFamily.name} actualizado exitosamente`, { variant: 'success' });
         }
-        // playNotificationSound();;
+        playNotificationSound();
       }
     } catch (error) {
       console.error("Error updating sector:", error);
       // alert("Failed to update sector. Please try again.");
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+      playNotificationSound();
     }
   };
   const handleEditSector = async () => {
@@ -425,16 +425,16 @@ const Tables = () => {
         setIsProcessing(false)
         setAddsector({ name: "", noOfTables: "" }); // Reset form
         if (response.data && response.data.notification) {
-          //enqueueSnackbar (response.data.notification, { variant: 'success' });
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
         } else {
-          //enqueueSnackbar (`Sector ${addsector.name} creado exitosamente`, { variant: 'success' });
+          enqueueSnackbar(`Sector ${addsector.name} creado exitosamente`, { variant: 'success' });
         }
-        // playNotificationSound();;
+        playNotificationSound();
       }
     } catch (error) {
       console.error("Error creating sector:", error);
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+      playNotificationSound();
     }
   };
 
@@ -951,18 +951,18 @@ const Tables = () => {
         setShowDeleteConfirm(false);
         setItemToDelete(null);
         if (response.data && response.data.notification) {
-          //enqueueSnackbar (response.data.notification, { variant: 'success' });
+          enqueueSnackbar(response.data.notification, { variant: 'success' });
         } else {
-          //enqueueSnackbar (`Sector ${itemToDelete} eliminado exitosamente`, { variant: 'success' });
+          enqueueSnackbar(`Sector ${itemToDelete} eliminado exitosamente`, { variant: 'success' });
         }
-        // playNotificationSound();;
+        playNotificationSound();
       } catch (error) {
         console.error(
           "Error Delete OrderData:",
           error.response ? error.response.data : error.message
         );
-        //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-        // playNotificationSound();;
+        enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+        playNotificationSound();
       }
     }
   };
@@ -1981,28 +1981,9 @@ const Tables = () => {
                                 </div>
                                 <div className="text-white j-order-count-why ">
                                   {item.notes ? (
-                                    addNotes[index] ? (
-                                      <form
-                                        onSubmit={(e) =>
-                                          handleSubmitNote(e, index, item.id)}
-                                      >
-                                        <span className="j-nota-blue">
-                                          Nota:{" "}
-                                        </span>
-                                        <input
-                                          className="j-note-input"
-                                          type="text"
-                                          defaultValue={item.notes || ""}
-                                          autoFocus
-                                        />
-                                      </form>
-                                    ) : (
-                                      <span className="j-nota-blue" onClick={() =>
-                                        handleAddNoteClick(index)}>
-                                        Nota: {item.notes}
-                                      </span>
-                                    )
-
+                                    <span className="j-nota-blue">
+                                      Nota: {item.notes}
+                                    </span>
                                   ) : (
                                     <div>
                                       {addNotes[index] ? (
@@ -2199,27 +2180,9 @@ const Tables = () => {
                                 </div>
                                 <div className="text-white j-order-count-why">
                                   {item.notes ? (
-                                    addNotes[index] ? (
-                                      <form
-                                        onSubmit={(e) =>
-                                          handleSubmitNote(e, index, item.id)}
-                                      >
-                                        <span className="j-nota-blue">
-                                          Nota:{" "}
-                                        </span>
-                                        <input
-                                          className="j-note-input"
-                                          type="text"
-                                          defaultValue={item.notes || ""}
-                                          autoFocus
-                                        />
-                                      </form>
-                                    ) : (
-                                      <span className="j-nota-blue" onClick={() =>
-                                        handleAddNoteClick(index)}>
-                                        Nota: {item.notes}
-                                      </span>
-                                    )
+                                    <span className="j-nota-blue">
+                                      Nota: {item.notes}
+                                    </span>
                                   ) : (
                                     <div>
                                       {addNotes[index] ? (

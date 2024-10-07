@@ -18,7 +18,7 @@ const TableInformation = () => {
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token] = useState(sessionStorage.getItem("token"));
   const [role] = useState(sessionStorage.getItem("role"));
-  const admin_id = sessionStorage.getItem("admin_id")
+  const admin_id = sessionStorage.getItem("admin_id") 
 
   const [tId, setTId] = useState(location.state?.selectedTable);
   console.log(tId);
@@ -125,7 +125,7 @@ const TableInformation = () => {
       estado: "Recibido"
     },
 
-
+    
   ]);
 
   const [activeTab, setActiveTab] = useState("home");
@@ -288,7 +288,7 @@ const TableInformation = () => {
     try {
       const response = await axios.post(
         `${apiUrl}/table/getStats/${tableId}?from_month=${selectedDesdeMonth}&to_month=${selectedHastaMonth}`,
-        { admin_id },
+        {admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -452,7 +452,7 @@ const TableInformation = () => {
       //  // =============== Historial =============
 
       const response = await axios.post(
-        `${apiUrl}/table/getStats/${tableid}?from_month=${selectedDesdeMonthReport}&to_month=${selectedHastaMonthReport}`, { admin_id },
+        `${apiUrl}/table/getStats/${tableid}?from_month=${selectedDesdeMonthReport}&to_month=${selectedHastaMonthReport}`,{admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -756,7 +756,7 @@ const TableInformation = () => {
               >
                 <Tab
                   eventKey="home"
-                  title="Información"
+                 title="Información"
                   className=" text-white m_bgblack mt-2 rounded"
                 >
                   <div className="j-table-information-body">
@@ -987,7 +987,7 @@ const TableInformation = () => {
                                       style={{ fontSize: "12px" }}
                                       className="b_idbtn j-btn-primary text-nowrap j-tbl-font-3 "
                                     >
-                                      Ver detalles
+                                        Ver detalles
                                     </td>
                                   </Link>
                                 </td>

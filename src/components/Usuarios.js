@@ -18,7 +18,7 @@ import axios from "axios";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import useAudioManager from "./audioManager";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 const Usuarios = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -397,15 +397,15 @@ const Usuarios = () => {
       handleCloseEditProduction();
       handleShowEditProductionSuc();
       if (response?.data?.notification) {
-        //enqueueSnackbar (response?.data?.notification, { variant: 'success' })
-        // playNotificationSound();;
+        enqueueSnackbar(response?.data?.notification, { variant: 'success' })
+        playNotificationSound();
       }
 
 
     } catch (error) {
       console.error("Error updating user:", error);
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+      playNotificationSound();
     }
   };
 
@@ -467,16 +467,16 @@ const Usuarios = () => {
           handleShowCreSubSuc();
           handleClose();
           fetchUser();
-          //enqueueSnackbar (response.data.notification, { variant: 'success' })
-          // playNotificationSound();;
+          enqueueSnackbar(response.data.notification, { variant: 'success' })
+          playNotificationSound();
 
 
         }
       }
     } catch (error) {
       console.error("Error creating or updating user:", error);
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
+      playNotificationSound();
       // Handle API errors here
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -1052,7 +1052,7 @@ const Usuarios = () => {
                           <td>
                             {user.status === "Activa" ? (
                               <button className="btn btn-success" onClick={() => handleShowEditFam(user.id)} style={{ minWidth: "120px" }}>
-                                Activo
+                                Activa
                               </button>
                             ) : (
                               <button className="btn btn-danger" onClick={() => handleShowEditFam2(user.id)} style={{ minWidth: "120px" }} >
@@ -1093,7 +1093,7 @@ const Usuarios = () => {
                 <div className="text-center">
                   <img src={require("../Image/trash-check 1.png")} alt="" />
                   <p className="opacity-75 mt-2">
-                  Usuario Suspendido con éxito
+                    Usuario suspendida con éxito
                   </p>
                 </div>
               </Modal.Body>
@@ -1350,7 +1350,7 @@ const Usuarios = () => {
                   />
                   <p className="mb-0 mt-2 h6">
                     {" "}
-                    ¿Quieres suspender a esta Usuario?
+                    ¿Quieres suspender a esta usuaria?
                   </p>
                 </div>
               </Modal.Body>

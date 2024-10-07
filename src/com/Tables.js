@@ -161,7 +161,7 @@ const Tables = () => {
 
   const getSectorTable = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id:admin_id},{headers:{Authorization: `Bearer ${token}`}});
+      const response = await axios.post(`${apiUrl}/sector/getWithTable`);
       if (response.data) {
         setSecTab(response.data.data);
       } else {

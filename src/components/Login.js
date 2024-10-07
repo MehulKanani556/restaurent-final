@@ -8,9 +8,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../Image/Group.png";
 import { Modal } from "react-bootstrap";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import useAudioManager from "./audioManager";
-import useSocket from "../hooks/useSocket";
 
 const Login = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -26,8 +25,6 @@ const Login = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState([]);
   const { playNotificationSound } = useAudioManager();
-  const echo = useSocket();
-
 
   const location = useLocation();
   const handleEmailChange = (e) => {
@@ -91,83 +88,36 @@ const Login = () => {
         sessionStorage.setItem("admin_id", admin_id || id);
         setSuccessMessage("iniciar sesión exitosamente");
         setShowSuccessModal(true);
-        updateActiveStatus(id,name,email,access_token);
+
         // Play notification sound
-        // playNotificationSound();;
+        playNotificationSound();
 
         setTimeout(() => {
           setShowSuccessModal(false);
           const redirectPath = location?.state?.from || '/dashboard';
           navigate(redirectPath);
         }, 2000);
+
+        // Ensure notification message is a string before calling enqueueSnackbar
+        const notificationMessage = response.data?.notification || "iniciar sesión exitosamente";
+        if (typeof notificationMessage === 'string') {
+          enqueueSnackbar(notificationMessage, { variant: 'success' });
+          playNotificationSound();
+
+        }
+
       } else {
         setErrorMessage("Credenciales inválidas");
         setShowModal(true);
       }
-    } catch (error) {      
-      setErrorMessage(error.response?.data?.message || "An error occurred");
-      // playNotificationSound();;
-      setShowModal(true);
-    }
-  };
-  const updateActiveStatus = async (id, name, email, access_token) => {
-    try {
-      const responce = await axios.post(
-        `${apiUrl}/update-user/${id}`,
-        {
-          activeStatus: "1",
-          name: name,
-          email: email,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      )
-      console.log(responce);
-      socket();
-      fetchAllUsers(access_token);
-      // setupEchoListeners(userId);
     } catch (error) {
-      console.log("not updating user", + error.message);
-    }
-  }
-  
-  const socket = (id) => {
-    setupEchoListeners(id);
-    // console.log("QWQW");
-    return () => {
-      if (echo) {
-        // console.log("SS");
-        echo.leaveChannel(`chat.${id}`);
+      const errorMessage = error.response?.data?.alert || "An error occurred";
+      if (typeof errorMessage === 'string') {
+        enqueueSnackbar(error.response?.data?.message || errorMessage, { variant: 'error' });
       }
-    };
-  }
-  const setupEchoListeners = (id) => {
-    if (echo) {
-      // echo.channel(`chat.${selectedContact?.id}.${userId}`)
-      echo.channel(`chat.${id}`)
-        .listen('Chat', (data) => {
-          console.log("chat message received", data);
-          // fetchAllUsers();
-          // fetchMessages();
-        });
-    }
-  };
-  const fetchAllUsers = async (access_token) => {
-    try {
-      const response = await axios.get(`${apiUrl}/chat/user`, {
-        headers: { Authorization: `Bearer ${access_token}` }
-      });
-      console.log(response.data.users);
-      // setAllUser(response.data.users);
-      // setGroups(response.data.groups);
-      // setgroupChats(response.data.groupChats);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
-      // setIsProcessing(false);
+      setErrorMessage(error.response?.data?.message || "An error occurred");
+      playNotificationSound();
+      setShowModal(true);
     }
   };
   const handleSubmit = (event) => {

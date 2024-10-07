@@ -629,7 +629,7 @@ const Home_Pedidos = () => {
                                 <tbody className='text-white b_btnn '>
                                     {/* new========== */}
                                     {currentItems.length > 0 ?
-                                         currentItems.map((order) => (
+                                        currentItems.map((order) => (
                                             <tr key={order.id} className='b_row'>
                                                 {/* <Link to={"/home_Pedidos/paymet"}> */}
                                                 <Link to={`/home_Pedidos/paymet/${order.id}`}>
@@ -645,12 +645,13 @@ const Home_Pedidos = () => {
                                                 </td>
                                                 <td className=' bj-delivery-text-2'>{new Date(order.created_at).toLocaleDateString('en-GB')}</td>
                                                 <td className=' bj-delivery-text-2'>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                                                <td className=' bj-delivery-text-2'> 
-                                                {order.order_type.toLowerCase() === 'local' ? 'Local' : order.order_type.toLowerCase().includes("with") ? 'Retiro ' : order.order_type.toLowerCase() === 'delivery' ? 'Entrega' : order.order_type.toLowerCase() === 'uber' ? 'Uber' : order.order_type.toLowerCase().includes("plat") ? "Plataforma" : order.order_type}
-                                                    </td>
+                                                <td className=' bj-delivery-text-2'> {order.order_type}</td>
+                                                {/* <td className=' bj-delivery-text-2'>{order.fecha}</td>
+                                            <td className=' bj-delivery-text-2'>{order.hora}</td>
+                                            <td className=' bj-delivery-text-2'> {order.tipo}</td> */}
                                                 <Link to={`/home_Pedidos/paymet/${order.id}`}>
                                                     <td className='b_text_w ' onClick={() => handlerout(order.id)}>
-                                                        <button className='b_edit bj-delivery-text-2'>Ver detalles</button>
+                                                        <button className='b_edit bj-delivery-text-2'>See Details</button>
                                                     </td>
                                                 </Link>
                                                 <td>

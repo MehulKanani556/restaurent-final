@@ -57,26 +57,16 @@ const DeliveryDots = () => {
     }
   };
 
-  // const handleAddNoteClick = (index) => {
-    //     const updatedIsEditing = [...isEditing];
-    //     updatedIsEditing[index] = true;
-    //     setIsEditing(updatedIsEditing);
-    //     const updatedCartItems = [...cartItems];
-    //     if (!updatedCartItems[index].note) {
-    //         updatedCartItems[index].note = "Nota: ";
-    //         setCartItems(updatedCartItems);
-    //     }
-    // };
-    
-    const handleAddNoteClick = (index) => {
-        const updatedCartItems = cartItems.map(
-          (item, i) =>
-            i === index
-              ? { ...item, isEditing: true, note: item.note || "Nota: " }
-              : item
-        );
-        setCartItems(updatedCartItems);
-      };
+  const handleAddNoteClick = (index) => {
+    const updatedIsEditing = [...isEditing];
+    updatedIsEditing[index] = true;
+    setIsEditing(updatedIsEditing);
+    const updatedCartItems = [...cartItems];
+    if (!updatedCartItems[index].note) {
+      updatedCartItems[index].note = "Nota: ";
+      setCartItems(updatedCartItems);
+    }
+  };
 
   // cart
   useEffect(() => {
@@ -165,12 +155,7 @@ const DeliveryDots = () => {
 
   const [showEditFamDel, setShowEditFamDel] = useState(false);
   const handleCloseEditFamDel = () => setShowEditFamDel(false);
-  const handleShowEditFamDel = () => {
-    setShowEditFamDel(true);
-    setTimeout(() => {
-        setShowEditFamDel(false);
-      }, 2000);
-  }
+  const handleShowEditFamDel = () => setShowEditFamDel(true);
 
   const [showEditFam, setShowEditFam] = useState(false);
   const handleCloseEditFam = () => setShowEditFam(false);
@@ -810,145 +795,6 @@ console.log(data)
                                             </div>
                                         </Accordion.Body>
                                     </Accordion.Item>
-                                    <Accordion.Item eventKey="4" className="mb-3">
-                                        <Accordion.Header>
-                                            {" "}
-                                            {/* <div className="sj_bg_dark px-4 py-2 mt-3 sj_w-75">
-                                                <img src={box4} alt="#" />
-                                                <p className="d-inline px-3">
-                                                    Boleta personal
-                                                </p>
-                                            </div> */}
-                                            <div
-                                                onClick={() => handleAccordionClick("4")}
-                                                className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
-                                                    "4"
-                                                    ? "active"
-                                                    : ""}`}
-                                            >
-                                                <input
-                                                    type="radio"
-                                                    name="receiptType"
-                                                    value="1"
-                                                    checked={selectedRadio === "4"}
-                                                    onChange={() => setSelectedRadio("4")}
-                                                    className="me-2 j-radio-checkbox"
-                                                />
-                                                <p className="d-inline px-3">Factura:</p>
-                                            </div>
-                                        </Accordion.Header>
-                                        <Accordion.Body>
-                                            <div className="sj_gay_border px-3 py-4 mt-2 j_tb_size ">
-                                                <form>
-                                                    <div className="row j_col_width">
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Rut </label>
-                                                            <input
-                                                                type="text"
-                                                                name="rut"
-                                                                value={rut3}
-                                                                onChange={(e) => handleRutChange(e, setRut3)}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Razón Social </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="bname"
-                                                                value={formData.bname}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.business_name && <div className="text-danger errormessage">{errors.business_name}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Sa, Ltda, Spa </label>
-                                                            <select
-                                                                name="ltda"
-                                                                value={formData.ltda}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white form-select">
-                                                                <option value="0">Seleccionar opción</option>
-                                                                <option value="sa">Sa</option>
-                                                                <option value="ltda">Ltda</option>
-                                                                <option value="spa">Spa</option>
-                                                            </select>
-                                                            {errors.ltda && <div className="text-danger errormessage">{errors.ltda}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Apellido Paterno</label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="lname"
-                                                                value={formData.lname}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.lname && <div className="text-danger errormessage">{errors.lname}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Giro </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="tour"
-                                                                value={formData.tour}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.tour && <div className="text-danger errormessage">{errors.tour}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Dirección </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="address"
-                                                                value={formData.address}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.address && <div className="text-danger errormessage">{errors.address}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 ">
-                                                            <label className="mb-2">E-mail (opcional) </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="email"
-                                                                value={formData.email}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                        </div>
-                                                        <div className="col-6 ">
-                                                            <label className="mb-2">
-                                                                Teléfono móvil (opcional){" "}
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="number"
-                                                                value={formData.number}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </Accordion.Body>
-                                    </Accordion.Item>
                                     {/* <Accordion.Item eventKey="3" >
                                         <Accordion.Header>
                                             <div onClick={() => handleAccordionClick("4")}
@@ -1032,7 +878,7 @@ console.log(data)
 
                                     <div className="b-date-time b_date_time2 d-flex align-items-center justify-content-end text-white">
                                         <FaCalendarAlt />
-                                        <p className="mb-0 ms-2 me-3">{new Date().toLocaleDateString('en-GB')}</p>
+                                        <p className="mb-0 ms-2 me-3">{new Date().toDateString()}</p>
                                         <MdOutlineAccessTimeFilled />
                                         <p className="mb-0 ms-2">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                     </div>
@@ -1173,8 +1019,8 @@ console.log(data)
                                                                         </div>
                                                                     ) : (
                                                                         <div>
-                                                                           {item.note ? (
-                                                                                <p className="j-nota-blue" style={{ cursor: "pointer" }} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
+                                                                            {item.note ? (
+                                                                                <p className="j-nota-blue">{item.note}</p>
                                                                             ) : (
                                                                                 <button
                                                                                     className="j-note-final-button"
@@ -1244,7 +1090,7 @@ console.log(data)
                                                     <Modal.Body className="border-0">
                                                         <div className="text-center">
                                                             <img
-                                                                // className="j-trash-img-late"
+                                                                className="j-trash-img-late"
                                                                 src={require("../Image/trash-outline-secondary.png")}
                                                                 alt=""
                                                             />
@@ -1312,7 +1158,7 @@ console.log(data)
                                             <Modal.Body className="border-0">
                                                 <div className="text-center">
                                                     <img
-                                                        // className="j-trash-img-late"
+                                                        className="j-trash-img-late"
                                                         src={require("../Image/trash-outline-secondary.png")}
                                                         alt=""
                                                     />

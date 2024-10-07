@@ -102,7 +102,7 @@ const TablePago = () => {
     return regex.test(value) ? value : "";
   };
 
-  const [tipError,setTipError] = useState('')
+
   const handleprice = (event) => {
     let value = event.target.value.replace("$", "");
     value = validateNumericInput(value);
@@ -113,11 +113,8 @@ const TablePago = () => {
     if (numericValue > maxTip) {
       value = maxTip.toFixed(2);
     }
-    if(value){
-      setTipError('');
-      setPrice(value);
-      setTipAmount(parseFloat(value));
-    }
+    setPrice(value);
+    setTipAmount(parseFloat(value));
   };
   /* get name and image */
   const getItemInfo = (itemId) => {
@@ -247,8 +244,7 @@ const TablePago = () => {
     value = value.replace(/[^0-9/./]/g, "");
     setCustomerData((prevState) => ({
       ...prevState,
-      [name]: value,
-      turn: value ? ((parseInt(value) - parseFloat((tableData[0]?.order_total + (tableData[0]?.order_total * 0.19)) - parseInt(tableData[0]?.discount) + tipAmount).toFixed(2))).toFixed(2) : 0
+      [name]: value
     }));
     setFormErrors((prevState) => ({
       ...prevState,
@@ -438,7 +434,7 @@ const TablePago = () => {
     const paymentData = {
       ...payment,
       amount: customerData.amount,
-      type: selectedCheckboxes,
+      type: selectedCheckboxes[0],
       order_master_id: tableData[0].id,
       return: customerData.turn,
       tax: taxAmount,
@@ -633,7 +629,7 @@ const TablePago = () => {
                   </button>
                 </div>
 
-                {/* <Modal
+                <Modal
                   show={show}
                   onHide={handleClose}
                   backdrop={true}
@@ -661,9 +657,6 @@ const TablePago = () => {
                         value={`$${price}`}
                         onChange={handleprice}
                       />
-                       {tipError && (
-                        <p className="errormessage text-danger">{tipError}</p>
-                      )}
                     </div>
                   </Modal.Body>
                   <Modal.Footer className="border-0">
@@ -671,56 +664,6 @@ const TablePago = () => {
                       className="j-tbl-btn-font-1"
                       variant="primary"
                       onClick={() => {
-                        handleShowCreSuc();
-                        handleClose();
-                      }}
-                    >
-                      Aceptar
-                    </Button>
-                  </Modal.Footer>
-                </Modal> */}
-<Modal
-                  show={show}
-                  onHide={handleClose}
-                  backdrop={true}
-                  keyboard={false}
-                  className="m_modal"
-                >
-                  <Modal.Header closeButton className="m_borbot">
-                    <Modal.Title className="j-tbl-text-10">
-                      Agregar propina
-                    </Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body className="border-0">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="exampleFormControlInput1"
-                        className="form-label j-tbl-font-11"
-                      >
-                        Cantidad
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control j-table_input"
-                        id="exampleFormControlInput1"
-                        placeholder="$20"
-                        value={`$${price}`}
-                        onChange={handleprice}
-                      />
-                      {tipError && (
-                        <p className="errormessage text-danger">{tipError}</p>
-                      )}
-                    </div>
-                  </Modal.Body>
-                  <Modal.Footer className="border-0">
-                    <Button
-                      className="j-tbl-btn-font-1"
-                      variant="primary"
-                      onClick={() => {
-                        if (!price) {
-                          setTipError('Ingrese una cantidad')
-                          return
-                        }
                         handleShowCreSuc();
                         handleClose();
                       }}
@@ -729,6 +672,7 @@ const TablePago = () => {
                     </Button>
                   </Modal.Footer>
                 </Modal>
+
                 <Modal
                   show={showCreSuc}
                   onHide={handleCloseCreSuc}

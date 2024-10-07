@@ -758,17 +758,9 @@ function Home_Usuarios() {
                                                             <td className='b_text_w'>{new Date(order?.created_at).toLocaleDateString('en-GB')}</td>
                                                             <td className='b_text_w'>{new Date(order?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                                             <td className='b_text_w'>{order.customer_name}</td>
-                                                            <td className='b_text_w'>${order.order_details.reduce((acc,v)=>acc+parseInt(v.amount)*parseInt(v.quantity),0)}</td>
-                                                            {/* <td className='b_text_w'>{order.payment_type}</td> */}
-                                                            <td className='b_text_w'>
-                                                                {
-                                                                order.payment_type == 'cash' ? 'Caso' :
-                                                                order.payment_type == 'debit' ? 'Débito' :
-                                                                order.payment_type == 'credit' ? 'Crédito' :
-                                                                order.payment_type == 'transfer' ? 'Transferir' : " "
-                                                                }
-                                                            </td>
-                                                            <td className='b_text_w'>${order.order_details.reduce((acc,v)=>acc+parseInt(v.amount)*parseInt(v.quantity),0)}</td>
+                                                            <td className='b_text_w'>${order.total}</td>
+                                                            <td className='b_text_w'>{order.payment_type}</td>
+                                                            <td className='b_text_w'>${order.total}</td>
                                                             {/* <td className='b_btn1 bj-delivery-text-2 mb-3 ms-3 d-flex align-items-center justify-content-center'>{order.order_type}</td> */}
                                                             <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                             ${order.order_type.toLowerCase() === 'local' ? 'b_indigo' : order.order_type.toLowerCase() === 'order now' ? 'b_ora ' : order.order_type.toLowerCase() === 'delivery' ? 'b_blue' : order.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : order.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>

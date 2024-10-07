@@ -59,20 +59,11 @@ function Home_client() {
   const totalPages = Math.ceil(filteredOrderUser.length / itemsPerPage);
   const filteredUsers = error
     ? []
-    : filteredOrderUser.filter((user) => {
-
-      const displayName = user?.firstname || user?.business_name;
-      const fullName = `${displayName} ${user?.lastname || ''}`.toLowerCase();
-      const searchLower = searchTerm?.toLowerCase();
-
-      return (
-        fullName.includes(searchLower) ||
-        displayName?.toLowerCase().includes(searchLower) ||
-        (user?.lastname?.toLowerCase().includes(searchLower) || '') ||
-        user?.email?.toLowerCase().includes(searchLower) &&
-        user.email !== "superadmin@gmail.com"
-      );
-    });
+    : filteredOrderUser.filter((user) =>
+      user?.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.lastname.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      user.email !== "superadmin@gmail.com"
+    );
   const indexOfLastFilteredItem = currentPage * itemsPerPage;
   const indexOfFirstFilteredItem = indexOfLastFilteredItem - itemsPerPage;
   const currentFilteredItems = error

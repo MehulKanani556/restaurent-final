@@ -505,7 +505,7 @@ useEffect(() => {
         }
       );
       setDeliveryData(response.data.delivery_methods || {}); // Ensure deliveryData is an object
-      // console.log("delivery", response.data.delivery_methods)
+      console.log("delivery", response.data.delivery_methods)
 
     } catch (error) {
       console.error('Error fetching data:', error);

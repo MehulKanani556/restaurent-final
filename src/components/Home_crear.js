@@ -237,12 +237,12 @@ export default function Home_crear({ item }) {
         getItems();
         fetchUserPayment();
 
-    }, [id, deleteProductId]);
+    }, [id, visibleInputId, deleteProductId]);
 
     useEffect(() => {
         fetchUser();
         handleOrderDetails();
-    }, [orderAlldata, items, deleteProductId]);
+    }, [orderAlldata, items, visibleInputId, deleteProductId]);
 
     //    -------- Edite order Qyt ----
     const initialCounts = orderDetails?.reduce((acc, item) => {
@@ -262,7 +262,7 @@ export default function Home_crear({ item }) {
             });
             setCounts(initialCounts);
         }
-    }, [orderDetails, deleteProductId]);
+    }, [orderDetails, visibleInputId, deleteProductId]);
 
 
     const getAllorder = async () => {
@@ -524,8 +524,6 @@ export default function Home_crear({ item }) {
                 // setSavedNote(noteValues);
                 setNoteValues('');
                 setVisibleInputId(null);
-                getAllorder();
-                handleOrderDetails();
             } catch (error) {
                 console.error(
                     "Error adding note:",
@@ -771,26 +769,9 @@ export default function Home_crear({ item }) {
                                                                                     )}
                                                                                 </div>
                                                                             ) : (
-                                                                                < div key={item.id}>
-                                                                                {visibleInputId != item.id ? (
-                                                                                  <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
-                                                                                    <span className='j-nota-blue ms-4'>{item.notes}</span>
-                                                                                  </div>
-                                                                                ) : (
-                                                                                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                    <span className='j-nota-blue ms-4'>Nota:</span>
-                                                                                    <input
-                                                                                      type="text"
-                                                                                      className='j-note-input'
-                                                                                      // placeholder={v.notes}
-                                                                                      value={noteValues}
-                                                                                      onChange={(e) => handleNoteChange(item.id, e)}
-                                                                                      onKeyDown={handleNoteKeyDown(item.id)}
-                                                                                      // onBlur={console.log("blur")}
-                                                                                    />
-                                                                                  </div>
-                                                                                )}
-                                                                              </div>
+                                                                                <div className='a_home_addnote ms-4' >
+                                                                                    {item.notes}
+                                                                                </div>
                                                                             )}
                                                                         </div>
                                                                     </div>

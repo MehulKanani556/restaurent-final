@@ -4,7 +4,7 @@ import { IoMdInformationCircle } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 const OrderCart = ({ image, name, price, code, addItemToCart ,id }) => {
-  const API = process.env.REACT_APP_IMAGE_URL;
+  const API = "https://shreekrishnaastrology.com/public";
 
   const handleAddToCart = () => {
     addItemToCart({ id,image, name, price, code });

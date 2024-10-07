@@ -18,7 +18,7 @@ import { CgLayoutGrid } from "react-icons/cg";
 // import * as XLSX from "xlsx";
 import * as XLSX from "xlsx-js-style";
 import useAudioManager from "./audioManager";
-//import { enqueueSnackbar  } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 export default function SingleArticleProduct() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -364,8 +364,8 @@ export default function SingleArticleProduct() {
       );
       console.log("Product updated successfully");
       handleClose();
-      //enqueueSnackbar (response.data?.notification, { variant: 'success' })
-      // playNotificationSound();;
+      enqueueSnackbar(response.data?.notification, { variant: 'success' })
+      playNotificationSound();
       handleShowEditFamSuc();
       fetchInitialData(); // Consider passing the new ID if it has changed
     } catch (error) {
@@ -375,8 +375,8 @@ export default function SingleArticleProduct() {
         ...errorMessages,
         apiError: "Failed to update product. Please try again."
       });
-      //enqueueSnackbar (error?.response?.data?.alert , { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert , { variant: 'error' })
+      playNotificationSound();
     } finally {
       setIsProcessing(false);
     }
@@ -393,15 +393,15 @@ export default function SingleArticleProduct() {
       });
       console.log(response.data.message);
       handleShowEditFamDel();
-      //enqueueSnackbar (response.data?.notification, { variant: 'success' })
-      // playNotificationSound();; 
+      enqueueSnackbar(response.data?.notification, { variant: 'success' })
+      playNotificationSound(); 
       setIsProcessing(false);
 
       navigate("/articles");
     } catch (error) {
       console.error("Failed to delete item:", error);
-      //enqueueSnackbar (error?.response?.data?.alert , { variant: 'error' })
-      // playNotificationSound();;
+      enqueueSnackbar(error?.response?.data?.alert , { variant: 'error' })
+      playNotificationSound();
     } finally {
       setIsProcessing(false);
     }
