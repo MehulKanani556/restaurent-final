@@ -117,20 +117,37 @@ const Chat = () => {
     const echo = useSocket();
     const apiUrl = process.env.REACT_APP_API_URL;
     const chatContainerRef = useRef(null);
-
+    const [connection, setConnection] = useState(0)
+    const [length, setLength] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState();
 
     useEffect(() => {
         if (token) {
             setIsProcessing(true);
             fetchAllUsers();
+            fetchOnlineUsers();
         }
     }, [token]);
 
+    const fetchOnlineUsers = async () => {
+        // setIsProcessing(true);
+        try {
+            const response = await axios.get(`${apiUrl}/get-users`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setOnlineUsers(response.data.filter((v) => v.activeStatus == '1'));
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+        // setIsProcessing(false);
+    }
+
     useEffect(() => {
         setupEchoListeners();
-        return () => {
-            if (echo) {
-                echo.leaveChannel(`chat.${selectedContact?.id}.${userId}`);
+         return () => {
+            if (echo && selectedContact) {
+                // console.log("SS");
+                echo.leaveChannel(`chat.${userId}`);
             }
         };
     }, [echo, selectedContact, userId]);
@@ -139,17 +156,31 @@ const Chat = () => {
     const setupEchoListeners = () => {
         if (echo) {
             // echo.channel(`chat.${selectedContact?.id}.${userId}`)
-            console.log(userId)
+            // console.log(userId)
             echo.channel(`chat.${userId}`)
                 .listen('Chat', (data) => {
                     console.log("chat message received", data);
                     fetchAllUsers();
                     fetchMessages();
+                    fetchOnlineUsers();
                 });
                 console.log("Socket connection established")
         }
     };
-
+    const groupListeners = () => {
+        if (echo && selectedContact?.hasOwnProperty('pivot')) {
+            console.log(selectedContact.pivot.group_id);
+            // echo.channel(`chat.${selectedContact?.id}.${userId}`)
+            echo.channel(`group.${selectedContact.pivot.group_id}`)
+                .listen('Chat', (data) => {
+                    console.log("Groupchat message received", data);
+                    fetchAllUsers();
+                    fetchMessages();
+                    fetchOnlineUsers();
+                });
+            // console.log("Socket connection established")
+        }
+    }
     const fetchAllUsers = async () => {
         try {
             const response = await axios.post(`${apiUrl}/chat/user`,{admin_id:admin_id}, {
@@ -177,7 +208,8 @@ const Chat = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessages(response.data);
-            fetchAllUsers();
+            setLength(response.data.length)
+            return response.data;
         } catch (error) {
             console.error("Error fetching messages:", error);
         }
@@ -197,20 +229,24 @@ const Chat = () => {
             });
             setInputText('');
             fetchMessages();
+            fetchAllUsers();
         } catch (error) {
             console.error('Error sending message:', error);
         }
     };
     useEffect(() => {
         if (selectedContact) {
-            fetchMessages().then(() => markAsRead());
-            // console.log(messages)
+            // console.log("SS")
+            fetchMessages().then((messages) => markAsRead(messages));
+            fetchOnlineUsers();
+            fetchAllUsers();
+            groupListeners();
         }
     }, [selectedContact]);
 
-    const markAsRead = async () => {
+    const markAsRead = async (messages) => {
         //  console.log("object",messages);
-        const cardIds = messages.map(user => user.id);
+        const cardIds = messages?.filter(msg => msg.read_by == "no").map(msg => msg.id);
         // Assuming card_id is a property in allUser
         if (cardIds.length > 0) {
 
@@ -218,6 +254,7 @@ const Chat = () => {
                 await axios.post(`${apiUrl}/mark-as-read`, {
                     chat_id: cardIds
                 });
+                fetchAllUsers();
                 // console.log('Marked as read successfully');
             } catch (error) {
                 console.error('Error marking as read:', error);
@@ -229,7 +266,7 @@ const Chat = () => {
 
     const handleContactClick = (contact) => {
         setSelectedContact(contact);
-        fetchMessages();
+        // fetchMessages();
 
     };
 
@@ -277,7 +314,8 @@ const Chat = () => {
     const getMessageDate = (createdAt) => {
         const messageDate = new Date(createdAt);
         const today = new Date();
-        const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        // const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const weekDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         const daysAgo = Math.floor((today - messageDate) / (1000 * 60 * 60 * 24));
 
         if (daysAgo < 7) {
@@ -305,6 +343,7 @@ const Chat = () => {
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             groupChats={groupChats}
+                            onlineUsers={onlineUsers}
                         />
                     </Col>
                     <Col xs={7} className="p-0">
@@ -317,6 +356,7 @@ const Chat = () => {
                                 handleKeyPress={handleKeyPress}
                                 sendMessage={sendMessage}
                                 renderMessageGroups={renderMessageGroups}
+                                onlineUsers={onlineUsers}
                             />
                         ) : (
                             <EmptyChatWindow />
@@ -335,7 +375,7 @@ const Chat = () => {
     );
 };
 
-const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats }) => {
+const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats,onlineUsers }) => {
     const formatDateTime = (createdAt) => {
         const messageDate = new Date(createdAt);
         const currentDate = new Date();
@@ -349,7 +389,8 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
         } else if (isYesterday) {
             return 'Yesterday';
         } else if (currentDate - messageDate < 7 * 24 * 60 * 60 * 1000) {
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            // const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             return days[messageDate.getDay()];
         } else {
             return messageDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -412,19 +453,22 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                     <div className="sjcontacts-list" onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
                         <div className="sjcontact-item justify-content-between ">
                             <div className='d-flex align-items-center'>
-                                <div className="sjavatar " style={{ backgroundImage: `url(${avatar})` }}>
-                                    <div className="sjonline-status"></div>
+                            <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                    {/* <div className="sjonline-status"></div> */}
+                                    {group.name.split(' ')
+                                        .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
+                                        .join('')}
                                 </div>
                                 <div className="sjcontact-info ms-2">
                                     <div className="sjcontact-name">{group.name}</div>
                                     <div className="sjcontact-message">{groupChats?.[0]?.message}</div>                                   
                                 </div>
                             </div>
-                            {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (
+                            {/* {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (
                                 <div className="chat-circle">
                                     <p className='mb-0'>{groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length}</p>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 ))}
@@ -437,8 +481,11 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                         return (
                             <div key={ele.id} className={`sjcontacts-list  ${selectedContact === ele ? 'jchat-active' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleContactClick(ele)} >
                                 <div className="sjcontact-item" >
-                                    <div className="sjavatar" style={{ backgroundImage: `url(${avatar})` }}>
-                                        <div className="sjonline-status"></div>
+                                <div className="sjavatar me-2" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                        {onlineUsers?.map((v) => v.id == ele.id && <div className="sjonline-status"></div>)}
+                                        {ele.name.split(' ')
+                                            .map(word => word.charAt(0).toUpperCase())
+                                            .join('')}
                                     </div>
                                     <div className="sjcontact-info">
                                         <div className="sjcontact-name">{ele.name}</div>
@@ -466,7 +513,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
     );
 };
 
-const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, handleKeyPress, sendMessage, renderMessageGroups }) => {
+const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, handleKeyPress, sendMessage, renderMessageGroups,onlineUsers }) => {
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -479,16 +526,28 @@ const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, h
         renderMessageGroups()
     }, [messages, selectedContact]);
 
+    const getUserStatus = (userId) => {
+        return onlineUsers?.some(user => user.id === userId) ? 'En línea' : 'desconectado';
+    };
+
     return (
         <div style={styles.container} className="j-chat-margin">
             <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "0" }}>
-                <Image src={avatar} roundedCircle width="32" height="32" className="me-2" />
+                 <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                    {selectedContact.name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
+                </div>
                 <div>
                     <div className="fw-bold j-chat-bold-size m16">{selectedContact.name}</div>
-                    <div className="d-flex align-items-center text-success small j-chat-bold-size-2">
+                    {/* <div className="d-flex align-items-center text-success small j-chat-bold-size-2">
                         <div className="bg-success rounded-circle" style={{ width: '8px', height: '8px' }}></div>
                         <span className="ms-2">Online</span>
-                    </div>
+                    </div> */}
+                    {!selectedContact?.hasOwnProperty('pivot') &&
+                        <div className={`d-flex align-items-center small j-chat-bold-size-2 ${getUserStatus(selectedContact.id) === 'En línea' ? 'text-success' : 'text-secondary'}`}>
+                            <div className={`rounded-circle`} style={{ width: '8px', height: '8px', backgroundColor: getUserStatus(selectedContact.id) === 'En línea' ? 'green' : 'gray' }}></div>
+                            <span className="ms-2">{getUserStatus(selectedContact.id)}</span>
+                        </div>
+                    }
                 </div>
             </div>
 

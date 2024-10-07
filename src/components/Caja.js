@@ -6,7 +6,7 @@ import Sidenav from "./Sidenav";
 import { Alert, Button, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
 import Loader from "./Loader";
-import { enqueueSnackbar } from "notistack";
+//import { enqueueSnackbar  } from "notistack";
 import useAudioManager from "./audioManager";
 
 const Caja = () => {
@@ -148,7 +148,7 @@ const Caja = () => {
         setIsProcessing(true);
 
         try {
-            const response = await axios.post(`${apiUrl}/box/create`, {
+           const response = await axios.post(`${apiUrl}/box/create`, {
                 name: boxName,
                 user_id: cashierAssigned
             }, {
@@ -156,21 +156,23 @@ const Caja = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            fetchAllBox();
+            console.log(response.data.success);
             setIsProcessing(false);
-            handleShowCreSuc(); // Show success message
-            setBoxName(''); // Clear box name
-            setCashierAssigned(''); // Clear cashier assigned
-            enqueueSnackbar(response.data?.notification, { variant: 'success' })
-            playNotificationSound();
-
+            if(response.data.success){
+                setIsProcessing(false);
+                fetchAllBox();
+                setIsProcessing(false);
+                handleShowCreSuc(); // Show success message
+                setBoxName(''); // Clear box name
+                setCashierAssigned(''); // Clear cashier assigned
+            }else{
+                setIsProcessing(false);
+                alert("A cada cajero se le puede asignar una sola caja.")
+            }
+            setIsProcessing(false);
         } catch (error) {
             const errorMessage = error.response ? error.response.data.message : "Error al crear la caja. Por favor, inténtelo de nuevo.";
-            enqueueSnackbar(error?.response?.data?.alert || errorMessage, { variant: 'error' })
             setValidationErrors({ apiError: errorMessage });
-            playNotificationSound();
-
-            setIsProcessing(false);
         }
     };
 

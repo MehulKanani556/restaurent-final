@@ -38,13 +38,17 @@ export default function Homeinformation() {
 
   const [show12, setShow12] = useState(false);
   const handleClose12 = () => setShow12(false);
-
+  const [errorReason, setReasonError] = useState(null);
   const handleShow12 = async () => {
 
     // ----resons----
     // ===change====
     // console.log(reason);
-
+    if (!reason) {
+      setReasonError("Ingrese el motivo de validez")
+      return;
+    }
+    handleClose();
     try {
       const response = await axios.post(
         `${API_URL}/order/updateorderreason/${id.toString()}`,
@@ -148,16 +152,17 @@ export default function Homeinformation() {
 
     getOrder();
     getItems();
-    getSector();
+   
     getOrderStatus();
     getRole();
     getFamily();
     getSubFamily();
-  }, [ show12, show1Prod,token]);
+  }, [show12, show1Prod, token]);
 
   useEffect(() => {
     if (orderData && items.length > 0) {
       handleOrderDetails();
+      getSector();
     }
     if (orderData?.user_id) {
       console.log(orderData?.user_id);
@@ -173,7 +178,7 @@ export default function Homeinformation() {
 
   const getOrder = async () => {
     try {
-      const response = await axios.post(`${API_URL}/order/getSingle/${id}`,{admin_id: admin_id}, {
+      const response = await axios.post(`${API_URL}/order/getSingle/${id}`, { admin_id: admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -190,9 +195,11 @@ export default function Homeinformation() {
   const getItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/item/getAll`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${API_URL}/item/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setItems(response.data.items);
       setObj1(response.data.items);
       // setFilteredMenuItems(response.data.items);
@@ -209,16 +216,22 @@ export default function Homeinformation() {
   const getSector = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${API_URL}/sector/getWithTable`,{admin_id: admin_id});
+      const response = await axios.post(`${API_URL}/sector/getWithTable`,{admin_id: admin_id}, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
       let sectors = response.data.data;
 
       const sectorWithTable = sectors.find(v =>
-        v.tables.some(a => a.order_id == id)
+        v.tables.some(a => a.id == orderData.table_id)
       );
 
+      // console.log(sectors);
+      
       if (sectorWithTable) {
         setSector(sectorWithTable);
-        setTable(sectorWithTable.tables.find(a => a.order_id == id));
+        setTable(sectorWithTable.tables.find(a => a.id == orderData.table_id));
       }
     } catch (error) {
       console.error(
@@ -227,7 +240,6 @@ export default function Homeinformation() {
       );
     }
     setIsProcessing(false);
-
   };
 
   const getOrderStatus = async () => {
@@ -317,9 +329,11 @@ export default function Homeinformation() {
   const getFamily = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/family/getFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${API_URL}/family/getFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setParentCheck(response.data);
     } catch (error) {
       console.error(
@@ -332,9 +346,11 @@ export default function Homeinformation() {
   const getSubFamily = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/subfamily/getSubFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${API_URL}/subfamily/getSubFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -350,6 +366,9 @@ export default function Homeinformation() {
   const handlereasons = (event) => {
     let notes = event?.target.value
     setReason(notes)
+    if (notes) {
+      setReasonError(null)
+    }
   }
 
   // ----resons section  end-----
@@ -580,14 +599,18 @@ export default function Homeinformation() {
 
                 <div className='d-flex flex-wrap me-4'>
                   {showCancelOrderButton ? (
-                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancel order</div>
+                    !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") &&
+                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancelar Pedido</div>
                   ) : (
+                    !(orderData?.status == "cancelled") &&
                     <Link className='text-decoration-none' to={`/home/usa/information/payment_edit/${id}`}>
                       <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
                     </Link>
                   )}
                   {/* <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div> */}
-                  <div className='btn bj-btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center ' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1 ' />Agregar Producto</div>
+                  {!(orderData?.status == "cancelled") &&
+                    <div className='btn bj-btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center ' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1 ' />Agregar Producto</div>
+                  }
                 </div>
 
               </div>
@@ -650,6 +673,7 @@ export default function Homeinformation() {
                     onKeyUp={handlereasons}
                     required
                   />
+                  {errorReason && <div className="text-danger errormessage">{errorReason}</div>}
                 </div>
               </Modal.Body>
               <Modal.Footer className="border-0 pt-0">
@@ -666,7 +690,7 @@ export default function Homeinformation() {
                   className="j-tbl-btn-font-1"
                   variant="primary"
                   onClick={() => {
-                    handleClose();
+                    // handleClose();
                     handleShow12();
                   }}
                 >
@@ -674,7 +698,31 @@ export default function Homeinformation() {
                 </Button>
               </Modal.Footer>
             </Modal>
+            {/* cancel order Success */}
 
+            <Modal
+              show={show12}
+              onHide={handleClose12}
+              backdrop={true}
+
+              keyboard={false}
+              className="m_modal"
+            >
+              <Modal.Header closeButton className="border-0" />
+              <Modal.Body>
+                <div className="text-center">
+                  <img
+                    src={require("../Image/check-circle.png")}
+                    alt=""
+                  />
+                  <p className="mb-0 mt-2 h6">Pedido anulado</p>
+                  <p className="opacity-75">
+                    Su pedido ha sido anulado exitosamente
+                  </p>
+                </div>
+              </Modal.Body>
+            </Modal>
+            
             <Tabs
               activeKey={activeTab}
               onSelect={handleTabSelect}
@@ -776,7 +824,7 @@ export default function Homeinformation() {
                         </div>
                         <div className={`bj-delivery-text-2  b_btn1 mb-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                             ${orderData?.[0]?.status?.toLowerCase() === 'received' ? 'b_indigo' : orderData?.[0]?.status?.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.[0]?.status?.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.[0]?.status?.toLowerCase() === 'finalized' ? 'b_green' : orderData?.[0]?.status?.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.[0]?.status?.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
-                          {orderData?.[0]?.status?.toLowerCase() === 'received' ? 'Recibido' : orderData?.[0]?.status?.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.[0]?.status?.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.[0]?.status?.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.[0]?.status?.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.[0]?.status?.toLowerCase() === 'local' ? 'Local'  : orderData?.[0]?.status?.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
+                          {orderData?.[0]?.status?.toLowerCase() === 'received' ? 'Recibido' : orderData?.[0]?.status?.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.[0]?.status?.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.[0]?.status?.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.[0]?.status?.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.[0]?.status?.toLowerCase() === 'local' ? 'Local' : orderData?.[0]?.status?.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
                         </div>
                         {/* <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3   p-0 text-nowrap d-flex  align-items-center justify-content-center 
                         ${orderData?.order_type.toLowerCase() === 'local' ? 'b_indigo' : orderData?.order_type.toLowerCase() === 'order now' ? 'b_ora ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'b_blue' : orderData?.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : orderData?.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>
@@ -796,7 +844,7 @@ export default function Homeinformation() {
                           <div className=' a_mar_summary bj-delivery-text-650'>Costo total</div>
                           <div className='d-flex justify-content-between align-items-center my-1 mb-2'>
                             <div className='bj-delivery-text-150'>Productos</div>
-                            {console.log("orderDetails",orderDetails)}
+                            {console.log("orderDetails", orderDetails)}
                             <div className='bj-delivery-text-151'>${orderDetails?.reduce((acc, v) => v.amount * v.quantity + acc, 0)}</div>
                           </div>
                           <div className='d-flex justify-content-between align-items-center my-1'>
@@ -812,7 +860,9 @@ export default function Homeinformation() {
                           </div>
                         </div>
                         <div className='mx-auto text-center mt-3'>
-                          <div className='btn btn-primary w-100 my-4 bj-delivery-text-3 border-0' style={{ backgroundColor: "#147BDE", borderRadius: "8px", padding: "10px 20px" }}>Cobrar ahora</div>
+                          <Link to="/home/usa" className='d-flex text-decoration-none'>
+                            <div className='btn btn-primary w-100 my-4 bj-delivery-text-3 border-0' style={{ backgroundColor: "#147BDE", borderRadius: "8px", padding: "10px 20px" }}>Cobrar ahora</div>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -821,7 +871,7 @@ export default function Homeinformation() {
 
               </Tab>
 
-              <Tab eventKey="profile" title="Informaction del cliente" className='b_border ' style={{ marginTop: "2px" }}>
+              <Tab eventKey="profile" title="Información del cliente" className='b_border ' style={{ marginTop: "2px" }}>
                 <div className='b-bg-color1'>
                   <div className='text-white ms-4 pt-4' >
                     <h5 >Información del pedido</h5>
@@ -830,11 +880,11 @@ export default function Homeinformation() {
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Cliente</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.customer_name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Plataforma</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.order_type} id="inputPassword2" placeholder="Uber" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                     </div>
                   </div>
 

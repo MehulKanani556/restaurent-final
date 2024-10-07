@@ -11,7 +11,7 @@ import axios from "axios";
 import Loader from "./Loader";
 import { Spinner } from "react-bootstrap";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { enqueueSnackbar } from "notistack";
+//import { enqueueSnackbar  } from "notistack";
 import useAudioManager from "./audioManager";
 
 export default function Articles() {
@@ -364,8 +364,8 @@ export default function Articles() {
         await fetchSubFamilyData();
         setFamName("");
         setFamilyError("");
-        enqueueSnackbar(response.data?.notification, { variant: 'success' })
-        playNotificationSound();
+        //enqueueSnackbar (response.data?.notification, { variant: 'success' })
+        // playNotificationSound();;
         setIsProcessing(false);
       })
       .catch(function (error) {
@@ -376,8 +376,8 @@ export default function Articles() {
         setFamilyError(
           "Error al crear la familia. Por favor, inténtelo de nuevo."
         );
-        enqueueSnackbar(error?.response?.data?.alert || errorMessage, { variant: 'error' })
-        playNotificationSound();
+        //enqueueSnackbar (error?.response?.data?.alert || errorMessage, { variant: 'error' })
+        // playNotificationSound();;
       })
       .finally(() => {
         setIsProcessing(false);
@@ -418,8 +418,8 @@ export default function Articles() {
         setIsProcessing(false);
         setSubFamName("");
         setSubSelectName("");
-        enqueueSnackbar(response.data?.notification, { variant: 'success' })
-        playNotificationSound();
+        //enqueueSnackbar (response.data?.notification, { variant: 'success' })
+        // playNotificationSound();;
       })
       .catch(function (error) {
         console.error(
@@ -429,8 +429,8 @@ export default function Articles() {
         setSubFamilyError(
           "Error al crear la subfamilia. Por favor, inténtelo de nuevo."
         );
-        enqueueSnackbar(error?.response?.data?.alert || errorMessage, { variant: 'error' })
-        playNotificationSound();
+        //enqueueSnackbar (error?.response?.data?.alert || errorMessage, { variant: 'error' })
+        // playNotificationSound();;
       })
       .finally(() => {
         setIsProcessing(false);
@@ -783,13 +783,13 @@ export default function Articles() {
         });
         setSelectedFile("")
         setErrorMessages({});
-        enqueueSnackbar(response.data?.notification, { variant: 'success' })
-        playNotificationSound();
+        //enqueueSnackbar (response.data?.notification, { variant: 'success' })
+        // playNotificationSound();;
       }
     } catch (er) {
       setErrorMessages({ general: er.response.data.errors.code });
-      enqueueSnackbar(er.response.data?.alert, { variant: 'error' })
-      playNotificationSound();
+      //enqueueSnackbar (er.response.data?.alert, { variant: 'error' })
+      // playNotificationSound();;
     } finally {
       setIsProcessing(false);
     }
@@ -1269,7 +1269,7 @@ export default function Articles() {
                     />
                     <p className="mb-0 mt-2 h6">
                       {" "}
-                      deseas eliminar este family Artículos
+                      Deseas eliminar esta familia
                     </p>
                   </div>
                 </Modal.Body>
@@ -1447,7 +1447,7 @@ export default function Articles() {
                     />
                     <p className="mb-0 mt-2 h6">
                       {" "}
-                      deseas eliminar este subfamily Artículos
+                      Desar eliminar esta Subfamilia
                     </p>
                   </div>
                 </Modal.Body>
@@ -1488,7 +1488,7 @@ export default function Articles() {
                     <img src={require("../Image/trash-check 1.png")} alt="" />
                     <p className="mb-0 mt-2 h6">SubFamilia</p>
                     <p className="opacity-75">
-                      Ha sido eliminada subfamily correctamente
+                    Ha sido eliminada Subfamilia correctamente
                     </p>
                   </div>
                 </Modal.Body>

@@ -3,7 +3,7 @@ import ApexCharts from "apexcharts"; // Make sure to install ApexCharts
 // import "bootstrap/dist/css/bootstrap.min.css"; // Ensure you have bootstrap installed
 
 export default function Aa({ data }) {
-  console.log(data);
+  // console.log(data);
   
   const getChartOptions = () => {
     return {

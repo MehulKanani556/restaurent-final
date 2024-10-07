@@ -13,7 +13,7 @@ import { IoMdInformationCircle } from "react-icons/io";
 import axios from "axios";
 import Loader from "./Loader";
 import useAudioManager from "./audioManager";
-import { enqueueSnackbar } from "notistack";
+//import { enqueueSnackbar  } from "notistack";
 
 export default function Articles() {
   const API = process.env.REACT_APP_IMAGE_URL; // Laravel Image URL
@@ -379,11 +379,11 @@ export default function Articles() {
       handleShowCreSuc();
       fetchMenuData();
       if (response.data && response.data.notification) {
-        enqueueSnackbar(response.data.notification, { variant: 'success' });
-        playNotificationSound();
+        //enqueueSnackbar (response.data.notification, { variant: 'success' });
+        // playNotificationSound();;
       } else {
-        enqueueSnackbar(`Menú ${menuName} creado exitosamente`, { variant: 'success' });
-      playNotificationSound();
+        //enqueueSnackbar (`Menú ${menuName} creado exitosamente`, { variant: 'success' });
+      // playNotificationSound();;
 
       }
     } catch (error) {
@@ -394,8 +394,8 @@ export default function Articles() {
       setCreateMenuError(
         "Error al crear el menú. Por favor, inténtelo de nuevo."
       );
-      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-      playNotificationSound();
+      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
+      // playNotificationSound();;
     } finally {
       setIsProcessing(false);
     }
@@ -455,11 +455,11 @@ export default function Articles() {
 
        handleShowEditFamSuc();
       if (response.data && response.data.notification) {
-        enqueueSnackbar(response.data.notification, { variant: 'success' });
-        playNotificationSound();
+        //enqueueSnackbar (response.data.notification, { variant: 'success' });
+        // playNotificationSound();;
       } else {
-        enqueueSnackbar(`El menú ${selectedMenu.name} ha sido actualizado con éxito`, { variant: 'success' });
-      playNotificationSound();
+        //enqueueSnackbar (`El menú ${selectedMenu.name} ha sido actualizado con éxito`, { variant: 'success' });
+      // playNotificationSound();;
 
       }
     } catch (error) {
@@ -470,8 +470,8 @@ export default function Articles() {
       setEditMenuError(
         "Error al actualizar el menú. Por favor, inténtelo de nuevo."
       );
-      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-      playNotificationSound();
+      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
+      // playNotificationSound();;
     } finally {
       setIsProcessing(false);
     }
@@ -532,11 +532,11 @@ export default function Articles() {
 
   //       window.location.reload();
   //       if (response.data && response.data.notification) {
-  //         enqueueSnackbar(response.data.notification, { variant: 'success' });
-  //         playNotificationSound();
+  //         //enqueueSnackbar (response.data.notification, { variant: 'success' });
+  //         // playNotificationSound();;
   //       } else {
-  //         enqueueSnackbar(`Elementos añadidos al menú con éxito`, { variant: 'success' });
-  //         playNotificationSound();
+  //         //enqueueSnackbar (`Elementos añadidos al menú con éxito`, { variant: 'success' });
+  //         // playNotificationSound();;
   //       }
   //     } else {
   //       console.error("Failed to add items to menu");
@@ -546,8 +546,8 @@ export default function Articles() {
   //       "Error adding items to menu:",
   //       error.response ? error.response.data : error.message
   //     );
-  //     enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-  //     playNotificationSound();
+  //     //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
+  //     // playNotificationSound();;
   //   } finally {
   //     setIsProcessing(false);
   //   }
@@ -619,11 +619,11 @@ export default function Articles() {
         setItemId([]);
   
         if (response.data && response.data.notification) {
-          enqueueSnackbar(response.data.notification, { variant: 'success' });
+          //enqueueSnackbar (response.data.notification, { variant: 'success' });
         } else {
-          enqueueSnackbar(`Elementos añadidos al menú con éxito`, { variant: 'success' });
+          //enqueueSnackbar (`Elementos añadidos al menú con éxito`, { variant: 'success' });
         }
-        playNotificationSound();
+        // playNotificationSound();;
       } else {
         console.error("Failed to add items to menu");
       }
@@ -632,8 +632,8 @@ export default function Articles() {
         "Error adding items to menu:",
         error.response ? error.response.data : error.message
       );
-      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-      playNotificationSound();
+      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
+      // playNotificationSound();;
     } finally {
       setIsProcessing(false);
     }
@@ -797,19 +797,22 @@ export default function Articles() {
       handleShowEditFamDel();
       setShowDeleteConfirmation(false);
       if (response.data && response.data.notification) {
-        enqueueSnackbar(response.data.notification, { variant: 'success' });
-        playNotificationSound();
+        //enqueueSnackbar (response.data.notification, { variant: 'success' });
+        // playNotificationSound();;
       } else {
-        enqueueSnackbar(`El menú ${selectedMenu.name} ha sido eliminado con éxito`, { variant: 'success' });
-        playNotificationSound();
+        //enqueueSnackbar (`El menú ${selectedMenu.name} ha sido eliminado con éxito`, { variant: 'success' });
+        // playNotificationSound();;
       }
     } catch (error) {
       console.error(
         "Error deleting menu:",
         error.response ? error.response.data : error.message
       );
-      enqueueSnackbar(error?.response?.data?.alert, { variant: 'error' })
-      playNotificationSound();
+      if(error.response.data){
+
+        //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
+        // playNotificationSound();;
+      }
     } finally {
       setIsProcessing(false);
     }

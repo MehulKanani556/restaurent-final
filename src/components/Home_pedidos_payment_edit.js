@@ -105,7 +105,6 @@ const Home_pedidos_payment_edit = ({ item }) => {
         setIsProcessing(true);
         getOrder();
         getItems();
-        getSector();
         getOrderStatus();
         getRole();
         getFamily();
@@ -117,6 +116,8 @@ const Home_pedidos_payment_edit = ({ item }) => {
     useEffect(() => {
         if (orderData && items.length > 0) {
             handleOrderDetails();
+        getSector();
+
         }
         if (orderData?.user_id) {
             // console.log(orderData?.user_id);
@@ -137,6 +138,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            console.log("order", response.data[0])
             setOrderData(response.data[0]);
         } catch (error) {
             console.error(
@@ -166,16 +168,16 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getSector = async () => {
         try {
-            const response = await axios.post(`${apiUrl}/sector/getWithTable`);
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id:admin_id},{headers:{Authorization: `Bearer ${token}`}});
             let sectors = response.data.data;
 
             const sectorWithTable = sectors.find(v =>
-                v.tables.some(a => a.order_id == id)
+                v.tables.some(a => a.id == orderData.table_id)
             );
 
             if (sectorWithTable) {
                 setSector(sectorWithTable);
-                setTable(sectorWithTable.tables.find(a => a.order_id == id));
+                setTable(sectorWithTable.tables.find(a => a.id == orderData.table_id));
             }
         } catch (error) {
             console.error(
@@ -766,18 +768,24 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                                             </div>
                                                                         </div>
                                                                         <div className="col-sm-2 a_text_price">
-                                                                            <button className="b_count11 btn btn-secondary" onClick={() => decrement(item.id, item.item_id, item.quantity)}>-</button>
+                                                                            {!(orderData?.status == "cancelled") &&
+                                                                                <button className="b_count11 btn btn-secondary" onClick={() => decrement(item.id, item.item_id, item.quantity)}>-</button>
+                                                                            }
                                                                             <span className="pe-3 ms-2">{counts[item.id]}</span>
-                                                                            <button className="b_count btn btn-secondary" onClick={() => increment(item.id, item.item_id, item.quantity)}>+</button>
+                                                                            {!(orderData?.status == "cancelled") &&
+                                                                                <button className="b_count btn btn-secondary" onClick={() => increment(item.id, item.item_id, item.quantity)}>+</button>
+                                                                            }
                                                                         </div>
                                                                         <div className="col-sm-1 a_text_price">
-                                                                            <div className="pe-5 fw-bold">{item.amount}</div>
+                                                                            <div className="pe-5 fw-bold">${item.amount}</div>
                                                                         </div>
-                                                                        <div className="col-sm-1">
-                                                                            <button className="b_bg_red btn" onClick={() => deleteProductModal(item.id)}>
-                                                                                <RiDeleteBinLine />
-                                                                            </button>
-                                                                        </div>
+                                                                        {!(orderData?.status == "cancelled") &&
+                                                                            <div className="col-sm-1">
+                                                                                <button className="b_bg_red btn" onClick={() => deleteProductModal(item.id)}>
+                                                                                    <RiDeleteBinLine />
+                                                                                </button>
+                                                                            </div>
+                                                                        }
                                                                     </div>
                                                                 </div>
                                                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
@@ -850,9 +858,14 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                 <div className='fw-bold fs-5'>
                                                     Datos
                                                 </div>
-                                                <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
-                                                    ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : 'text-danger'}`}>
-                                                    {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : ' '}
+                                                
+                                                {/* <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
+                                                    ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora  text-danger'}`}>
+                                                    {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ''}
+                                                </div> */}
+                                                 <div className={`bj-delivery-text-2 b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex align-items-center justify-content-center 
+                                                    ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : orderData?.status.toLowerCase() === 'cancelled' ? 'b_ora text-danger' : 'b_ora text-danger'}`}>
+                                                    {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : 'Unknown'}
                                                 </div>
 
                                                 <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
@@ -899,7 +912,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
                             </Tab>
 
-                            <Tab eventKey="profile" title="Detalles" className='b_border ' style={{ marginTop: "2px" }}>
+                            <Tab eventKey="profile" title="Información del cliente" className='b_border ' style={{ marginTop: "2px" }}>
                                 <div className='b-bg-color1'>
                                     {orderData?.reason &&
                                         <div className='text-white ms-4 pt-4' >
@@ -914,21 +927,21 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                                         <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Sector</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name} id="inputPassword2" placeholder="Uber" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={`${table?.name}  (${table?.id})`} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                     </div>
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                                         <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Cliente</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Personas</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="Uber" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                     </div>
 

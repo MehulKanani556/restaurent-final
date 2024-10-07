@@ -31,7 +31,8 @@ import { Link, useLocation } from "react-router-dom";
 import { AiFillPieChart } from "react-icons/ai";
 import artical from "../Image/Artical.png"
 
-const Sidenav = ({ children ,onNavigate}) => {
+const Sidenav = ({ children, onNavigate }) => {
+  // console.log(onNavigate);
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isClose, setIsClose] = useState(false);
@@ -161,13 +162,12 @@ const Sidenav = ({ children ,onNavigate}) => {
           <div className="j-sidebar-content m_bgblack">
             {menuItem.map((item, index) => (
               <Link
-              to= {onNavigate ? "#" : item.path } 
+                to= {onNavigate ? "#" : item.path } 
                 key={index}
+                onClick={onNavigate ? () => onNavigate(item.path) : undefined}
                 // className={`j-link ${location.pathname === item.path ? 'j-active' : ''}`}
                 // className={`j-link ${location.includes(pathname) && pathname === item.path ? 'j-active' : ''}`}
                 className={`j-link ${location === item.path ? 'j-active' : ''}`}
-
-
               >
                 <div className="j-icon">{item.icon}</div>
                 <div className="j-link_text">{item.name}</div>
@@ -183,8 +183,9 @@ const Sidenav = ({ children ,onNavigate}) => {
         <div className="j-sidebar-content">
           {menuItem.map((item, index) => (
             <Link
-            to= {onNavigate ? "#" : item.path } 
+              to= {onNavigate ? "#" : item.path } 
               key={index}
+              onClick={onNavigate ? () => onNavigate(item.path) : undefined}
               // className={`j-link ${location.includes(pathname) === item.path ? 'j-active' : ''}`}
               // className={`j-link ${location.includes(pathname) && pathname === item.path ? 'j-active' : ''}`}
               // className={`j-link ${location === item.path ? 'j-active' : ''}`}
