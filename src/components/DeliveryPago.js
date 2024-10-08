@@ -1012,7 +1012,7 @@ const DeliveryPago = () => {
 
                         <div className="j-border-bottom-counter">
                           <div className="j-total-discount d-flex justify-content-between">
-                            <p className="j-counter-text-2">IVA 12.00%</p>
+                            <p className="j-counter-text-2">IVA 19.00%</p>
                             <span className="text-white">${taxAmount.toFixed(2)}</span>
                           </div>
                         </div>

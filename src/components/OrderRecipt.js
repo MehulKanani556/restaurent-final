@@ -76,7 +76,7 @@ const OrderRecipt = ({ paymentData, orderData }) => {
 
   console.log(price);
 
-  const iva = itemsTotal * 0.12; // 12% tax
+  const iva = itemsTotal * 0.19; // 12% tax
   const total = price + iva;
   receiptData.totals = {
     subtotalIva: itemsTotal,
@@ -95,6 +95,12 @@ const OrderRecipt = ({ paymentData, orderData }) => {
     future: "compra futura"
     // Add other payment types as needed
   };
+
+  const paymentList = paymentData.type.split(",");
+const translatedPayments = paymentList
+  .map(payment => paymentTypes[payment.trim()])
+  .filter(Boolean); // Filter out any undefined values
+
   return (
     <div id="receipt-content" >
       <div className="j-counter-recipt">
@@ -233,7 +239,7 @@ const OrderRecipt = ({ paymentData, orderData }) => {
               </div>
             </div>
             <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>IVA 12.00%:</div>
+              <div>IVA 19.00%:</div>
               <div>
                 $ {receiptData.totals.iva.toFixed(2)}
                 <br />
@@ -275,15 +281,16 @@ const OrderRecipt = ({ paymentData, orderData }) => {
               </p>
             </>
           ) : (
-            <p
+           <p
               className="mb-0 mx-1"
               style={{ fontSize: "12px", textAlign: "left" }}
             >
 
               Forma de pago:
               <br />
-              {paymentTypes[paymentData.type]}:{" "}
-              $ {receiptData.totals.received.toFixed(2)}
+              {translatedPayments.join(", ")}
+              {/* {paymentTypes[paymentData.type]}:{" "} */}
+              :{" "} $ {receiptData.totals.received.toFixed(2)}
               <br />
               <div className="mt-2 d-flex" style={{ display: 'flex' }}>
                 <div className="me-3" style={{ marginRight: '16px' }}>Recibido: $ {paymentData.amount}</div>

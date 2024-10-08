@@ -80,7 +80,7 @@ const CajaOrderRecipe = ({ data }) => {
     0
   );
   const price =  itemsTotal - data.discount;
-  const iva = itemsTotal * 0.12; // 12% tax
+  const iva = itemsTotal * 0.19; // 12% tax
   const total = price + iva;
   receiptData.totals = {
     subtotalIva: itemsTotal,
@@ -230,7 +230,7 @@ const CajaOrderRecipe = ({ data }) => {
             </div>
           </div>
           <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>IVA 12.00%:</div>
+            <div>IVA 19.00%:</div>
             <div>
               $ {receiptData.totals.iva.toFixed(2)}
               <br />

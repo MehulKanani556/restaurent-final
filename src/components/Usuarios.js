@@ -1295,13 +1295,13 @@ const Usuarios = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer className="border-0">
-                <Button
+                {/* <Button
                   variant="danger"
                   className="b_btn_close"
                   onClick={handleCloseEditProduction}
                 >
                   Eliminar
-                </Button>
+                </Button> */}
                 <Button
                   variant="primary"
                   className="b_btn_pop"

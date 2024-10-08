@@ -20,8 +20,8 @@ const CreditRecipt = forwardRef(({ paymentData, creditData }, ref) => {
             add: paymentData.address
         },
         subtotal: creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0),
-        tax: (creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0) * 12 / 100).toFixed(2),
-        total: (creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0) * 12 / 100 + creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0)).toFixed(2),
+        tax: (creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0) * 19 / 100).toFixed(2),
+        total: (creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0) * 19 / 100 + creditData.return_items.reduce((acc, v) => acc + v.quantity * v.amount, 0)).toFixed(2),
     };
     const barcodeData = JSON.stringify({
         code: creditData.code,
@@ -126,7 +126,7 @@ const CreditRecipt = forwardRef(({ paymentData, creditData }, ref) => {
                             <div>${receiptData.subtotal}<br /></div>
                         </div>
                         <div style={{ fontSize: "14px", display: "flex", justifyContent: "space-between" }}>
-                            <div style={{ fontWeight: "800" }}>IVA (12%)</div>
+                            <div style={{ fontWeight: "800" }}>IVA (19%)</div>
                             <div>${receiptData.tax}<br /></div>
                         </div>
                         <div style={{ fontSize: "14px", display: "flex", justifyContent: "space-between" }}>
@@ -276,7 +276,7 @@ const CreditRecipt = forwardRef(({ paymentData, creditData }, ref) => {
                             <div>${receiptData.subtotal}<br /></div>
                         </div>
                         <div style={{ fontSize: "14px", display: "flex", justifyContent: "space-between" }}>
-                            <div style={{ fontWeight: "800" }}>IVA (12%)</div>
+                            <div style={{ fontWeight: "800" }}>IVA (19%)</div>
                             <div>${receiptData.tax}<br /></div>
                         </div>
                         <div style={{ fontSize: "14px", display: "flex", justifyContent: "space-between" }}>

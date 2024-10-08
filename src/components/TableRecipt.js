@@ -52,7 +52,7 @@ const TableRecipt = ({payment,tableData,productData}) => {
 const discount = parseFloat(tableData[0].discount) || 0; // Ensure discount is a number
 
       const price = itemsTotal - tableData[0].discount;
-  const iva = price * 0.12; // 12% tax
+  const iva = price * 0.19; // 12% tax
   const total = price + iva;
   receiptData.totals = {
     subtotalIva: itemsTotal,
@@ -137,7 +137,7 @@ const discount = parseFloat(tableData[0].discount) || 0; // Ensure discount is a
                     </div>
                     <div className="d-flex justify-content-between mx-1">
                         <div>
-                            IVA 12.00%:
+                            IVA 19.00%:
                         </div>
                         <div>
                             {receiptData.totals.iva.toFixed(2)}<br />

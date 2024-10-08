@@ -57,7 +57,7 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
     0
   );
   const price = itemsTotal - discount;
-  const iva = price * 0.12; // 12% tax
+  const iva = price * 0.19; // 12% tax
   const total = price + iva;
 
   receiptData.totals = {
@@ -69,6 +69,30 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
     received: total, // Assuming the exact amount is received
     change: 0.0
   };
+  
+ const paymentTypes = {
+  credit: "Tarjeta de Crédito",
+  debit: "Tarjeta de Débito",
+  cash: "Efectivo",
+  transfer:"Transferencia"
+  // Add other payment types as needed
+};
+
+// const paymentList = paymentType.split(",");
+// const translatedPayments = paymentList
+// .map(payment => paymentTypes[payment.trim()])
+// .filter(Boolean); // Filter out any undefined values
+let translatedPayments;
+
+console.log(paymentType);
+
+
+if(paymentType){
+  // const paymentList = (paymentType && typeof paymentType === 'string') ? paymentType.split(",") : [];
+  translatedPayments = paymentType.length > 0 ? paymentType
+  .map(payment => paymentTypes[payment.trim()])
+  .filter(Boolean) : [];
+}
   return (
     <div id="receipt-content">
       <div className="j-counter-recipt">
@@ -201,7 +225,7 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
               </div>
             </div>
             <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>IVA 12.00%:</div>
+              <div>IVA 19.00%:</div>
               <div>
                 {receiptData.totals.iva.toFixed(2)}
                 <br />
@@ -228,8 +252,9 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
             className="mb-0 mx-1"
             style={{ fontSize: "12px", textAlign: "left" }}
           >
-            Forma de pago:<br /> {paymentType}:{" "}
-            {receiptData.totals.received.toFixed(2)}
+            Forma de pago:<br /> {translatedPayments.join(", ")}
+            
+            {/* :{" "}{receiptData.totals.received.toFixed(2)} */}
             <br />
             <div className="mt-2 d-flex" style={{ display: 'flex' }}>
               <div className="me-3" style={{ marginRight: '16px' }}>Recibido: {paymentAmt.amount}</div>

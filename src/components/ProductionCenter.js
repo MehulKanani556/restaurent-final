@@ -22,6 +22,7 @@ export default function ProductionCenter() {
   const [token] = useState(sessionStorage.getItem("token"));
   // const [isLoading, setIsLoading] = useState(true);
 const admin_id = sessionStorage.getItem("admin_id");
+const role = sessionStorage.getItem("role");
   const [productionCenters, setProductionCenters] = useState([]);
   const [prodName, setProdName] = useState("");
   const [printerCode, setPrinterCode] = useState("");
@@ -907,15 +908,17 @@ const admin_id = sessionStorage.getItem("admin_id");
                         Centros de Producción
                       </p>
                       <div>
-                        <div>
-                          <Button
-                            variant="primary"
-                            className="mb-3 m12 b_btn_pop"
-                            onClick={handleShowCreate}
-                          >
-                            + Crear Centro
-                          </Button>
-                        </div>
+                      {(role == "admin") &&
+                          <div>
+                            <Button
+                              variant="primary"
+                              className="mb-3 m12 b_btn_pop"
+                              onClick={handleShowCreate}
+                            >
+                              + Crear Centro
+                            </Button>
+                          </div>
+                        }
                       </div>
                     </div>
                   </div>
@@ -1043,13 +1046,15 @@ const admin_id = sessionStorage.getItem("admin_id");
                               <p className="text-white mb-0">{item.name}</p>
                             </label>
                           </div>
-                          <div
-                            className="text-white  "
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleEditClick(item)}
-                          >
-                            <BsThreeDots className="j-tbl-dot-color" />
-                          </div>
+                          {(role == "admin") &&
+                            <div
+                              className="text-white  "
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleEditClick(item)}
+                            >
+                              <BsThreeDots className="j-tbl-dot-color" />
+                            </div>
+                          }
                         </div>
                       </div>
                     ))}
@@ -1304,7 +1309,7 @@ const admin_id = sessionStorage.getItem("admin_id");
                       </Dropdown>
                     </div>
                       {/* add product */}
-                      {selectedMenus.length == 1 &&
+                      {(selectedMenus.length == 1 && role == "admin")  &&
                       <div>
                         <Button
                           variant="primary text-nowrap"

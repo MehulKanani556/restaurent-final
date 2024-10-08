@@ -631,7 +631,7 @@ export default function Articles() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif'];
+      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif','image/jpg'];
       const fileType = file.type;
   
       if (!allowedTypes.includes(fileType)) {

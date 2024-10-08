@@ -598,9 +598,9 @@ export default function Homeinformation() {
                 </div>
 
                 <div className='d-flex flex-wrap me-4'>
-                  {showCancelOrderButton ? (
-                    !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") &&
-                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancelar Pedido</div>
+                {showCancelOrderButton ? (
+                    !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") && 
+                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
                   ) : (
                     !(orderData?.status == "cancelled") &&
                     <Link className='text-decoration-none' to={`/home/usa/information/payment_edit/${id}`}>

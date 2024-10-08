@@ -379,7 +379,7 @@ const TablePago = () => {
       errors.paymentType = "Por favor seleccione un tipo de pago";
     }
 
-    const totalWithTax = tableData[0].order_total + (tableData[0].order_total * 0.12) + tipAmount - tableData[0].discount;
+    const totalWithTax = tableData[0].order_total + (tableData[0].order_total * 0.19) + tipAmount - tableData[0].discount;
     // Validate payment amount
     if (!customerData.amount || parseFloat(customerData.amount) <= 0) {
       errors.amount = "Por favor, introduzca un importe de pago válido";
@@ -434,7 +434,7 @@ const TablePago = () => {
       return;
     }
 
-    const taxAmount = (tableData[0].order_total * 0.12) // Calculate tax (12%)
+    const taxAmount = (tableData[0].order_total * 0.19) // Calculate tax (12%)
     const paymentData = {
       ...payment,
       amount: customerData.amount,
@@ -787,7 +787,7 @@ const TablePago = () => {
                         name="receiptType"
                         value="cash"
                         checked={selectedCheckboxes.includes("cash")}
-                        onChange={() => handleCheckboxChange("cash")}
+                        // onChange={() => handleCheckboxChange("cash")}
                         className="me-2 j-change-checkbox"
                       />
 
@@ -847,7 +847,7 @@ const TablePago = () => {
                         name="receiptType"
                         value="debit"
                         checked={selectedCheckboxes.includes("debit")}
-                        onChange={() => handleCheckboxChange("debit")}
+                        // onChange={() => handleCheckboxChange("debit")}
                         className="me-2 j-change-checkbox"
                       />
 
@@ -893,7 +893,7 @@ const TablePago = () => {
                         name="receiptType"
                         value="credit"
                         checked={selectedCheckboxes.includes("credit")}
-                        onChange={() => handleCheckboxChange("credit")}
+                        // onChange={() => handleCheckboxChange("credit")}
                         className="me-2 j-change-checkbox"
                       />
                       <p className="d-inline px-3">Tarjeta de credito</p>
@@ -940,7 +940,7 @@ const TablePago = () => {
                         name="receiptType"
                         value="4"
                         checked={selectedCheckboxes.includes("transfer")}
-                        onChange={() => handleCheckboxChange("transfer")}
+                        // onChange={() => handleCheckboxChange("transfer")}
                         className="me-2 j-change-checkbox"
                       />
                       <p className="d-inline px-3">Transferencia</p>
@@ -1169,10 +1169,10 @@ const TablePago = () => {
                     </div>
                     <div className="j-border-bottom-counter">
                       <div className="j-total-discount d-flex justify-content-between">
-                        <p className="j-counter-text-2">IVA 12.00%</p>
+                        <p className="j-counter-text-2">IVA 19.00%</p>
                         <span className="text-white">{tableData.map((item) => (
                           <span key={item.id}>
-                            ${parseFloat(item.order_total * 0.12).toFixed(2)}
+                            ${parseFloat(item.order_total * 0.19).toFixed(2)}
                           </span>
                         ))}
                         </span>
@@ -1185,7 +1185,7 @@ const TablePago = () => {
                           <span key={item.id}>
                             ${" "}
                             {parseFloat(
-                              item.order_total + (item.order_total * 0.12) - item.discount + tipAmount
+                              item.order_total + (item.order_total * 0.19) - item.discount + tipAmount
                             ).toFixed(2)}
                           </span>
                         ))}

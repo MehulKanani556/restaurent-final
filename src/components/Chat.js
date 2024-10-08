@@ -144,7 +144,7 @@ const Chat = () => {
 
     useEffect(() => {
         setupEchoListeners();
-         return () => {
+        return () => {
             if (echo && selectedContact) {
                 // console.log("SS");
                 echo.leaveChannel(`chat.${userId}`);
@@ -164,7 +164,7 @@ const Chat = () => {
                     fetchMessages();
                     fetchOnlineUsers();
                 });
-                console.log("Socket connection established")
+            console.log("Socket connection established")
         }
     };
     const groupListeners = () => {
@@ -183,7 +183,7 @@ const Chat = () => {
     }
     const fetchAllUsers = async () => {
         try {
-            const response = await axios.post(`${apiUrl}/chat/user`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/chat/user`, { admin_id: admin_id }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAllUser(response.data.users);
@@ -203,7 +203,7 @@ const Chat = () => {
             const response = await axios.post(`${apiUrl}/chat/messages`, {
                 receiver_id: selectedContact.id,
                 group_id: selectedContact?.pivot?.group_id || null,
-                admin_id:admin_id
+                admin_id: admin_id
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -223,7 +223,7 @@ const Chat = () => {
                 receiver_id: selectedContact.id || null,
                 msg: inputText,
                 group_id: selectedContact?.pivot?.group_id || null,
-                admin_id:admin_id
+                admin_id: admin_id
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -375,7 +375,7 @@ const Chat = () => {
     );
 };
 
-const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats,onlineUsers }) => {
+const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats, onlineUsers }) => {
     const formatDateTime = (createdAt) => {
         const messageDate = new Date(createdAt);
         const currentDate = new Date();
@@ -453,7 +453,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                     <div className="sjcontacts-list" onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
                         <div className="sjcontact-item justify-content-between ">
                             <div className='d-flex align-items-center'>
-                            <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                                     {/* <div className="sjonline-status"></div> */}
                                     {group.name.split(' ')
                                         .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
@@ -461,7 +461,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                                 </div>
                                 <div className="sjcontact-info ms-2">
                                     <div className="sjcontact-name">{group.name}</div>
-                                    <div className="sjcontact-message">{groupChats?.[0]?.message}</div>                                   
+                                    <div className="sjcontact-message">{groupChats?.[0]?.message}</div>
                                 </div>
                             </div>
                             {/* {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (
@@ -473,7 +473,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                     </div>
                 ))}
 
-                <div className="j-chats-meaasges">
+                <div className="j-chats-meaasges" style={{ borderTop: "1px solid #374151" }}>
                     {sortedContacts.map((ele) => {
                         const messagesWithReadByNo = ele.messages.filter(message => message.receiver_id == userId && message.read_by === "no");
                         const numberOfMessagesWithReadByNo = messagesWithReadByNo.length;
@@ -481,7 +481,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                         return (
                             <div key={ele.id} className={`sjcontacts-list  ${selectedContact === ele ? 'jchat-active' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleContactClick(ele)} >
                                 <div className="sjcontact-item" >
-                                <div className="sjavatar me-2" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                    <div className="sjavatar me-2" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                                         {onlineUsers?.map((v) => v.id == ele.id && <div className="sjonline-status"></div>)}
                                         {ele.name.split(' ')
                                             .map(word => word.charAt(0).toUpperCase())
@@ -513,7 +513,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
     );
 };
 
-const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, handleKeyPress, sendMessage, renderMessageGroups,onlineUsers }) => {
+const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, handleKeyPress, sendMessage, renderMessageGroups, onlineUsers }) => {
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -533,7 +533,7 @@ const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, h
     return (
         <div style={styles.container} className="j-chat-margin">
             <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "0" }}>
-                 <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                     {selectedContact.name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
                 </div>
                 <div>

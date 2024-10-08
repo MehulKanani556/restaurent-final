@@ -427,7 +427,8 @@ const Mostrador = () => {
                 <div className="j-tracker-mar d-flex justify-content-between ">
                   <div className="line1 flex-grow-1">
                     <Link
-                      to={"/counter"}
+                      // to={"/counter"}
+                      to={"#"}
                       className="text-decoration-none px-2 sj_text_dark"
                     >
                       <FaCircleCheck className="mx-1" />
@@ -442,7 +443,8 @@ const Mostrador = () => {
                   </div>
                   <div className="line2 flex-grow-1 text-end">
                     <Link
-                      to={"/counter/payment"}
+                      // to={"/counter/payment"}
+                      to={"#"}
                       className="text-decoration-none px-2 sj_text_dark"
                     >
                       <FaCircleCheck className="mx-1" />

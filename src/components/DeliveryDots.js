@@ -159,10 +159,12 @@ const DeliveryDots = () => {
     localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
     setCountsoup(updatedCartItems.map((item) => item.count));
   };
+
   const handleAccordionClick = (value) => {
     setSelectedRadio(value);
-  };
+    setActiveAccordionItem(value)
 
+  };
   const [showEditFamDel, setShowEditFamDel] = useState(false);
   const handleCloseEditFamDel = () => setShowEditFamDel(false);
   const handleShowEditFamDel = () => {
@@ -372,7 +374,40 @@ console.log(data)
     setOrderType(updatedOrder);
     localStorage.setItem("currentOrder", JSON.stringify(updatedOrder));
   };
+  const [paymentData, setPaymentData] = useState(null);
 
+  const [activeA, setActiveA] = useState(null)
+
+  useEffect(() => {
+    const storedPayment = JSON.parse(localStorage.getItem("payment"));
+    if (storedPayment) {
+      setPaymentData(storedPayment);
+    }
+  }, [])
+
+  
+  useEffect(() => {
+
+    if (paymentData) {
+      setFormData({
+        fname: paymentData.firstname,
+        lname: paymentData.lastname,
+        tour: paymentData.tour,
+        address: paymentData.address,
+        email: paymentData.email,
+        number: paymentData.phone,
+        bname: paymentData.business_name,
+        ltda: paymentData.ltda,
+        tipoEmpresa: paymentData.receiptType === "4" ? paymentData.ltda : "0",
+        rut: paymentData.receiptType == "1" ? paymentData.rut : paymentData.receiptType == "2" ? paymentData.rut : paymentData.rut,
+      })
+      setActiveAccordionItem(paymentData.receiptType); // {{ edit_1 }}
+      paymentData.receiptType == "1" ? setRut1(paymentData.rut) : paymentData.receiptType == "2" ? setRut2(paymentData.rut) : setRut3(paymentData.rut)
+      handleAccordionClick(paymentData.receiptType);
+      setSelectedRadio(paymentData.receiptType);
+      setActiveA(paymentData.receiptType);
+    }
+  }, [paymentData])
     return (
         <div>
             <Header />
@@ -423,8 +458,8 @@ console.log(data)
                                 <p className="mb-2">Datos cliente</p>
                                 <p>Tipos de comprobantes</p>
                                 <hr className="sj_bottom" />
-                                <Accordion className="sj_accordion" defaultActiveKey={["0"]}>
-                                    <Accordion.Item eventKey="0" className="mb-3">
+                                <Accordion className="sj_accordion"  activeKey={activeAccordionItem}>
+                                    <Accordion.Item eventKey="1" className="mb-3">
                                         <Accordion.Header>
                                             {" "}
                                             {/* <div className="sj_bg_dark px-4 py-2 sj_w-75">
@@ -547,7 +582,7 @@ console.log(data)
                                             </div>
                                         </Accordion.Body>
                                     </Accordion.Item>
-                                    <Accordion.Item eventKey="1" className="mb-3">
+                                    <Accordion.Item eventKey="2" className="mb-3">
                                         <Accordion.Header>
                                             {" "}
                                             {/* <div className="sj_bg_dark px-4 py-2 mt-3 sj_w-75">
@@ -671,7 +706,7 @@ console.log(data)
                                             </div>
                                         </Accordion.Body>
                                     </Accordion.Item>
-                                    <Accordion.Item eventKey="2" className="mb-3">
+                                    <Accordion.Item eventKey="3" className="mb-3">
                                         <Accordion.Header>
                                             {" "}
                                             {/* <div className="sj_bg_dark px-4 py-2 mt-3 sj_w-75">
@@ -810,15 +845,10 @@ console.log(data)
                                             </div>
                                         </Accordion.Body>
                                     </Accordion.Item>
-                                    <Accordion.Item eventKey="4" className="mb-3">
+                                    {/* <Accordion.Item eventKey="4" className="mb-3">
                                         <Accordion.Header>
                                             {" "}
-                                            {/* <div className="sj_bg_dark px-4 py-2 mt-3 sj_w-75">
-                                                <img src={box4} alt="#" />
-                                                <p className="d-inline px-3">
-                                                    Boleta personal
-                                                </p>
-                                            </div> */}
+                                           
                                             <div
                                                 onClick={() => handleAccordionClick("4")}
                                                 className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
@@ -948,7 +978,7 @@ console.log(data)
                                                 </form>
                                             </div>
                                         </Accordion.Body>
-                                    </Accordion.Item>
+                                    </Accordion.Item> */}
                                     {/* <Accordion.Item eventKey="3" >
                                         <Accordion.Header>
                                             <div onClick={() => handleAccordionClick("4")}

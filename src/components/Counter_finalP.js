@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Recipt from "./Recipt";
 import { MdRoomService } from "react-icons/md";
 import axios from "axios";
-//import { enqueueSnackbar  } from "notistack";
 
 const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -31,7 +30,13 @@ const Counter_finalP = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState(0);
   const [show11, setShow11] = useState(false);
-  const handleClose11 = () => setShow11(false);
+  const handleClose11 = () => {
+    setShow11(true)
+    setTimeout(() => {
+      setShow11(false)
+      navigate('/counter')
+    }, 2000);
+  }
   const handleShow11 = () => setShow11(true);
 
   const [price, setPrice] = useState("");
@@ -249,7 +254,7 @@ const Counter_finalP = () => {
   const totalCost = getTotalCost();
   const discount = 1.0;
   const finalTotal = totalCost - discount;
-  const taxAmount = finalTotal * 0.12;
+  const taxAmount = finalTotal * 0.19;
 
 
   // ==== Get BOX Data =====
@@ -293,7 +298,7 @@ const Counter_finalP = () => {
   const paymentData = {
     ...payment,
     amount: customerData.amount,
-    type: selectedCheckboxes[0],
+    type: selectedCheckboxes,
     order_master_id: orderType.orderId,
     return: customerData.turn,
     tax: taxAmount // Added tax amount to payment data
@@ -416,7 +421,9 @@ const Counter_finalP = () => {
         localStorage.removeItem("currentOrder");
         localStorage.removeItem("payment");
         setIsSubmitted(true);
-        handleShow11();
+        // handleShow11();
+        handleClose11();
+
         setIsProcessing(false);
         handlePrint();
       }
@@ -492,7 +499,8 @@ const Counter_finalP = () => {
                   </div>
                   <div className="  flex-grow-1 text-center">
                     <Link
-                      to={"/counter/mostrador"}
+                      // to={"/counter/mostrador"}
+                      to={"#"}
                       className="text-decoration-none px-2 sj_text_dark"
                     >
                       <FaCircleCheck className="mx-1" />
@@ -1028,7 +1036,7 @@ const Counter_finalP = () => {
 
                         <div className="j-border-bottom-counter">
                           <div className="j-total-discount d-flex justify-content-between">
-                            <p className="j-counter-text-2">IVA 12.00%</p>
+                            <p className="j-counter-text-2">IVA 19.00%</p>
                             <span className="text-white">${taxAmount.toFixed(2)}</span>
                           </div>
                         </div>
