@@ -281,11 +281,26 @@ const Caja = () => {
                                                     </option>
                                                 ))} */}
                                                 {/* // Filter the cashier array dynamically based on names */}
-                                                {cashier.filter(user => !data.some(d => d.user_id === user.id)).map(order => (
+                                                {/* {cashier.filter(user => !data.some(d => d.user_id === user.id)).map(order => (
                                                     <option key={order.id} value={order.id}>
                                                         {order.name}
                                                     </option>
-                                                ))}
+                                                ))} */}
+                                                 {data.length === 0 ? (
+                                                    cashier.map(order => (
+                                                        <option key={order.id} value={order.id}>
+                                                            {order.name}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    cashier
+                                                        .filter(user => !data.some(d => d.user_id === user.id))
+                                                        .map(order => (
+                                                            <option key={order.id} value={order.id}>
+                                                                {order.name}
+                                                            </option>
+                                                        ))
+                                                )}
                                             </select>
                                             {validationErrors.cashierAssigned && (
                                                 <div className="text-danger errormessage">{validationErrors.cashierAssigned}</div>

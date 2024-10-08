@@ -44,9 +44,9 @@ export default function Home_Pedidos_paymet() {
     // ----resons----
     // ===change====
     // console.log(reason);
-    if(!reason){
-        setReasonError("Ingrese el motivo de validez")
-        return;
+    if (!reason) {
+      setReasonError("Ingrese el motivo de validez")
+      return;
     }
 
     try {
@@ -180,7 +180,7 @@ export default function Home_Pedidos_paymet() {
   const getOrder = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, {admin_id: admin_id}, {
+      const response = await axios.post(`${apiUrl}/order/getSingle/${id}`, { admin_id: admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -198,9 +198,11 @@ export default function Home_Pedidos_paymet() {
   const getItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setItems(response.data.items);
       setObj1(response.data.items);
       // setFilteredMenuItems(response.data.items);
@@ -217,19 +219,19 @@ export default function Home_Pedidos_paymet() {
   const getSector = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id: admin_id}, {
+      const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id: admin_id }, {
         headers: {
-            Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-    });
+      });
       let sectors = response.data.data;
 
       const sectorWithTable = sectors.find(v =>
         v.tables.some(a => a.id == orderData.table_id)
       );
 
-     
-      
+
+
       if (sectorWithTable) {
         setSector(sectorWithTable);
         setTable(sectorWithTable.tables.find(a => a.id == orderData.table_id));
@@ -300,7 +302,7 @@ export default function Home_Pedidos_paymet() {
 
   const getuserRole = () => {
     if (user && roles.length > 0) {
-      const role = roles.find((v) => v.id === user[0].role_id);
+      const role = roles.find((v) => v.id === user[0]?.role_id);
       if (role) {
         setUserRole(role.name);
       }
@@ -321,9 +323,11 @@ export default function Home_Pedidos_paymet() {
 
   const getFamily = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/family/getFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setParentCheck(response.data);
     } catch (error) {
       console.error(
@@ -334,9 +338,11 @@ export default function Home_Pedidos_paymet() {
   }
   const getSubFamily = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -351,7 +357,7 @@ export default function Home_Pedidos_paymet() {
   const handlereasons = (event) => {
     let notes = event?.target.value
     setReason(notes)
-    if(notes){
+    if (notes) {
       setReasonError(null)
     }
   }
@@ -525,7 +531,7 @@ export default function Home_Pedidos_paymet() {
           error.response ? error.response.data : error.message
         );
       }
-       getOrder();
+      getOrder();
       handleOrderDetails();
     }
   };
@@ -599,17 +605,17 @@ export default function Home_Pedidos_paymet() {
                     <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
                   ) : (
                     !(orderData?.status == "cancelled") && <>
-                    <Link className='text-decoration-none'
-                      to={`/home_Pedidos/payment_edit/${id}`}
-                    >
-                      <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
-                    </Link>
-                    <div className='btn btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1' />Agregar Producto</div>
+                      <Link className='text-decoration-none'
+                        to={`/home_Pedidos/payment_edit/${id}`}
+                      >
+                        <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
+                      </Link>
+                      <div className='btn btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1' />Agregar Producto</div>
                     </>
                   )}
-                {showCancelOrderButton &&
-                  <div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
-                }
+                  {showCancelOrderButton &&
+                    <div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
+                  }
                 </div>
 
                 {/* cancel order modal */}
@@ -656,7 +662,7 @@ export default function Home_Pedidos_paymet() {
                         onKeyUp={handlereasons}
                         required
                       />
-                       {errorReason && <div className="text-danger errormessage">{errorReason}</div>}
+                      {errorReason && <div className="text-danger errormessage">{errorReason}</div>}
                     </div>
                   </Modal.Body>
                   <Modal.Footer className="border-0 pt-0">
@@ -749,7 +755,7 @@ export default function Home_Pedidos_paymet() {
                                 </div> */}
                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
 
-                                {v.notes === null ? (
+                                  {v.notes === null ? (
                                     <div key={v.id}>
                                       {visibleInputId !== v.id ? (
                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
@@ -770,24 +776,24 @@ export default function Home_Pedidos_paymet() {
                                     </div>
                                   ) : (
                                     < div key={v.id}>
-                                  {visibleInputId != v.id ? (
-                                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
-                                      <span className='j-nota-blue ms-4'>{v.notes}</span>
-                                    </div>
-                                  ) : (
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                      <span className='j-nota-blue ms-4'>Nota:</span>
-                                      <input
-                                        type="text"
-                                        className='j-note-input'
-                                        value={noteValues}
-                                        onChange={(e) => handleNoteChange(v.id, e)}
-                                        onKeyDown={handleNoteKeyDown(v.id)}
-                                      />
+                                      {visibleInputId != v.id ? (
+                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
+                                          <span className='j-nota-blue ms-4'>{v.notes}</span>
+                                        </div>
+                                      ) : (
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <span className='j-nota-blue ms-4'>Nota:</span>
+                                          <input
+                                            type="text"
+                                            className='j-note-input'
+                                            value={noteValues}
+                                            onChange={(e) => handleNoteChange(v.id, e)}
+                                            onKeyDown={handleNoteKeyDown(v.id)}
+                                          />
+                                        </div>
+                                      )}
                                     </div>
                                   )}
-                                </div>
-                                )}
 
 
 

@@ -490,7 +490,8 @@ const Counter = () => {
                 </div>
                 <div className="  flex-grow-1 text-center">
                   <Link
-                    to={"/counter/mostrador"}
+                    // to={"/counter/mostrador"}
+                    to={"#"}
                     className="text-decoration-none px-2 sj_text_dark"
                   >
                     <FaCircleCheck className="mx-1" />

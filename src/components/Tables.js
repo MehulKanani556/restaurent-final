@@ -2037,13 +2037,15 @@ const Tables = () => {
                             );
                           })
                       )}
-                      <a
-                        href="#"
-                        onClick={handleShowMoreClick}
-                        className="j-tbl-pop-2"
-                      >
-                        {showAll ? "Ver menos" : "Ver más"}
-                      </a>
+                     {tableData[0]?.items.length >= 2 &&
+                        <a
+                          href="#"
+                          onClick={handleShowMoreClick}
+                          className="j-tbl-pop-2"
+                        >
+                          {showAll ? "Ver menos" : "Ver más"}
+                        </a>
+                      }
                     </div>
                     <div className="j-counter-total-2">
                       <h5 className="text-white j-tbl-text-15 ">Costo total</h5>
@@ -2254,13 +2256,15 @@ const Tables = () => {
                             );
                           })
                       )}
-                      <a
-                        href="#"
-                        onClick={handleShowMoreClick}
-                        className="j-tbl-pop-2"
-                      >
-                        {showAll ? "Ver menos" : "Ver más"}
-                      </a>
+                      {tableData[0]?.items.length >= 2 &&
+                        <a
+                          href="#"
+                          onClick={handleShowMoreClick}
+                          className="j-tbl-pop-2"
+                        >
+                          {showAll ? "Ver menos" : "Ver más"}
+                        </a>
+                      }
                     </div>
                     <div className="j-counter-total-2">
                       <h5 className="text-white j-tbl-text-15 ">Costo total</h5>

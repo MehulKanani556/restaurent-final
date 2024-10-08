@@ -52,7 +52,15 @@ export default function Articles() {
 
   // Add product
   const [show1, setShow1] = useState(false);
-  const handleClose1 = () => { setShow1(false); setSelectedItemsCount(0) };
+  const handleClose1 = () => { 
+    // console.log("close");
+   setSelectedItemsCount(0);
+   setItemId([]); 
+   setSelectedMenus([]);
+   setItemId([]);
+   setMenuId(null); 
+   setShow1(false);
+  };
   const handleShow1 = () => {
     setShow1(true);
     setCount(0);
@@ -110,6 +118,12 @@ export default function Articles() {
   const handleShow1AddMenuSuc = () => {
     setShow1AddMenuSuc(true);
     setTimeout(() => {
+      setSelectedMenus([]);
+      setItemId([]);
+      setMenuId(null);
+      // fetchMenuData(); 
+      fetchMenuItemData();
+      fetchAllItems();
       setShow1AddMenuSuc(false);
     }, 2000);
   };
@@ -185,6 +199,7 @@ export default function Articles() {
   // Function to handle adding an item
   const handleAddItem = (item) => {
     if (!selectedItemsMenu.has(item)) {
+      // Add item if it's not already selected
       setSelectedItemsMenu(new Set(selectedItemsMenu).add(item));
       setSelectedItemsCount(selectedItemsCount + 1);
       setItemId((prevArray) => [...prevArray, item]);
@@ -192,7 +207,15 @@ export default function Articles() {
       // Perform any other action here when adding an item
       console.log(`Added item ${item}`);
     } else {
-      console.log(`Item ${item} already added`);
+      // Remove item if it's already selected
+      const updatedSelectedItemsMenu = new Set(selectedItemsMenu);
+      updatedSelectedItemsMenu.delete(item);
+      setSelectedItemsMenu(updatedSelectedItemsMenu);
+      setSelectedItemsCount(selectedItemsCount - 1);
+      setItemId((prevArray) => prevArray.filter((i) => i !== item));
+
+      // Perform any other action here when removing an item
+      console.log(`Removed item ${item}`);
     }
   };
 
@@ -331,19 +354,19 @@ export default function Articles() {
   useEffect(() => {
     if (!(role == "admin" || role == "cashier" || role == "waitress")) {
       navigate('/dashboard')
-    }else{
-
-    
+    } else {
       if (token) {
+        setSelectedMenus([]);
+        setItemId([]);
+        setMenuId(null);
         fetchMenuData();
         fetchMenuItemData();
         fetchFamilyData();
         fetchSubFamilyData();
         fetchAllItems();
-      
       }
     }
-  }, [role,token]);
+  }, [role, token,show1AddMenuSuc]);
 
   // create menu
   const handleCreateMenu = async () => {
@@ -817,6 +840,25 @@ export default function Articles() {
       setIsProcessing(false);
     }
   };
+  useEffect(()=>{
+    if(!showRetirar){
+        //  console.log("update");
+      setSelectedMenus([]);
+      setItemId([]);
+      setMenuId(null);
+      fetchMenuData(); 
+      fetchMenuItemData();
+      fetchAllItems();
+    }
+  },[showRetirar])
+
+  const handlesaveEdit = () => {
+    if(showRetirar){
+      setSelectedMenus([]);
+      setItemId([]);
+    }
+    setShowRetirar(!showRetirar)
+  }
   return (
     <div className="m_bg_black">
       <Header />
@@ -949,6 +991,7 @@ export default function Articles() {
                               <p className="text-white mb-0">{item.name}</p>
                             </label>
                           </div>
+                          { (role == "admin" || role == "cashier") &&
                           <div
                             className="text-white"
                             style={{ cursor: "pointer" }}
@@ -956,6 +999,7 @@ export default function Articles() {
                           >
                             <BsThreeDots className="j-tbl-dot-color" />
                           </div>
+                          }
                         </div>
                       </div>
                     ))}
@@ -1153,21 +1197,25 @@ export default function Articles() {
                           </div>
                         </div>
                       </div>
+                      {
+                          (role == "admin" || role == "cashier") && 
                       <div>
                         <button
                           className="btn j-btn-primary j_editor_menu text-white text-nowrap m12 me-2"
-                          onClick={() => setShowRetirar(!showRetirar)}
+                          onClick={handlesaveEdit}
                         >
-                          + Editar
+                          {showRetirar ? "Ahorrar" : "+ Editar"}
                         </button>
-
-                        <button
-                          className="btn j-btn-primary text-white text-nowrap m12 "
-                          onClick={handleShow1}
-                        >
-                          + Agregar
-                        </button>
+                        {(selectedMenus.length == 1 && !showRetirar)  && 
+                            <button
+                              className="btn j-btn-primary text-white text-nowrap m12 "
+                              onClick={handleShow1}
+                            >
+                              + Agregar
+                            </button>
+                          }
                       </div>
+                        }
                     </div>
                     {/* add product*/}
 
@@ -1327,71 +1375,81 @@ export default function Articles() {
                             </div>
                             <div className="row p-2">
                               {filteredItemsMenu.length > 0 ? (
-                                filteredItemsMenu.map((ele, index) => (
-                                  <div
-                                    className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
-                                    key={ele.id} // Corrected from 'keys' to 'key'
-                                  >
-                                    <div>
-                                      <div className="card m_bgblack text-white position-relative">
-                                        <img
-                                          src={`${API}/images/${ele.image}`}
-                                          className="card-img-top object-fit-cover rounded"
-                                          alt="..."
-                                          style={{ height: "162px" }}
-                                        />
-                                        <div className="card-body">
-                                          <h6 className="card-title">
-                                            {ele.name}
-                                          </h6>
-                                          <h6 className="card-title">
-                                            ${ele.sale_price}
-                                          </h6>
-                                          <p className="card-text opacity-50">
-                                            Codigo: {ele.code}
-                                          </p>
-                                          <div
-                                            onClick={() =>
-                                              handleAddItem(ele.id)}
-                                            className="btn w-100 btn-primary text-white"
-                                          >
-                                            <Link
-                                              className="text-white text-decoration-none"
-                                              style={{ fontSize: "14px" }}
+                                filteredItemsMenu
+                                  .filter(ele =>
+                                    !selectedMenus[0]?.items.some(item => item.id === ele.id)
+                                  )
+                                  .map((ele, index) => {
+                                    const isAdded = itemId.length > 0 ? itemId.some((item) => item == ele.id) : false;
+                                    // console.log(isAdded);
+                                    return (
+                                      <div
+                                        className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
+                                        key={ele.id} // Corrected from 'keys' to 'key'
+                                      >
+                                        <div>
+                                          <div className="card m_bgblack text-white position-relative">
+                                            <img
+                                              src={`${API}/images/${ele.image}`}
+                                              className="card-img-top object-fit-cover rounded"
+                                              alt="..."
+                                              style={{ height: "162px" }}
+                                            />
+                                            <div className="card-body">
+                                              <h6 className="card-title">
+                                                {ele.name}
+                                              </h6>
+                                              <h6 className="card-title">
+                                                ${ele.sale_price}
+                                              </h6>
+                                              <p className="card-text opacity-50">
+                                                Codigo: {ele.code}
+                                              </p>
+                                              <div
+                                                style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
+                                                onClick={() =>
+                                                  handleAddItem(ele.id)}
+                                                className="btn w-100 btn-primary text-white"
+
+                                              >
+                                                <Link
+                                                  className="text-white text-decoration-none"
+                                                  style={{ fontSize: "14px" }}
+                                                >
+                                                  <span className="ms-1">
+                                                    {isAdded ? 'Agregado' : 'Agregar al menú'}
+                                                  </span>
+                                                </Link>
+                                              </div>
+                                            </div>
+                                            <div
+                                              className="position-absolute"
+                                              style={{ cursor: "pointer" }}
                                             >
-                                              <span className="ms-1">
-                                                Añadir{" "}
-                                              </span>
-                                            </Link>
+                                              <Link
+                                                to={`/articles/singleatricleproduct/${ele.id}`}
+                                                className="text-white text-decoration-none"
+                                              >
+                                                <p
+                                                  className="px-1 rounded m-2"
+                                                  style={{
+                                                    backgroundColor: "#374151"
+                                                  }}
+                                                >
+                                                  <IoMdInformationCircle />{" "}
+                                                  <span
+                                                    style={{ fontSize: "12px" }}
+                                                  >
+                                                    Ver información
+                                                  </span>
+                                                </p>
+                                              </Link>
+                                            </div>
                                           </div>
                                         </div>
-                                        <div
-                                          className="position-absolute"
-                                          style={{ cursor: "pointer" }}
-                                        >
-                                          <Link
-                                            to={`/articles/singleatricleproduct/${ele.id}`}
-                                            className="text-white text-decoration-none"
-                                          >
-                                            <p
-                                              className="px-1 rounded m-2"
-                                              style={{
-                                                backgroundColor: "#374151"
-                                              }}
-                                            >
-                                              <IoMdInformationCircle />{" "}
-                                              <span
-                                                style={{ fontSize: "12px" }}
-                                              >
-                                                Ver información
-                                              </span>
-                                            </p>
-                                          </Link>
-                                        </div>
                                       </div>
-                                    </div>
-                                  </div>
-                                ))
+                                    )
+                                  })
                               ) : (
                                 <div className="col-12 text-center text-white mt-5">
                                   <h5 className="opacity-75 m-0">

@@ -680,7 +680,7 @@ const TableInformation = () => {
                 </div>
                 <div className="j-table-information-head-buttons">
                   <h5 className="j-table-information-1 j-table-text-23 ">
-                    Datos mesa <span>{tableData?.id}</span>
+                  Datos mesa <span>- {tableData?.name} ( {tableData?.id} )</span>
                   </h5>
 
                   <div className="j-table-information-btn-1">

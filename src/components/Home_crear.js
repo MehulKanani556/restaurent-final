@@ -720,6 +720,7 @@ export default function Home_crear({ item }) {
                                                                                             className="me-4  custom-checkbox"
                                                                                             style={{ marginTop: "22px" }}
                                                                                             onClick={() => handleReturnItems(item)}
+                                                                                            checked={selectedItems.some((v) => v.id == item.id)}
                                                                                         />
                                                                                         <img src={`${API}/images/${item.image}`} alt="pic" height={60} width={60} />
                                                                                         <div className="ms-4">
@@ -772,25 +773,25 @@ export default function Home_crear({ item }) {
                                                                                 </div>
                                                                             ) : (
                                                                                 < div key={item.id}>
-                                                                                {visibleInputId != item.id ? (
-                                                                                  <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
-                                                                                    <span className='j-nota-blue ms-4'>{item.notes}</span>
-                                                                                  </div>
-                                                                                ) : (
-                                                                                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                    <span className='j-nota-blue ms-4'>Nota:</span>
-                                                                                    <input
-                                                                                      type="text"
-                                                                                      className='j-note-input'
-                                                                                      // placeholder={v.notes}
-                                                                                      value={noteValues}
-                                                                                      onChange={(e) => handleNoteChange(item.id, e)}
-                                                                                      onKeyDown={handleNoteKeyDown(item.id)}
-                                                                                      // onBlur={console.log("blur")}
-                                                                                    />
-                                                                                  </div>
-                                                                                )}
-                                                                              </div>
+                                                                                    {visibleInputId != item.id ? (
+                                                                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
+                                                                                            <span className='j-nota-blue ms-4'>{item.notes}</span>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                            <span className='j-nota-blue ms-4'>Nota:</span>
+                                                                                            <input
+                                                                                                type="text"
+                                                                                                className='j-note-input'
+                                                                                                // placeholder={v.notes}
+                                                                                                value={noteValues}
+                                                                                                onChange={(e) => handleNoteChange(item.id, e)}
+                                                                                                onKeyDown={handleNoteKeyDown(item.id)}
+                                                                                            // onBlur={console.log("blur")}
+                                                                                            />
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
                                                                             )}
                                                                         </div>
                                                                     </div>
@@ -1041,7 +1042,7 @@ export default function Home_crear({ item }) {
                                                                             <div>${selectedItems?.reduce((total, v) => total + v.amount * v.quantity, 0)}</div>
                                                                         </div>
                                                                     </div> */}
-                                                                     <div className='b_bborder my-3 p-4'>
+                                                                    <div className='b_bborder my-3 p-4'>
                                                                         <h5>Tipos de pago</h5>
                                                                         <div className='d-flex justify-content-between'>
                                                                             <div className='mt-3'>

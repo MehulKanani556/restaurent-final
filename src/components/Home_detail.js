@@ -137,8 +137,8 @@ function Home_detail() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = (id, status) => {
-        if (status == 'received' || status == 'delivered' || status == 'finalized' || status == "cancelled") {
-            alert(`Tu pedido ha sido ${status == 'received' ? "Recibido" : status == 'delivered' ? "Entregado" : status == 'finalized' ? "Finalizado" : status == 'cancelled' ? "Cancelado" : ''}.`)
+        if (status == 'delivered' || status == 'finalized' || status == "cancelled") {
+            alert(`Tu pedido ha sido ${status == 'delivered' ? "Entregado" : status == 'finalized' ? "Finalizado" : status == 'cancelled' ? "Cancelado" : ''}.`)
         } else {
             setOrderId(id)
             setShow(true);
@@ -323,7 +323,7 @@ function Home_detail() {
             console.log("Navigating to credit creation page");
             navigate(`/home/client/crear/${id}`, { replace: true, state: { user } });
         } else {
-            alert(`Tu pedido ha sido ${status == 'cancelled' ? "Cancelado" : status == 'prepared' ? "Preparado" : status == 'withdraw' ? "Retirar" : status == 'delivered' ? "Entregado" : ''}.`)
+            alert(`Tu pedido ha sido ${status == 'cancelled' ? "Cancelado" : status == 'prepared' ? "Preparado" : status == 'withdraw' ? "Retirar" : status ==  'received' ? 'Recibido' : ''}.`)
         }
     };
 
@@ -632,11 +632,11 @@ function Home_detail() {
                                         <div className=' b_search text-white a_input_size'>
                                             <label htmlFor="inputPassword2" className="">Nombre</label>
                                             <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="4" style={{ backgroundColor: '#374151', borderRadius: "10px" }}
-                                                value={(user?.firstname ? user?.firstname : user?.business_name) + " " + (user?.lastname)} />
+                                                value={(user?.firstname ? user?.firstname : user?.business_name) + " " + (user?.lastname)}  disabled/>
                                         </div>
                                         <div className=' b_search text-white a_input_size'>
                                             <label htmlFor="inputPassword2" className="">DNI</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 bj-slimilar-class-why " id="inputPassword2" placeholder="0123456789" style={{ backgroundColor: '#374151', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 bj-slimilar-class-why " id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={"-"} disabled/>
                                         </div>
 
                                     </div>
@@ -646,12 +646,11 @@ function Home_detail() {
                                 <div className='d-flex gap-5 mx-4 b_inputt mb-5 '>
                                     <div className=' b_search text-white a_input_size' >
                                         <label htmlFor="inputPassword2" className="">Correo</label>
-
-                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={user?.email} />
+                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={user?.email} disabled/>
                                     </div>
                                     <div className=' b_search text-white a_input_size'>
                                         <label htmlFor="inputPassword2" className=" ">Pedidos</label>
-                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="4" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={orderAlldata.length} />
+                                        <input type="text" className="form-control bg-gray border-0 bj-slimilar-class-why mt-2" id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={orderAlldata.length} disabled/>
                                     </div>
                                 </div>
                             </div>

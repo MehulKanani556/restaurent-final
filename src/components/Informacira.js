@@ -49,7 +49,8 @@ const Informacira = () => {
   const [selectedHastaMonthReport, setSelectedHastaMonthReport] = useState(
     new Date().getMonth() + 1
   );
-
+  const [boxnameError , setBoxnameError] = useState();
+  const [boxcashError , setBoxcashError] = useState();
 
   useEffect(
     () => {
@@ -212,6 +213,16 @@ const Informacira = () => {
 
   // update box
   const handleSaveChanges = async () => {
+    if(!editedBoxName){
+      setBoxnameError("por favor ingrese el nombre")
+      return
+    }
+
+    if(!editedCashierId){
+      setBoxcashError("por favor seleccione cajero")
+      return;
+    }
+
     if (!selectedBox) return;
     handleClose();
 
@@ -242,6 +253,8 @@ const Informacira = () => {
         fetchAllBox();
 
         getBox();
+        setBoxcashError('');
+        setBoxnameError('');
         if (response.data && response.data.notification) {
           //enqueueSnackbar (response.data.notification, { variant: 'success' });
           // playNotificationSound();;
@@ -453,7 +466,7 @@ const Informacira = () => {
       });
       const filteredItem = response.data.filter(item => item.id == bId);
       setBoxName(filteredItem);
-      setUsers(response.data);
+      // setUsers(response.data);
     } catch (error) {
       console.error("Error fetching boxes:", error);
     }
@@ -1333,8 +1346,16 @@ const Informacira = () => {
                               placeholder="Caja#"
                               id="boxName"
                               value={editedBoxName}
-                              onChange={(e) => setEditedBoxName(e.target.value)}
+                              onChange={(e) => {
+                                setEditedBoxName(e.target.value)
+                                if(e.target.value){
+                                  setBoxnameError('');
+                                }
+                              }}
                             />
+
+                            {boxnameError && <div className="text-danger errormessage">{boxnameError}</div>}
+
                           </div>
                           <div className="mb-3">
                             <label
@@ -1349,20 +1370,23 @@ const Informacira = () => {
                               aria-label="Selecciona un título"
                               id="cashierSelect"
                               value={editedCashierId}
-                              onChange={(e) => setEditedCashierId(e.target.value)}
+                              onChange={(e) => {
+                                setEditedCashierId(e.target.value);
+                                if(e.target.value){
+                                  setBoxcashError('');
+                                }
+                              }
+                            }
                             >
+
                               <option value="0">Cajero asignado</option>
-                              {/* {cashier.map(user => (
+                              {cashier.map(user => (
                                 <option key={user.id} value={user.id}>
                                   {user.name}
                                 </option>
-                              ))} */}
-                              {cashier.filter(user => !data.some(d => d.user_id === user.id)).map(order => (
-                                <option key={order.id} value={order.id}>
-                                  {order.name}
-                                </option>
                               ))}
                             </select>
+                            {boxcashError && <div className="text-danger errormessage">{boxcashError}</div>}
                           </div>
                         </Modal.Body>
                         <Modal.Footer className="sjmodenone justify-content-between pt-0">
@@ -1372,7 +1396,7 @@ const Informacira = () => {
                               className="btn j-btn-primary text-white j-caja-text-1 me-2"
                               onClick={handleSaveChanges}
                             >
-                              Guardar combios
+                              Guardar cambios
                             </Button>
                             <Button
                               className="btn j-btn-White text-white j-caja-text-1"
@@ -1593,7 +1617,7 @@ const Informacira = () => {
                             />
                             <p className="mb-0 mt-2 h6 j-tbl-pop-1">Caja</p>
                             <p className="opacity-75 j-tbl-pop-2">
-                              Cierre de caja exitosamente
+                            Informe generado exitosamente
                             </p>
                           </div>
                         </Modal.Body>
@@ -1830,7 +1854,7 @@ const Informacira = () => {
                           className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
                         >
                           <Modal.Title className="modal-title j-caja-pop-up-text-1 ">
-                            Detalles cajac
+                          Detalles de caja
                           </Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
@@ -2026,7 +2050,7 @@ const Informacira = () => {
                           className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
                         >
                           <Modal.Title className="modal-title j-caja-pop-up-text-1">
-                            Detalles cajao
+                          Detalles de caja
 
                           </Modal.Title>
                         </Modal.Header>

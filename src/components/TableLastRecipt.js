@@ -58,7 +58,7 @@ const TableLastRecipt = ({ data ,itemInfo , payment}) => {
     0
   );
   const price =  itemsTotal - data[0].discount;
-  const iva = itemsTotal * 0.12; // 12% tax
+  const iva = itemsTotal * 0.19; // 12% tax
   const total = price + iva;
   receiptData.totals = {
     subtotalIva: itemsTotal,
@@ -76,6 +76,9 @@ const TableLastRecipt = ({ data ,itemInfo , payment}) => {
     transfer:"Transferencia"
     // Add other payment types as needed
 };
+const translatedPayments = payment.type.length > 0 ? payment.type
+  .map(payment => paymentTypes[payment.trim()])
+  .filter(Boolean) : [];
   return (
     <div id="receipt-content">
     <div className="j-counter-recipt">
@@ -208,7 +211,7 @@ const TableLastRecipt = ({ data ,itemInfo , payment}) => {
             </div>
           </div>
           <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>IVA 12.00%:</div>
+            <div>IVA 19.00%:</div>
             <div>
               $ {receiptData.totals.iva.toFixed(2)}
               <br />
@@ -235,8 +238,10 @@ const TableLastRecipt = ({ data ,itemInfo , payment}) => {
           className="mb-0 mx-1"
           style={{ fontSize: "12px", textAlign: "left" }}
         >
-                   Forma de pago:<br />{paymentTypes[payment.type]}:{" "}
-         $ {receiptData.totals.received.toFixed(2)}
+                   Forma de pago:<br />
+                    {/* {paymentTypes[paymentData.type]}:{" "} */}
+                    {translatedPayments.join(", ")}
+         {/*:{" "} $ {receiptData.totals.received.toFixed(2)} */}
           <br />
           <div className="mt-2 d-flex" style={{ display: 'flex' }}>
             <div className="me-3" style={{ marginRight: '16px' }}>Recibido: $ {payment.amount}</div>
