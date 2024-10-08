@@ -31,6 +31,9 @@ const TableDatos = () => {
   const [tableData, setTableData] = useState([]);
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [rut1, setRut1] = useState("");
+  const [rut2, setRut2] = useState("");
+  const [rut3, setRut3] = useState("");
   const orderitem = [
     {
       image: img2,
@@ -164,24 +167,42 @@ const TableDatos = () => {
     }
   };
 
-  useEffect(
-    () => {
-
-
-      if (!(role == "admin" || role == "cashier" || role == "waitress")) {
-        navigate('/dashboard')
-      } else {
-        setIsProcessing(true);
-        if (id) {
-          getTableData(id)
-          fetchAllItems();
-        };
-        setIsProcessing(false);
+  useEffect(() => {
+    // Check if the user has a role that allows access
+    if (!(role == "admin" || role == "cashier" || role == "waitress")) {
+      navigate('/dashboard');
+    } else {
+      setIsProcessing(true);
+      if (id) {
+        getTableData(id);
+        fetchAllItems();
       }
+      setIsProcessing(false);
+    }
 
-    },
-    [id, role]
-  );
+    // New code to check localStorage for tablePayment
+    const storedData = localStorage.getItem("tablePayment");
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+    
+      setFormData((prevState) => ({
+        ...prevState,
+        fname: parsedData.firstname || prevState.fname,
+        lname: parsedData.lastname || prevState.lname,
+        tour: parsedData.tour || prevState.tour,
+        address: parsedData.address || prevState.address,
+        email: parsedData.email || prevState.email,
+        number: parsedData.phone || prevState.number,
+        rut1: parsedData.receiptType === "1" ? parsedData.rut : prevState.rut,
+        rut2: parsedData.receiptType === "2" ? parsedData.rut : prevState.rut
+      }));
+      setRut1(parsedData.receiptType === "1"? parsedData.rut : "");
+      setRut2(parsedData.receiptType === "2"? parsedData.rut : "")
+      setRut3(parsedData.receiptType === "3"? parsedData.rut : "")
+      setSelectedRadio(parsedData.receiptType || "1"); // Set default receipt type if not present
+    }
+
+  }, [id, role]);
   const handleDeleteItem = (index) => {
     const updatedCartItems = cartItems.filter((_, i) => i !== index);
     setCartItems(updatedCartItems);
@@ -249,9 +270,7 @@ const TableDatos = () => {
     setSelectedRadio(value);
   };
 
-  const [rut1, setRut1] = useState("");
-  const [rut2, setRut2] = useState("");
-  const [rut3, setRut3] = useState("");
+
 
   const handleRutChange = (e, setRut) => {
     let value = e.target.value.replace(/-/g, ""); // Remove any existing hyphen
@@ -611,9 +630,11 @@ const TableDatos = () => {
                                 type="text"
                                 name="rut"
                                 value={rut1}
+                                
                                 onChange={(e) => handleRutChange(e, setRut1)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
+                            
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
 
                             </div>

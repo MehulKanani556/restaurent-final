@@ -650,6 +650,7 @@ const Counter = () => {
                               <h5 className="text-white j-tbl-font-5">
                                 {item.name}
                               </h5>
+                              
                             </div>
                             <div className="d-flex align-items-center">
                               <div className="j-counter-mix">

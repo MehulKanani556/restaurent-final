@@ -31,11 +31,12 @@ const Counter_finalP = () => {
   const [tipAmount, setTipAmount] = useState(0);
   const [show11, setShow11] = useState(false);
   const handleClose11 = () => {
-    setShow11(true)
-    setTimeout(() => {
-      setShow11(false)
-      navigate('/counter')
-    }, 2000);
+    setShow11(false)
+    navigate('/counter')
+    // setTimeout(() => {
+    //   setShow11(false)
+    //   navigate('/counter')
+    // }, 2000);
   }
   const handleShow11 = () => setShow11(true);
 
@@ -425,7 +426,7 @@ const Counter_finalP = () => {
         handleClose11();
 
         setIsProcessing(false);
-        handlePrint();
+        // handlePrint();
       }
     } catch (error) {
       console.error("Error creating order : ", error);

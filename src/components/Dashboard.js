@@ -340,7 +340,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getStatisticalData`,
-        {durationData,admin_id},
+        {...durationData,admin_id} ,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -348,6 +348,7 @@ const Dashboard = () => {
           },
         }
       );
+      console.log(response.data.statistical_data)
       setStateData(response.data.statistical_data);
       setLoading(false);
 
@@ -390,7 +391,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getPaymentMethods`,
-        {durationData,admin_id},
+        {...durationData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -436,7 +437,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getTotalRevenue`,
-        {admin_id,durationData},
+        {...durationData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -498,7 +499,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getPopularProducts`,
-        {admin_id,durationData},
+        {...durationData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -537,7 +538,7 @@ const Dashboard = () => {
           month: selectBoxMonth  // Current month (1-12)
         };
       }
-      const response = await axios.post(`${apiUrl}/getBoxEntry`,  {admin_id,durationData}, {
+      const response = await axios.post(`${apiUrl}/getBoxEntry`,    {...durationData,admin_id}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -574,7 +575,7 @@ const Dashboard = () => {
       }
       const response = await axios.post(
         `${apiUrl}/getdelivery`,
-        {admin_id,durationData},
+        {...durationData,admin_id},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -611,7 +612,7 @@ const Dashboard = () => {
       }
       const response = await axios.post(
         `${apiUrl}/cancelOrders`,
-        {admin_id,durationData},
+        {...durationData,admin_id},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -1264,6 +1265,7 @@ const Dashboard = () => {
                     <p className="sjfs-16">Total pedidos</p>
                     <h3 className="text-white fw-bold sj-fs30">{stateData.total_orders_count}</h3>
                   </div>
+                  {console.log("stateData",stateData)}
                   <ResponsiveContainer width="100%" height={100}>
                     <AreaChart
                       data={transformOrdersData(stateData.total_orders || [], statisticalData)}

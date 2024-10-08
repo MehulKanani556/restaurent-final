@@ -1854,7 +1854,7 @@ const Informacira = () => {
                           className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
                         >
                           <Modal.Title className="modal-title j-caja-pop-up-text-1 ">
-                          Detalles de caja
+                          Detalles de caja 
                           </Modal.Title>
                         </Modal.Header>
                         <Modal.Body>

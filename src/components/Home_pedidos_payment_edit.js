@@ -240,7 +240,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getuserRole = () => {
         if (user && roles.length > 0) {
-            const role = roles.find((v) => v.id === user[0].role_id);
+            const role = roles.find((v) => v.id === user[0]?.role_id);
             if (role) {
                 setUserRole(role.name);
             }
@@ -1017,7 +1017,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                     </div>
 
                                     <div className="py-3 m_borbot mx-3  m14 ">
-                                        {parentCheck.map((parentItem) => (
+                                        {parentCheck?.map((parentItem) => (
                                             <div key={parentItem.id}>
                                                 <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
                                                     <div className="text-nowrap">

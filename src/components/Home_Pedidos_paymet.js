@@ -770,6 +770,8 @@ export default function Home_Pedidos_paymet() {
                                             value={noteValues}
                                             onChange={(e) => handleNoteChange(v.id, e)}
                                             onKeyDown={handleNoteKeyDown(v.id)}
+                                           
+
                                           />
                                         </div>
                                       )}
@@ -778,7 +780,7 @@ export default function Home_Pedidos_paymet() {
                                     < div key={v.id}>
                                       {visibleInputId != v.id ? (
                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
-                                          <span className='j-nota-blue ms-4'>{v.notes}</span>
+                                          <span className='j-nota-blue ms-4'>Nota : {v.notes}</span>
                                         </div>
                                       ) : (
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -789,6 +791,7 @@ export default function Home_Pedidos_paymet() {
                                             value={noteValues}
                                             onChange={(e) => handleNoteChange(v.id, e)}
                                             onKeyDown={handleNoteKeyDown(v.id)}
+                                         
                                           />
                                         </div>
                                       )}
@@ -1083,7 +1086,7 @@ export default function Home_Pedidos_paymet() {
                   </div>
                 </div>
                 <div className="row p-2">
-                  {filteredItemsMenu.map((ele, index) => (
+                  {filteredItemsMenu?.map((ele, index) => (
                     <div
                       className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                       keys={index}

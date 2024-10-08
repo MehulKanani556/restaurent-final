@@ -1167,30 +1167,34 @@ const TableCounter1 = () => {
                                       </div>
                                     </div>
                                     <div className="text-white j-order-count-why">
-                                      {item.notes ? (
-                                        <span className="j-nota-blue">
-                                          Nota: {item.notes}
-                                        </span>
+                                      {item.isEditing ? (
+                                        <div>
+                                          <input
+                                            className="j-note-input"
+                                            type="text"
+                                            value={item.note}
+                                            onChange={(e) =>
+                                              handleNoteChange(
+                                                index,
+                                                e.target.value
+                                              )}
+                                            onBlur={() =>
+                                              handleFinishEditing(index)}
+                                            onKeyDown={(e) => {
+                                              if (e.key === "Enter")
+                                                handleFinishEditing(index);
+                                            }}
+                                            autoFocus
+                                          />
+                                        </div>
                                       ) : (
                                         <div>
-                                          {addNotes[index] ? (
-                                            <form
-                                              // onSubmit={(e) =>
-                                              //   handleSubmitNote(e, index, item.id)}
-                                            >
-                                              <span className="j-nota-blue">
-                                                Nota:{" "}
-                                              </span>
-                                              <input
-                                                className="j-note-input"
-                                                type="text"
-                                                defaultValue={item.notes || ""}
-                                                autoFocus
-                                              />
-                                            </form>
+                                          {item.note ? (
+                                            <p className="j-nota-blue" style={{cursor: "pointer"}}  onClick={() => handleAddNoteClick(index)}>
+                                              {item.note}
+                                            </p>
                                           ) : (
                                             <button
-                                              type="button"
                                               className="j-note-final-button"
                                               onClick={() =>
                                                 handleAddNoteClick(index)}
@@ -1507,7 +1511,7 @@ const TableCounter1 = () => {
                                       ) : (
                                         <div>
                                           {item.note ? (
-                                            <p className="j-nota-blue">
+                                            <p className="j-nota-blue" style={{cursor: "pointer"}}  onClick={() => handleAddNoteClick(index)}>
                                               {item.note}
                                             </p>
                                           ) : (
