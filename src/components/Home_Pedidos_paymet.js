@@ -302,7 +302,7 @@ export default function Home_Pedidos_paymet() {
 
   const getuserRole = () => {
     if (user && roles.length > 0) {
-      const role = roles.find((v) => v.id === user[0]?.role_id);
+      const role = roles?.find((v) => v.id === user[0]?.role_id);
       if (role) {
         setUserRole(role.name);
       }
@@ -506,10 +506,8 @@ export default function Home_Pedidos_paymet() {
     setNoteValues(e.target.value);
   };
 
-  const handleNoteKeyDown = (id) => async (e) => {
-
-    if (e.key === 'Enter') {
-      // console.log(id);
+  const handleNoteKeyDown = async(id) => {
+    console.log(id)
       try {
         const response = await axios.post(
           `${apiUrl}/order/addNote/${id}`,
@@ -530,10 +528,9 @@ export default function Home_Pedidos_paymet() {
           "Error adding note:",
           error.response ? error.response.data : error.message
         );
-      }
-      getOrder();
-      handleOrderDetails();
     }
+    getOrder();
+    handleOrderDetails();
   };
 
   // =============end note==========
@@ -577,6 +574,11 @@ export default function Home_Pedidos_paymet() {
   }
 
 
+  const handlePayment = () => {
+    // navigate(`/table/datos?oId=${id}`, { state:  orderData });
+  }
+
+
   // =============== End ============
 
 
@@ -599,6 +601,7 @@ export default function Home_Pedidos_paymet() {
                   {/* Pedido : {order} */}
                   Pedido : {id}
                 </div>
+
                 <div className='d-flex flex-wrap me-4'>
                   {showCancelOrderButton ? (
                     !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") &&
@@ -754,7 +757,6 @@ export default function Home_Pedidos_paymet() {
                                   )}
                                 </div> */}
                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
-
                                   {v.notes === null ? (
                                     <div key={v.id}>
                                       {visibleInputId !== v.id ? (
@@ -769,9 +771,11 @@ export default function Home_Pedidos_paymet() {
                                             className='j-note-input'
                                             value={noteValues}
                                             onChange={(e) => handleNoteChange(v.id, e)}
-                                            onKeyDown={handleNoteKeyDown(v.id)}
-                                           
-
+                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            onKeyDown={(e)=>{
+                                              if (e.key === "Enter")
+                                                handleNoteKeyDown(v.id)
+                                              }}
                                           />
                                         </div>
                                       )}
@@ -780,7 +784,7 @@ export default function Home_Pedidos_paymet() {
                                     < div key={v.id}>
                                       {visibleInputId != v.id ? (
                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
-                                          <span className='j-nota-blue ms-4'>Nota : {v.notes}</span>
+                                          <span className='j-nota-blue ms-4'>Nota: {v.notes}</span>
                                         </div>
                                       ) : (
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -790,16 +794,18 @@ export default function Home_Pedidos_paymet() {
                                             className='j-note-input'
                                             value={noteValues}
                                             onChange={(e) => handleNoteChange(v.id, e)}
-                                            onKeyDown={handleNoteKeyDown(v.id)}
-                                         
+                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            onKeyDown={(e)=>{
+                                              console.log(e.key);
+                                              if (e.key == "Enter"){
+                                                handleNoteKeyDown(v.id)
+                                              }
+                                              }}
                                           />
                                         </div>
                                       )}
                                     </div>
                                   )}
-
-
-
                                   {/* {editingNote === index ? (
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                       <span className='j-nota-blue ms-4'>Nota:</span>
@@ -882,7 +888,7 @@ export default function Home_Pedidos_paymet() {
                           </div>
                         </div>
                         <div className='mx-auto text-center mt-3'>
-                          <div className='btn text-white j-btn-primary w-100  border-0' style={{ padding: "8px 12px", borderRadius: "8px" }}>Pagar ahora</div>
+                          <div className='btn text-white j-btn-primary w-100  border-0' style={{ padding: "8px 12px", borderRadius: "8px" }} onClick={handlePayment}>Pagar ahora</div>
                         </div>
                       </div>
                     </div>
@@ -900,21 +906,21 @@ export default function Home_Pedidos_paymet() {
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Sector</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={`${table?.name}  (${table?.id})`} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " v value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                   </div>
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Cliente</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Personas</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                   </div>
 

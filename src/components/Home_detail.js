@@ -516,6 +516,7 @@ function Home_detail() {
             console.log(response);
             if (!(response.success == "false")) {
                 setDeleteProductId(null);
+                setIsProcessing(false);
                 setShowDeleteConfirmation(false);
                 handleShowEditFamfinal();
             }
@@ -587,7 +588,7 @@ function Home_detail() {
 
                                                     <td>
                                                         {credits && credits?.some(v => v.order_id === order.id) ? (
-                                                            <div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_c m-0' style={{ borderRadius: "10px", width: "145px" }}>  crédito generado   </div>
+                                                            <div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_c m-0' style={{ borderRadius: "10px", width: "145px", background:"#2f5dadbd"}}>  crédito generado   </div>
                                                         ) : (
                                                             <div
                                                                 onClick={() => handleCredit(order.id, order.status)}
@@ -600,7 +601,11 @@ function Home_detail() {
 
 
 
-                                                    <td ><div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_a  ' style={{ borderRadius: "10px" }} onClick={() => handleShow(order.id, order.status)} >Anular venta</div></td>
+                                                    <td >
+                                                    {order.status.toLowerCase() != 'cancelled' ? 
+                                                        <div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_a  ' style={{ borderRadius: "10px" }} onClick={() => handleShow(order.id, order.status)} >Anular venta</div>
+                                                        : " "}
+                                                    </td>
                                                     <td>
                                                         <button className='b_edit sj-button-xise' style={{ backgroundColor: "#0694A2" }} onClick={() => handleRecipe(order)}>
                                                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -705,7 +710,7 @@ function Home_detail() {
                                     <tbody className='text-white b_btnn '>
                                         {credits.length > 0 ?
                                             credits?.map((order) => (
-                                                console.log(order),
+                                                // console.log(order),
 
                                                 <tr key={order.id} className='b_row'>
                                                     <td ><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.order_id}</div></td>
@@ -718,7 +723,7 @@ function Home_detail() {
                                                     </td>
 
                                                     <td>
-                                                        <div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_a  ' style={{ borderRadius: "10px" }} onClick={() => deleteProductModal(order.id)}> Anular credito</div>
+                                                        {order.status == 'pending' ? <div className='b_text_w bj-delivery-text-2 b_idbtn b_idbtn_a  ' style={{ borderRadius: "10px" }} onClick={() => deleteProductModal(order.id)}> Anular credito</div> : " " }    
                                                     </td>
                                                     <td onClick={() => handleCreditRecipe(order)}>
                                                         <button className='b_edit sj-button-xise' style={{ backgroundColor: "#0694A2" }}>

@@ -116,7 +116,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
     useEffect(() => {
         if (orderData && items.length > 0) {
             handleOrderDetails();
-        getSector();
+            getSector();
 
         }
         if (orderData?.user_id) {
@@ -168,7 +168,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const getSector = async () => {
         try {
-            const response = await axios.post(`${apiUrl}/sector/getWithTable`,{admin_id:admin_id},{headers:{Authorization: `Bearer ${token}`}});
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id: admin_id }, { headers: { Authorization: `Bearer ${token}` } });
             let sectors = response.data.data;
 
             const sectorWithTable = sectors.find(v =>
@@ -433,32 +433,32 @@ const Home_pedidos_payment_edit = ({ item }) => {
         setNoteValues(e.target.value);
     };
 
-    const handleNoteKeyDown = (id) => async (e) => {
-        if (e.key === 'Enter') {
-            // console.log(id);
-            try {
-                const response = await axios.post(
-                    `${apiUrl}/order/addNote/${id}`,
-                    { notes: noteValues },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                // console.log("Note added successfully:", response.data);
-
-                // setSavedNote(noteValues);
-                setNoteValues('');
-                setVisibleInputId(null);
-            } catch (error) {
-                console.error(
-                    "Error adding note:",
-                    error.response ? error.response.data : error.message
-                );
-            }
+    const handleNoteKeyDown = async(id) => {
+        console.log(id)
+          try {
+            const response = await axios.post(
+              `${apiUrl}/order/addNote/${id}`,
+              { notes: noteValues },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            // console.log("Note added successfully:", response.data);
+    
+            // setSavedNote(noteValues);
+            setNoteValues('');
+            setVisibleInputId(null);
+          } catch (error) {
+            console.error(
+              "Error adding note:",
+              error.response ? error.response.data : error.message
+            );
         }
-    };
+        getOrder();
+        handleOrderDetails();
+      };
 
 
     //    -------- Edite order Qyt ----
@@ -804,33 +804,51 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                                     )} */}
                                                                     {item.notes === null ? (
                                                                         <div key={item.id}>
-                                                                            {visibleInputId !== item.id && (
-                                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                    <span
-                                                                                        className='j-nota-blue ms-4 text-decoration-underline'
-                                                                                        onClick={() => toggleInput(item.id)}
-                                                                                    >
-                                                                                        + Nota
-                                                                                    </span>
+                                                                            {visibleInputId !== item.id ? (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
+                                                                                    <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
                                                                                 </div>
-                                                                            )}
-
-                                                                            {visibleInputId === item.id && (
+                                                                            ) : (
                                                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                                     <span className='j-nota-blue ms-4'>Nota:</span>
                                                                                     <input
                                                                                         type="text"
-                                                                                        className='ms-4 j-note-input'
+                                                                                        className='j-note-input'
                                                                                         value={noteValues}
                                                                                         onChange={(e) => handleNoteChange(item.id, e)}
-                                                                                        onKeyDown={handleNoteKeyDown(item.id)}
+                                                                                        onBlur={() => handleNoteKeyDown(item.id)}
+                                                                                        onKeyDown={(e) => {
+                                                                                            if (e.key === "Enter")
+                                                                                                handleNoteKeyDown(item.id)
+                                                                                        }}
                                                                                     />
                                                                                 </div>
                                                                             )}
                                                                         </div>
                                                                     ) : (
-                                                                        <div className='a_home_addnote ms-4' >
-                                                                            {item.notes}
+                                                                        < div key={item.id}>
+                                                                            {visibleInputId != item.id ? (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
+                                                                                    <span className='j-nota-blue ms-4'>Nota: {item.notes}</span>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                    <span className='j-nota-blue ms-4'>Nota:</span>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        className='j-note-input'
+                                                                                        value={noteValues}
+                                                                                        onChange={(e) => handleNoteChange(item.id, e)}
+                                                                                        onBlur={() => handleNoteKeyDown(item.id)}
+                                                                                        onKeyDown={(e) => {
+                                                                                            console.log(e.key);
+                                                                                            if (e.key == "Enter") {
+                                                                                                handleNoteKeyDown(item.id)
+                                                                                            }
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -858,12 +876,12 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                 <div className='fw-bold fs-5'>
                                                     Datos
                                                 </div>
-                                                
+
                                                 {/* <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                     ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora  text-danger'}`}>
                                                     {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ''}
                                                 </div> */}
-                                                 <div className={`bj-delivery-text-2 b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex align-items-center justify-content-center 
+                                                <div className={`bj-delivery-text-2 b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex align-items-center justify-content-center 
                                                     ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : orderData?.status.toLowerCase() === 'cancelled' ? 'b_ora text-danger' : 'b_ora text-danger'}`}>
                                                     {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : 'Unknown'}
                                                 </div>
@@ -931,7 +949,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={`${table?.name}  (${table?.id})`} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " v value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
                                         </div>
                                     </div>
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>

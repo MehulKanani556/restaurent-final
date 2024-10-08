@@ -25,15 +25,21 @@ const TableDatos = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
+  const orderId = queryParams.get("oId");
+
+  const {state} = useLocation();
+
+  // console.log(id,orderId,state);
+  const [rut1, setRut1] = useState("");
+  const [rut2, setRut2] = useState("");
+  const [rut3, setRut3] = useState("");
+
   const [obj1, setObj1] = useState([]);
 
   const [tId, setTId] = useState(id);
   const [tableData, setTableData] = useState([]);
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [rut1, setRut1] = useState("");
-  const [rut2, setRut2] = useState("");
-  const [rut3, setRut3] = useState("");
   const orderitem = [
     {
       image: img2,
@@ -64,7 +70,6 @@ const TableDatos = () => {
   const [countsoup, setCountsoup] = useState(
     orderitem.map((item) => parseInt(item.quantity))
   );
-
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showAllItems, setShowAllItems] = useState(false);
   const toggleShowAllItems = () => {
@@ -270,7 +275,7 @@ const TableDatos = () => {
     setSelectedRadio(value);
   };
 
-
+ 
 
   const handleRutChange = (e, setRut) => {
     let value = e.target.value.replace(/-/g, ""); // Remove any existing hyphen
@@ -422,6 +427,7 @@ const TableDatos = () => {
       );
     }
   };
+
   /* get name and image */
   const getItemInfo = (itemId) => {
     const item = obj1.find((item) => item.id === itemId);
@@ -550,6 +556,7 @@ const TableDatos = () => {
     updatedAddNotes[index] = true;
     setAddNotes(updatedAddNotes);
   };
+
   return (
     <div>
       <Header />
@@ -630,11 +637,9 @@ const TableDatos = () => {
                                 type="text"
                                 name="rut"
                                 value={rut1}
-                                
                                 onChange={(e) => handleRutChange(e, setRut1)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
-                            
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
 
                             </div>

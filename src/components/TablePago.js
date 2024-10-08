@@ -567,6 +567,7 @@ const TablePago = () => {
         // Remove the iframe after printing (or if printing fails)
         setTimeout(() => {
           document.body.removeChild(iframe);
+
         }, 500);
       };
     } else {

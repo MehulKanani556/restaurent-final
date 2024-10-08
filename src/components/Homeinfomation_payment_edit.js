@@ -47,7 +47,6 @@ const Homeinfomation_payment_edit = ({ item }) => {
     console.log(state);
 
 
-
     // =============new==========
     const [obj1, setObj1] = useState([]);
     const [orderData, setOrderData] = useState(null);
@@ -238,7 +237,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
     const getuserRole = () => {
         if (user && roles.length > 0) {
-            const role = roles.find((v) => v.id === user[0].role_id);
+            const role = roles.find((v) => v.id === user[0]?.role_id);
             if (role) {
                 setUserRole(role.name);
             }
@@ -430,31 +429,31 @@ const Homeinfomation_payment_edit = ({ item }) => {
         setNoteValues(e.target.value);
     };
 
-    const handleNoteKeyDown = (id) => async (e) => {
-        if (e.key === 'Enter') {
-            console.log(id);
-            try {
-                const response = await axios.post(
-                    `${API_URL}/order/addNote/${id}`,
-                    { notes: noteValues },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                console.log("Note added successfully:", response.data);
+    const handleNoteKeyDown = async (id) => {
+        console.log(id)
+        try {
+            const response = await axios.post(
+                `${API_URL}/order/addNote/${id}`,
+                { notes: noteValues },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            // console.log("Note added successfully:", response.data);
 
-                // setSavedNote(noteValues);
-                setNoteValues('');
-                setVisibleInputId(null);
-            } catch (error) {
-                console.error(
-                    "Error adding note:",
-                    error.response ? error.response.data : error.message
-                );
-            }
+            // setSavedNote(noteValues);
+            setNoteValues('');
+            setVisibleInputId(null);
+        } catch (error) {
+            console.error(
+                "Error adding note:",
+                error.response ? error.response.data : error.message
+            );
         }
+        getOrder();
+        handleOrderDetails();
     };
 
 
@@ -626,7 +625,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
     };
 
 
-
+    console.log(orderData);
 
     return (
         <div>
@@ -790,33 +789,51 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                                                     )} */}
                                                                     {item.notes === null ? (
                                                                         <div key={item.id}>
-                                                                            {visibleInputId !== item.id && (
-                                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                    <span
-                                                                                        className='j-nota-blue ms-4 text-decoration-underline'
-                                                                                        onClick={() => toggleInput(item.id)}
-                                                                                    >
-                                                                                        + Nota
-                                                                                    </span>
+                                                                            {visibleInputId !== item.id ? (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
+                                                                                    <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
                                                                                 </div>
-                                                                            )}
-
-                                                                            {visibleInputId === item.id && (
+                                                                            ) : (
                                                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                                     <span className='j-nota-blue ms-4'>Nota:</span>
                                                                                     <input
                                                                                         type="text"
-                                                                                        className='ms-4 j-note-input'
+                                                                                        className='j-note-input'
                                                                                         value={noteValues}
                                                                                         onChange={(e) => handleNoteChange(item.id, e)}
-                                                                                        onKeyDown={handleNoteKeyDown(item.id)}
+                                                                                        onBlur={() => handleNoteKeyDown(item.id)}
+                                                                                        onKeyDown={(e) => {
+                                                                                            if (e.key === "Enter")
+                                                                                                handleNoteKeyDown(item.id)
+                                                                                        }}
                                                                                     />
                                                                                 </div>
                                                                             )}
                                                                         </div>
                                                                     ) : (
-                                                                        <div className='a_home_addnote ms-4' >
-                                                                            {item.notes}
+                                                                        < div key={item.id}>
+                                                                            {visibleInputId != item.id ? (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
+                                                                                    <span className='j-nota-blue ms-4'>Nota: {item.notes}</span>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                    <span className='j-nota-blue ms-4'>Nota:</span>
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        className='j-note-input'
+                                                                                        value={noteValues}
+                                                                                        onChange={(e) => handleNoteChange(item.id, e)}
+                                                                                        onBlur={() => handleNoteKeyDown(item.id)}
+                                                                                        onKeyDown={(e) => {
+                                                                                            console.log(e.key);
+                                                                                            if (e.key == "Enter") {
+                                                                                                handleNoteKeyDown(item.id)
+                                                                                            }
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -844,16 +861,17 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                                 <div className='fw-bold fs-5'>
                                                     Datos
                                                 </div>
-
-                                                <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
+                                                {orderData && <>
+                                                    <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                     ${orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
-                                                    {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ''}
-                                                </div>
+                                                        {orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ''}
+                                                    </div>
 
-                                                <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
+                                                    <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                      ${orderData?.order_type.toLowerCase() === 'local' ? 'b_indigo' : orderData?.order_type.toLowerCase() === 'order now' ? 'b_ora ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'b_blue' : orderData?.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : orderData?.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>
-                                                    {orderData?.order_type.toLowerCase() === 'local' ? 'Local' : orderData?.order_type.toLowerCase().includes("with") ? 'Retiro ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'Entrega' : orderData?.order_type.toLowerCase() === 'uber' ? 'Uber' : orderData?.order_type}
-                                                </div>
+                                                        {orderData?.order_type.toLowerCase() === 'local' ? 'Local' : orderData?.order_type.toLowerCase().includes("with") ? 'Retiro ' : orderData?.order_type.toLowerCase() === 'delivery' ? 'Entrega' : orderData?.order_type.toLowerCase() === 'uber' ? 'Uber' : orderData?.order_type}
+                                                    </div></>
+                                                }
 
 
                                                 {/* <div className='btn a_btn_lightjamun my-3 bj-delivery-text-2 ' style={{ borderRadius: "10px" }}><span style={{ fontWeight: "600" }}>{orderData?.order_type}</span></div><br />

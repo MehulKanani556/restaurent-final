@@ -3,7 +3,7 @@ import Header from "./Header";
 import box from "../Image/Ellipse 20.png";
 import box4 from "../Image/box5.png";
 import { FaCircleCheck, FaMinus, FaPlus } from "react-icons/fa6";
-import { Accordion, Button, Modal } from "react-bootstrap";
+import { Accordion, Button, Modal, Spinner } from "react-bootstrap";
 import check from "../Image/Checkbox.png";
 import check5 from "../Image/Checkbox6.png";
 import Sidenav from "./Sidenav";
@@ -49,7 +49,7 @@ const DeliveryPago = () => {
     const regex = allowDecimal ? /^\d*\.?\d{0,2}$/ : /^\d*$/;
     return regex.test(value) ? value : "";
   };
-  const [tipError,setTipError] = useState('')
+  const [tipError, setTipError] = useState('')
 
   const handleprice = (event) => {
     let value = event.target.value.replace("$", "");
@@ -61,7 +61,7 @@ const DeliveryPago = () => {
     if (numericValue > maxTip) {
       value = maxTip.toFixed(2);
     }
-    if(value){
+    if (value) {
       setTipError('');
       setPrice(value);
       setTipAmount(parseFloat(value));
@@ -81,6 +81,7 @@ const DeliveryPago = () => {
   const [activeAccordionItem, setActiveAccordionItem] = useState("0");
   const [formErrors, setFormErrors] = useState({});
   const [show, setShow] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const handleClose = () => {
     setShow(false);
     setPrice('');
@@ -370,13 +371,14 @@ const DeliveryPago = () => {
 
     console.log(paymentData);
 
+    setIsProcessing(true)
 
     try {
       const response = await axios.post(`${apiUrl}/order/place_new`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
       // console.log(response.data)
-      if(response.data.success){
+      if (response.data.success) {
 
         try {
           const responsePayment = await axios.post(
@@ -388,6 +390,7 @@ const DeliveryPago = () => {
               }
             }
           )
+          setIsProcessing(false)
           // console.log(responsePayment.status);
           if (responsePayment.status) {
             localStorage.removeItem("cartItems");
@@ -397,15 +400,17 @@ const DeliveryPago = () => {
           }
           // console.log("payemnt suc", responsePayment.data);
         } catch (error) {
-          console.log("Payment not done." + error.message); 
+          setIsProcessing(false)
+          console.log("Payment not done." + error.message);
         }
       }
     } catch (error) {
+      setIsProcessing(false)
       console.error("Error creating order : ", error);
       //enqueueSnackbar (error?.response?.data?.message, { variant: 'error' })
     }
 
-    
+
 
 
     // localStorage.removeItem("cartItems");
@@ -1103,6 +1108,21 @@ const DeliveryPago = () => {
                             </div>
                           </Modal.Body>
                         </Modal>
+
+                        {/* processing */}
+                        <Modal
+                          show={isProcessing}
+                          keyboard={false}
+                          backdrop={true}
+                          className="m_modal  m_user "
+                        >
+                          <Modal.Body className="text-center">
+                            <p></p>
+                            <Spinner animation="border" role="status" style={{ height: '85px', width: '85px', borderWidth: '6px' }} />
+                            <p className="mt-2">Procesando solicitud...</p>
+                          </Modal.Body>
+                        </Modal>
+
 
                         <Modal
                           show={showSuccess}

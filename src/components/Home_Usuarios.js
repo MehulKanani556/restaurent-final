@@ -755,7 +755,7 @@ function Home_Usuarios() {
                                                             <Link to={`/home/usa/information/${order.id}`}>
                                                                 <td className='b_idbtn bj-delivery-text-2 ms-3' style={{ borderRadius: "10px" }}>{order.id}</td>
                                                             </Link>
-                                                           
+                                                            <td className='b_text_w'>{new Date(order?.created_at).toLocaleDateString('en-GB')}</td>
                                                             <td className='b_text_w'>{new Date(order?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                                             <td className='b_text_w'>{order.customer_name}</td>
                                                             <td className='b_text_w'>${order.order_details.reduce((acc,v)=>acc+parseInt(v.amount)*parseInt(v.quantity),0)-parseFloat(order.discount).toFixed(2)}</td>

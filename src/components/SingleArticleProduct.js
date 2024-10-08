@@ -1685,8 +1685,8 @@ export default function SingleArticleProduct() {
                                     </td>
                                   </tr>
                                 )} */}
-                              {datatab.length > 0 ? (
-                                datatab.map((order, index) => {
+                              {datatab?.length > 0 ? (
+                                datatab?.map((order, index) => {
                                   const payment = payments?.find(
                                     (p) => p.order_master_id === order.id
                                   );
@@ -1696,7 +1696,8 @@ export default function SingleArticleProduct() {
                                       : "No pagado";
 
                                   return (
-                                    <tr key={order.id} className="m_borbot p-3">
+                                    <tr key={order.id} className="m_borbot p-3"> 
+                                     
                                       <td >
                                       <Link to={`/home_Pedidos/paymet/${order.id}`}>
                                         <div className="m_idbtn m12">{order.id}</div>

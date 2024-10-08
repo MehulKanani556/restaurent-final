@@ -1922,7 +1922,7 @@ const Tables = () => {
                     <div className={"j-counter-order-data"}>
                       {tableData.map((tableItem) =>
                         tableItem.items
-                          .slice(0, showAll ? tableItem.items.length : 3)
+                          .slice(0, showAll ? tableItem.items.length : 2)
                           .map((item, index) => {
                             const itemInfo = getItemInfo(item.item_id);
                             return (
@@ -2037,7 +2037,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                     {tableData[0]?.items.length >= 2 &&
+                      {tableData[0]?.items.length >= 2 &&
                         <a
                           href="#"
                           onClick={handleShowMoreClick}
@@ -2256,7 +2256,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                      {tableData[0]?.items.length >= 2 &&
+                     {tableData[0]?.items.length >= 2 &&
                         <a
                           href="#"
                           onClick={handleShowMoreClick}

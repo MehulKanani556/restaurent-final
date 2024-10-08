@@ -392,26 +392,30 @@ const Home_Pedidos = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
+            console.log(response);
+            setIsProcessing(false);
             if (response.data.success) {
                 setPaymentData(response.data.data);
                 setPrintOrderData(order);
                 handleShow11();
             } else {
+                setIsProcessing(false);
+                alert("El pago está pendiente")
                 console.error('Error fetching payment data:', response.data.message);
             }
-
 
         } catch (error) {
             console.error(
                 "Error fetching allOrders:",
                 error.response ? error.response.data : error.message
             );
+            setIsProcessing(false);
+            // alert("El pago está pendiente")
+
         } finally {
             setIsProcessing(false);
         }
     };
-
     const handlePrint = async () => {
         const printContent = document.getElementById("receipt-content");
         if (printContent) {

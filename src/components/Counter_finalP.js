@@ -177,12 +177,28 @@ const Counter_finalP = () => {
     }));
   };
 
+  const getTotalCost = () => {
+    return (
+      cartItems.reduce(
+        (total, item, index) => total + parseInt(item.price) * item.count,
+        0
+      )
+    );
+  };
+  const totalCost = getTotalCost();
+  const discount = 1.0;
+  const finalTotal = totalCost - discount;
+  const taxAmount = finalTotal * 0.19;
+
   const handleChange = (event) => {
+
     let { name, value } = event.target;
+    
     value = value.replace(/[^0-9/./]/g, "");
     setCustomerData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
+      turn: value ? (parseFloat(value) - (finalTotal + taxAmount  + tipAmount)).toFixed(2) : 0
     }));
     setFormErrors((prevState) => ({
       ...prevState,
@@ -244,18 +260,7 @@ const Counter_finalP = () => {
     setCartItems(updatedCartItems);
   };
 
-  const getTotalCost = () => {
-    return (
-      cartItems.reduce(
-        (total, item, index) => total + parseInt(item.price) * item.count,
-        0
-      )
-    );
-  };
-  const totalCost = getTotalCost();
-  const discount = 1.0;
-  const finalTotal = totalCost - discount;
-  const taxAmount = finalTotal * 0.19;
+ 
 
 
   // ==== Get BOX Data =====
@@ -500,7 +505,6 @@ const Counter_finalP = () => {
                   </div>
                   <div className="  flex-grow-1 text-center">
                     <Link
-                      // to={"/counter/mostrador"}
                       to={"#"}
                       className="text-decoration-none px-2 sj_text_dark"
                     >

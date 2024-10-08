@@ -15,6 +15,7 @@ import { IoMdCloseCircle, IoMdInformationCircle } from 'react-icons/io';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { RiDeleteBin5Fill } from 'react-icons/ri';
+import { BsCalculatorFill } from 'react-icons/bs';
 
 export default function Homeinformation() {
 
@@ -513,9 +514,8 @@ export default function Homeinformation() {
     setNoteValues(e.target.value);
   };
 
-  const handleNoteKeyDown = (id) => async (e) => {
-    if (e.key === 'Enter') {
-      console.log(id);
+  const handleNoteKeyDown = async(id) => {
+    console.log(id)
       try {
         const response = await axios.post(
           `${API_URL}/order/addNote/${id}`,
@@ -526,7 +526,7 @@ export default function Homeinformation() {
             },
           }
         );
-        console.log("Note added successfully:", response.data);
+        // console.log("Note added successfully:", response.data);
 
         // setSavedNote(noteValues);
         setNoteValues('');
@@ -536,12 +536,19 @@ export default function Homeinformation() {
           "Error adding note:",
           error.response ? error.response.data : error.message
         );
-      }
-
-      getOrder();
-      handleOrderDetails();
     }
+    getOrder();
+    handleOrderDetails();
   };
+
+
+  const handleCredit = () => {
+    if (orderData?.status == 'delivered') {
+      navigate(`/home/client/crear/${id}`, { replace: true })
+    } else {
+      alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
+    }
+  }
 
   // =============end note==========
 
@@ -558,7 +565,6 @@ export default function Homeinformation() {
           button.classList.remove('bg-primary', 'text-light');
           button.classList.add('bg-light', 'text-dark');
         });
-
         // Add 'bg-primary' and 'text-light' to the clicked tab
         tab.classList.remove('bg-light', 'text-dark');
         tab.classList.add('bg-primary', 'text-light');
@@ -578,7 +584,7 @@ export default function Homeinformation() {
       setShowCancelOrderButton(false);
     }
   };
-  // console.log(orderData);
+  console.log(orderData);
 
 
   return (
@@ -599,17 +605,19 @@ export default function Homeinformation() {
 
                 <div className='d-flex flex-wrap me-4'>
                 {showCancelOrderButton ? (
-                    !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") && 
-                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
+                    !(orderData?.[0].status == 'delivered' || orderData?.[0].status == 'finalized' || orderData?.[0].status == "cancelled") && 
+                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancelar Pedido</div>
                   ) : (
-                    !(orderData?.status == "cancelled") &&
+                    !(orderData?.[0].status == "cancelled") && <>
                     <Link className='text-decoration-none' to={`/home/usa/information/payment_edit/${id}`}>
                       <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
                     </Link>
+                    <div className='btn bj-btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center ' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1 ' />Agregar Producto</div>
+                    </>
                   )}
                   {/* <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div> */}
-                  {!(orderData?.status == "cancelled") &&
-                    <div className='btn bj-btn-outline-primary b_mar_lef ms-2 py-2 text-nowrap d-flex align-item-center justify-content-center ' style={{ borderRadius: "10px" }} onClick={handleShow1Prod}> <FiPlus className='me-2 mt-1 ' />Agregar Producto</div>
+                  {showCancelOrderButton &&
+                     <div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
                   }
                 </div>
 
@@ -766,20 +774,13 @@ export default function Homeinformation() {
                                 </div>
 
                                 <div className='' style={{ marginBottom: "68px", cursor: "pointer" }}><a href='#' className='a_home_addnote ms-4 bj-delivery-text-3 '>
-                                  {v.notes === null ? (
+                                {v.notes === null ? (
                                     <div key={v.id}>
-                                      {visibleInputId !== v.id && (
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                          <span
-                                            className='j-nota-blue ms-4 text-decoration-underline'
-                                            onClick={() => toggleInput(v.id)}
-                                          >
-                                            + Nota
-                                          </span>
+                                      {visibleInputId !== v.id ? (
+                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
+                                          <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
                                         </div>
-                                      )}
-
-                                      {visibleInputId === v.id && (
+                                      ) : (
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                           <span className='j-nota-blue ms-4'>Nota:</span>
                                           <input
@@ -787,14 +788,39 @@ export default function Homeinformation() {
                                             className='j-note-input'
                                             value={noteValues}
                                             onChange={(e) => handleNoteChange(v.id, e)}
-                                            onKeyDown={handleNoteKeyDown(v.id)}
+                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            onKeyDown={(e)=>{
+                                              if (e.key === "Enter")
+                                                handleNoteKeyDown(v.id)
+                                              }}
                                           />
                                         </div>
                                       )}
                                     </div>
                                   ) : (
-                                    <div className='a_home_addnote ms-4' >
-                                      {v.notes}
+                                    < div key={v.id}>
+                                      {visibleInputId != v.id ? (
+                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
+                                          <span className='j-nota-blue ms-4'>Nota: {v.notes}</span>
+                                        </div>
+                                      ) : (
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <span className='j-nota-blue ms-4'>Nota:</span>
+                                          <input
+                                            type="text"
+                                            className='j-note-input'
+                                            value={noteValues}
+                                            onChange={(e) => handleNoteChange(v.id, e)}
+                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            onKeyDown={(e)=>{
+                                              console.log(e.key);
+                                              if (e.key == "Enter"){
+                                                handleNoteKeyDown(v.id)
+                                              }
+                                              }}
+                                          />
+                                        </div>
+                                      )}
                                     </div>
                                   )}
                                 </a></div>
@@ -812,11 +838,11 @@ export default function Homeinformation() {
                         <div className='d-flex justify-content-end align-items-center ' >
                           <div className='d-flex justify-content-end align-items-center me-3 '>
                             <div className='me-2 fs-4'><FaCalendarAlt className='bj-icon-size-change' /></div>
-                            <div className='pt-1 bj-delivery-text-3'>{new Date(orderData?.created_at).toLocaleDateString('en-GB')}</div>
+                            <div className='pt-1 bj-delivery-text-3'>{new Date(orderData?.[0].created_at).toLocaleDateString('en-GB')}</div>
                           </div>
                           <div className='d-flex justify-content-end align-items-center '>
                             <div className='me-2 fs-4 '><MdOutlineAccessTimeFilled /></div>
-                            <div className='pt-1 a_time bj-delivery-text-3'>{new Date(orderData?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                            <div className='pt-1 a_time bj-delivery-text-3'>{new Date(orderData?.[0].created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                           </div>
                         </div>
                         <div className='bj-delivery-text-15'>
@@ -880,11 +906,11 @@ export default function Homeinformation() {
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Cliente</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Plataforma</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                   </div>
 

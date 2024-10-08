@@ -49,8 +49,8 @@ const Informacira = () => {
   const [selectedHastaMonthReport, setSelectedHastaMonthReport] = useState(
     new Date().getMonth() + 1
   );
-  const [boxnameError , setBoxnameError] = useState();
-  const [boxcashError , setBoxcashError] = useState();
+  const [boxnameError, setBoxnameError] = useState();
+  const [boxcashError, setBoxcashError] = useState();
 
   useEffect(
     () => {
@@ -213,12 +213,12 @@ const Informacira = () => {
 
   // update box
   const handleSaveChanges = async () => {
-    if(!editedBoxName){
+    if (!editedBoxName) {
       setBoxnameError("por favor ingrese el nombre")
       return
     }
 
-    if(!editedCashierId){
+    if (!editedCashierId) {
       setBoxcashError("por favor seleccione cajero")
       return;
     }
@@ -358,7 +358,7 @@ const Informacira = () => {
     setIsProcessing(true);
     try {
       const response = await axios.post(
-        `${apiUrl}/sector/getWithTable`,{admin_id: admin_id},
+        `${apiUrl}/sector/getWithTable`, { admin_id: admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -1348,7 +1348,7 @@ const Informacira = () => {
                               value={editedBoxName}
                               onChange={(e) => {
                                 setEditedBoxName(e.target.value)
-                                if(e.target.value){
+                                if (e.target.value) {
                                   setBoxnameError('');
                                 }
                               }}
@@ -1372,11 +1372,11 @@ const Informacira = () => {
                               value={editedCashierId}
                               onChange={(e) => {
                                 setEditedCashierId(e.target.value);
-                                if(e.target.value){
+                                if (e.target.value) {
                                   setBoxcashError('');
                                 }
                               }
-                            }
+                              }
                             >
 
                               <option value="0">Cajero asignado</option>
@@ -1617,7 +1617,7 @@ const Informacira = () => {
                             />
                             <p className="mb-0 mt-2 h6 j-tbl-pop-1">Caja</p>
                             <p className="opacity-75 j-tbl-pop-2">
-                            Informe generado exitosamente
+                              Informe generado exitosamente
                             </p>
                           </div>
                         </Modal.Body>
@@ -1755,9 +1755,8 @@ const Informacira = () => {
                               key={box.id}
                               className="sjbordergray j-caja-text-2"
                             >
-                              <td className="p-3">{box.createdAt}</td>
-
-                              <td>{box.close_time}</td>
+                              <td className="p-3">{new Date(box.open_time).toLocaleDateString('en-GB')}<span className="ms-3">{new Date(box.open_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></td>
+                              <td className="ps-0">{new Date(box.close_time).toLocaleDateString('en-GB')}<span className="ms-3">{new Date(box.close_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></td>
                               <td>{box.open_amount}</td>
 
                               <td>{box.close_amount || "N/A"}</td>
@@ -1878,7 +1877,7 @@ const Informacira = () => {
                                   id="quien-abrio"
                                   className="sj_modelinput mt-2 w-100"
                                   placeholder="-"
-                                  value={users.find(user => user.id === selectedBox?.open_by)?.name || ""}
+                                  value={users?.find(user => user.id === selectedBox?.open_by)?.name || ""}
 
                                 />
                               </div>
@@ -1894,7 +1893,7 @@ const Informacira = () => {
                                   id="quien-cerro"
                                   className="sj_modelinput mt-2 w-100"
                                   placeholder="-"
-                                  value={users.find(user => user.id === selectedBox?.close_by)?.name || ""}
+                                  value={users?.find(user => user.id === selectedBox?.close_by)?.name || ""}
                                 />
                               </div>
                             </div>
@@ -2050,7 +2049,7 @@ const Informacira = () => {
                           className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
                         >
                           <Modal.Title className="modal-title j-caja-pop-up-text-1">
-                          Detalles de caja
+                            Detalles de caja
 
                           </Modal.Title>
                         </Modal.Header>
@@ -2075,7 +2074,7 @@ const Informacira = () => {
                                   id="quien-abrio"
                                   className="sj_modelinput mt-2 w-100"
                                   placeholder="-"
-                                  value={users.find(user => user.id === selectedBox?.open_by)?.name || ""}
+                                  value={users?.find(user => user.id === selectedBox?.open_by)?.name || ""}
                                 />
                               </div>
                               <div className="col-12 col-md-6 mb-3 pe-0">
@@ -2090,7 +2089,7 @@ const Informacira = () => {
                                   id="quien-cerro"
                                   className="sj_modelinput mt-2 w-100"
                                   placeholder="-"
-                                  value={users.find(user => user.id === selectedBox?.close_by)?.name || ""}
+                                  value={users?.find(user => user.id === selectedBox?.close_by)?.name || ""}
                                 />
                               </div>
                             </div>
@@ -2482,7 +2481,7 @@ const Informacira = () => {
                                   </button>
                                 </td>
                                 <td>
-                                  <Link to={`/home_Pedidos/paymet/${user.id}}`}>
+                                  <Link to={`/home_Pedidos/paymet/${user.id}`}>
                                     <button className="sjSky px-2 j-tbl-font-3">
                                       Ver detalles
                                     </button>

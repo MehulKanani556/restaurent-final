@@ -490,7 +490,6 @@ const Counter = () => {
                 </div>
                 <div className="  flex-grow-1 text-center">
                   <Link
-                    // to={"/counter/mostrador"}
                     to={"#"}
                     className="text-decoration-none px-2 sj_text_dark"
                   >
@@ -650,7 +649,6 @@ const Counter = () => {
                               <h5 className="text-white j-tbl-font-5">
                                 {item.name}
                               </h5>
-                              
                             </div>
                             <div className="d-flex align-items-center">
                               <div className="j-counter-mix">
