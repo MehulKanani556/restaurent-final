@@ -427,8 +427,8 @@ const Counter_finalP = () => {
         localStorage.removeItem("currentOrder");
         localStorage.removeItem("payment");
         setIsSubmitted(true);
-        // handleShow11();
-        handleClose11();
+        handleShow11();
+        // handleClose11();
 
         setIsProcessing(false);
         // handlePrint();

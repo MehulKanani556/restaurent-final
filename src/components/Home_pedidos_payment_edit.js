@@ -361,22 +361,27 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     // // ==== select items section ====
     const handleAddItem = (item) => {
+        setSelectedItemsMenu((prevArray) => {
+            const itemIndex = prevArray.findIndex((v) => v.item_id === item.id);
 
-        if (!selectedItemsMenu.some((v) => v.item_id == item.id)) {
-            const obj = {
-                item_id: item.id,
-                quantity: 1,
+            if (itemIndex !== -1) {
+                // Item exists, so remove it
+                const newArray = [...prevArray];
+                newArray.splice(itemIndex, 1);
+                setSelectedItemsCount(prevCount => prevCount - 1);
+                console.log(`Removed item ${item.id}`);
+                return newArray;
+            } else {
+                // Item doesn't exist, so add it
+                const newItem = {
+                    item_id: item.id,
+                    quantity: 1,
+                };
+                setSelectedItemsCount(prevCount => prevCount + 1);
+                console.log(`Added item ${item.id}`);
+                return [...prevArray, newItem];
             }
-            setSelectedItemsMenu((prevArray) => [...prevArray, obj]);
-            // console.log(selectedItemsMenu);
-            setSelectedItemsCount(selectedItemsCount + 1);
-            // setItemId((prevArray) => [...prevArray, item.id]);
-
-            // Perform any other action here when adding an item
-            console.log(`Added item ${item.id}`);
-        } else {
-            console.log(`Item ${item.id} already added`);
-        }
+        });
     };
 
     // // ==== select items section ====
@@ -743,7 +748,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                             fill>
                             <Tab
                                 eventKey="home"
-                                title="Orden"
+                                title="Pedidos"
                                 className="m_in text-white aaaaa  rounded"
                             >
                                 <div className='row'>
@@ -921,7 +926,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                     </div>
                                                 </div>
                                                 <div className='mx-auto text-center mt-3'>
-                                                    <div onClick={handleShow20} className='btn text-white j-btn-primary w-100  border-0' style={{ padding: "8px 12px", borderRadius: "8px" }}>Guardar cambios</div>
+                                                    <div onClick={handleShow20} className='btn text-white j-btn-primary w-100  border-0' style={{ padding: "8px 12px", borderRadius: "8px" }}>{orderData?.status !="cancelled" ? "Guardar cambios":"Pagar ahora"}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -949,7 +954,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " v value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 "  value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
                                         </div>
                                     </div>
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
@@ -1132,59 +1137,66 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                     </div>
                                 </div>
                                 <div className="row p-2">
-                                    {filteredItemsMenu.map((ele, index) => (
-                                        <div
-                                            className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
-                                            keys={index}
-                                        >
-                                            <div>
-                                                <div class="card m_bgblack text-white position-relative">
-                                                    <img
-                                                        src={`${API}/images/${ele.image}`}
-                                                        class="card-img-top object-fit-fill rounded"
-                                                        alt="..."
-                                                        style={{ height: "162px" }}
-                                                    />
-                                                    <div class="card-body">
-                                                        <h6 class="card-title">{ele.name}</h6>
-                                                        <h6 class="card-title">${ele.sale_price}</h6>
-                                                        <p class="card-text opacity-50">
-                                                            Codigo: {ele.code}
-                                                        </p>
-                                                        <div class="btn w-100 btn-primary text-white" onClick={() => handleAddItem(ele)}>
-                                                            <a
-                                                                href="# "
-                                                                className="text-white text-decoration-none"
-                                                                style={{ fontSize: "14px" }}
-                                                            >
-                                                                <span className="ms-1">Añadir </span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-
-                                                    <div
-                                                        className="position-absolute "
-                                                        style={{ cursor: "pointer" }}
-                                                    >
-                                                        <Link
-                                                            to={`/articles/singleatricleproduct/${ele.id}`}
-                                                            className="text-white text-decoration-none"
-                                                        >
-                                                            <p
-                                                                className=" px-1  rounded m-2"
-                                                                style={{ backgroundColor: "#374151" }}
-                                                            >
-                                                                <IoMdInformationCircle />{" "}
-                                                                <span style={{ fontSize: "12px" }}>
-                                                                    Ver información
-                                                                </span>
+                                {filteredItemsMenu.map((ele, index) => {
+                                        const isAdded = selectedItemsMenu.length > 0 ? selectedItemsMenu.some((v) => v.item_id == ele.id) : false;
+                                        return (
+                                            <div
+                                                className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
+                                                keys={index}
+                                            >
+                                                <div>
+                                                    <div class="card m_bgblack text-white position-relative">
+                                                        <img
+                                                            src={`${API}/images/${ele.image}`}
+                                                            class="card-img-top object-fit-fill rounded"
+                                                            alt="..."
+                                                            style={{ height: "162px" }}
+                                                        />
+                                                        <div class="card-body">
+                                                            <h6 class="card-title">{ele.name}</h6>
+                                                            <h6 class="card-title">${ele.sale_price}</h6>
+                                                            <p class="card-text opacity-50">
+                                                                Codigo: {ele.code}
                                                             </p>
-                                                        </Link>
+                                                            <div class="btn w-100 btn-primary text-white"
+                                                                style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
+                                                                onClick={() => handleAddItem(ele)}>
+                                                                <a
+                                                                    href="# "
+                                                                    className="text-white text-decoration-none"
+                                                                    style={{ fontSize: "14px" }}
+                                                                >
+                                                                    <span className="ms-1">
+                                                                        {isAdded ? 'Agregado' : 'Agregar al menú'}
+                                                                    </span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            className="position-absolute "
+                                                            style={{ cursor: "pointer" }}
+                                                        >
+                                                            <Link
+                                                                to={`/articles/singleatricleproduct/${ele.id}`}
+                                                                className="text-white text-decoration-none"
+                                                            >
+                                                                <p
+                                                                    className=" px-1  rounded m-2"
+                                                                    style={{ backgroundColor: "#374151" }}
+                                                                >
+                                                                    <IoMdInformationCircle />{" "}
+                                                                    <span style={{ fontSize: "12px" }}>
+                                                                        Ver información
+                                                                    </span>
+                                                                </p>
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -1258,11 +1270,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
                             />
                             <p className="mb-0 mt-3 h6">
                                 {" "}
-                                ¿Estás seguro de que quieres eliminar este menú?
+                                ¿Estás seguro de que quieres eliminar este pedido?
                             </p>
                         </div>
                     </Modal.Body>
-                    <Modal.Footer className="border-0 ">
+                    <Modal.Footer className="border-0 justify-content-center">
                         <Button
                             className="j-tbl-btn-font-1 b_btn_close"
                             variant="danger"
@@ -1290,11 +1302,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
                 >
                     <Modal.Header closeButton className="border-0" />
                     <Modal.Body>
-                        <div className="text-center">
-                            <img src={require("../Image/trash-outline-secondary.png")} alt="" />
+                        <div className="j-modal-trash  text-center">
+                            <img src={require("../Image/trash-outline.png")} alt="" />
                             <p className="mb-0 mt-3 h6">
                                 {" "}
-                                menú Ha sido eliminada correctamente
+                                Pedido Ha sido eliminada correctamente
                             </p>
                         </div>
                     </Modal.Body>

@@ -708,7 +708,7 @@ export default function Home_Pedidos_paymet() {
               fill>
               <Tab
                 eventKey="home"
-                title="Orden"
+                title="Pedidos"
                 className="m_in text-white aaaaa  rounded"
               >
                 <div className='row'>

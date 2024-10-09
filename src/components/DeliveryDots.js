@@ -292,7 +292,7 @@ const DeliveryDots = () => {
 
     let specificData = {};
 
-    if (selectedRadio === "4") {
+    if (selectedRadio === "3") {
       specificData = {
         business_name: formData.bname,
         ltda: formData.ltda
@@ -310,14 +310,14 @@ const DeliveryDots = () => {
     }
 
     // Name validation
-    if (data.receiptType !== "4") {
+    if (data.receiptType !== "3") {
       if (!data.firstname || data.firstname.trim() === "") {
         errors.fname = "Se requiere el primer nombre";
       }
     }
 console.log(data)
     // Business name validation for receipt type 4
-    if (data.receiptType === "4") {
+    if (data.receiptType === "3") {
       if (!data.business_name || data.business_name.trim() === "") {
         errors.business_name = "Se requiere el nombre de la empresa";
       }
@@ -398,7 +398,7 @@ console.log(data)
         number: paymentData.phone,
         bname: paymentData.business_name,
         ltda: paymentData.ltda,
-        tipoEmpresa: paymentData.receiptType === "4" ? paymentData.ltda : "0",
+        tipoEmpresa: paymentData.receiptType === "3" ? paymentData.ltda : "0",
         rut: paymentData.receiptType == "1" ? paymentData.rut : paymentData.receiptType == "2" ? paymentData.rut : paymentData.rut,
       })
       setActiveAccordionItem(paymentData.receiptType); // {{ edit_1 }}

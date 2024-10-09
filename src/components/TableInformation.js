@@ -773,10 +773,11 @@ const TableInformation = () => {
                             type="text"
                             className="form-control j-tbl-information-input"
                             id="exampleFormControlInput1"
-                            placeholder="Damian Lopez"
+                            placeholder="-"
                             value={userData[0]?.name}
                             readOnly
                           />
+                          {console.log(userData)}
                         </div>
                         <div className="col-6 mb-3">
                           <label
@@ -789,7 +790,7 @@ const TableInformation = () => {
                             type="text"
                             className="form-control j-tbl-information-input"
                             id="exampleFormControlInput1"
-                            placeholder="20/03/2024"
+                            placeholder="-"
                             value={new Date(tableData?.created_at).toLocaleDateString('en-GB')}
                             readOnly
                           />
@@ -805,7 +806,7 @@ const TableInformation = () => {
                             type="text"
                             className="form-control j-tbl-information-input"
                             id="exampleFormControlInput1"
-                            placeholder="4"
+                            placeholder="-"
                             // value={tableData?.sector_id}
                             value={userTableData?.name}
                             readOnly
@@ -822,7 +823,7 @@ const TableInformation = () => {
                             type="text"
                             className="form-control j-tbl-information-input"
                             id="exampleFormControlInput1"
-                            placeholder="1"
+                            placeholder="-"
                             value={tableData?.id}
                             readOnly
                           />

@@ -20,6 +20,7 @@ const Home_Pedidos = () => {
     const [boxes, setboxes] = useState([]);
     const [orderData, setOrderData] = useState([]);
     const admin_id = sessionStorage.getItem("admin_id");
+    const [users, setUsers] = useState([]);
     // const [selectedFilters, setSelectedFilters] = useState({
     //     All: false,
     //     Received: false,
@@ -38,11 +39,10 @@ const Home_Pedidos = () => {
 
 
     useEffect(() => {
-        // setIsProcessing(true);
         getBox();
         getAllorder();
         getSector();
-        // setIsProcessing(false);
+        getUser();
     }, [])
 
     useEffect(() => {
@@ -52,7 +52,28 @@ const Home_Pedidos = () => {
         // setIsProcessing(false);
     }, [orderAlldata, sectordata, boxes])
 
+    const getUser = async () => {
+        // setIsProcessing(true);
 
+        try {
+            const response = await axios.get(`${apiUrl}/get-users`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log(response.data);
+            setUsers(response.data);
+        } catch (error) {
+            console.error(
+                "Error fetching allOrder:",
+                error.response ? error.response.data : error.message
+            );
+        }
+        //   setIsProcessing(false);
+
+    }
     const getAllorder = async () => {
         setIsProcessing(true);
         try {
@@ -118,48 +139,29 @@ const Home_Pedidos = () => {
 
         let nsdata = [];
         orderAlldata.map((v) => {
-            
-            
             if (v.status != "cancelled") {
                 let obj = { ...v };
                 let flages = 0;
                 let flageb = 0;
                 sectordata.map(s => s.tables.map((a) => {
-
-                    // if (a.order_id == v.id) {
-                    //     console.log(a.order_id, v.id);
-                    //     obj.sector = s.name;
-                    //     obj.table = a.name
-                    //     obj.table_status = a.status
-                    //     flages = 1;
-                    // }
                     if (a.id == v.table_id) {
-                        // console.log(a.order_id, v.id);
                         obj.sector = s.name;
                         obj.table = a.name
                         obj.table_status = a.status
                         flages = 1;
                     }
                 }));
-                boxes.map((b) => {
-                    if (b.user_id == v.user_id) {
-                        // console.log(b.user_id, v.user_id);
-
+                users.map((b) => {
+                    if (b.id == v.user_id) {
                         obj.box = b.name;
                         flageb = 1;
                     }
                 })
-                // if (flages == 1) {
-                //     nsdata.push(obj);
-                //     // ndata.push(obj)
-                // }
                 nsdata.push(obj);
-                // ndata.push(obj)
             }
         })
         nsdata.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         setOrderData(nsdata);
-
     }
 
 

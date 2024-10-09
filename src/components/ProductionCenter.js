@@ -145,6 +145,9 @@ const role = sessionStorage.getItem("role");
     setShowCreate(false);
     setProdName("");
     setPrinterCode("");
+    setProdNameError("");
+    setPrinterCodeError("");
+
   };
   const handleShowCreate = () => setShowCreate(true);
 
@@ -443,7 +446,7 @@ const role = sessionStorage.getItem("role");
           `${apiUrl}/create/production-centers`,
           {
             name: prodName,
-            printer_code: printerCode
+            printer_code: printerCode,admin_id,
           },
           {
             headers: {
@@ -558,7 +561,7 @@ const role = sessionStorage.getItem("role");
 
       const response = await axios.post(
         `${apiUrl}/update/production-centers/${currentProdCenter.id}`,
-        {updatedData},
+        {...updatedData,admin_id},
         {
           headers: {
             Authorization: `Bearer ${token}`

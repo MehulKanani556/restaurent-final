@@ -586,7 +586,16 @@ export default function Homeinformation() {
   };
   console.log(orderData);
 
-
+  const translateOrderType = (orderType) => {
+    const translations = {
+        'local': 'Local',
+        'withdraw': 'Retirar',
+        'delivery': 'Entrega',
+        'uber': 'Uber',
+        // Add more translations as needed
+    };
+    return translations[orderType?.toLowerCase()] || orderType; // Fallback to original if not found
+};
   return (
     <div>
       <div className="m_bg_black">
@@ -739,7 +748,7 @@ export default function Homeinformation() {
               fill>
               <Tab
                 eventKey="home"
-                title="Orden"
+                title="Pedidos"
                 className="m_in text-white m-3 aaaaa rounded">
                 <div className='row'>
                   <div className='col-xl-7 ps-0 col-12 overflow-hidden '>
@@ -906,11 +915,12 @@ export default function Homeinformation() {
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Cliente</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.[0]?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white'>
                       <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Plataforma</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={translateOrderType(orderData?.[0]?.order_type)} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
+                      {/* <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.[0]?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/> */}
                     </div>
                   </div>
 

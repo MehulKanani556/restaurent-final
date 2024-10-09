@@ -2037,7 +2037,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                      {tableData[0]?.items.length >= 2 &&
+                      {tableData[0]?.items.length >= 4 &&
                         <a
                           href="#"
                           onClick={handleShowMoreClick}
@@ -2256,7 +2256,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                     {tableData[0]?.items.length >= 2 &&
+                     {tableData[0]?.items.length >= 4 &&
                         <a
                           href="#"
                           onClick={handleShowMoreClick}

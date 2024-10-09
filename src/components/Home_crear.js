@@ -27,7 +27,7 @@ export default function Home_crear({ item }) {
     const navigate = useNavigate()
     const { state } = useLocation();
     console.log(state);
-
+    const [orderUser, setOrderUser] = useState([]);
     console.log(id);
     // const [counts, setCounts] = useState(item ? { [item.id]: 0 } : {});
     // const [counts, setCounts] = useState(item ? { [item.id]: 0 } : {});
@@ -236,6 +236,7 @@ export default function Home_crear({ item }) {
         getAllorder();
         getItems();
         fetchUserPayment();
+        fetchPaymentUser();
 
     }, [id, deleteProductId]);
 
@@ -635,7 +636,10 @@ export default function Home_crear({ item }) {
                     setShowcreditfinal(true);
                     setTimeout(() => {
                         setShowcreditfinal(false);
-                        navigate("/home/client/detail", { state });
+                        let use = {user : {...orderUser}  }; // if you need to modify user later
+                        navigate("/home/client/detail", {
+                            state: state ? state : use
+                        });
                     }, 2000);
                 } else {
                     console.error("Error: The request was successful, but the response indicates a failure.");
@@ -645,7 +649,51 @@ export default function Home_crear({ item }) {
             }
         }
     };
+    const fetchPaymentUser = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(`${apiUrl}/get-payments`, { admin_id: admin_id }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
+            console.log(response.data.result);
+
+            // Group users and collect their order_master_ids
+            const groupedUsers = groupUsersByDetails(response.data.result);
+            console.log(groupedUsers);
+
+            //   console.log(id);
+            setOrderUser(groupedUsers.find(v => v.orderIds.some(a => a == id)));
+            //   console.log(groupedUsers.find(v => v.orderIds.some(a=>a == id)));
+
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+        setIsProcessing(false);
+    }
+    //   console.log(orderUser);
+
+
+    const groupUsersByDetails = (users) => {
+        setIsProcessing(true);
+        const groupedUsers = {};
+
+        users.forEach(user => {
+            const key = `${user.firstname}|${user.business_name}|${user.email}`;
+
+            if (!groupedUsers[key]) {
+                groupedUsers[key] = {
+                    ...user,
+                    orderIds: [user.order_master_id]
+                };
+            } else {
+                groupedUsers[key].orderIds.push(user.order_master_id);
+            }
+        });
+        setIsProcessing(false);
+
+        return Object.values(groupedUsers);
+    }
 
     return (
         <div className="m_bg_black">

@@ -684,7 +684,7 @@ const BHomeDelivery = () => {
           <Sidenav />
         </div>
         <div className="j-counter-menu sidebar">
-          <div className="j-counter-header">
+          <div className="j-counter-header j_counter_header_last_change">
             <h2 className="text-white mb-3 sjfs-18">Mostrador</h2>
             <div className="j-menu-bg-color ">
               <div className="j-tracker-mar d-flex justify-content-between ">
@@ -1042,10 +1042,10 @@ const BHomeDelivery = () => {
             <div className="j-modal-trash text-center">
               <img src={require("../Image/trash-outline.png")} alt="" />
               <p className="mb-0 mt-3 h6 j-tbl-pop-1">
-                Order eliminado
+                Pedido eliminado
               </p>
               <p className="opacity-75 j-tbl-pop-2">
-                El Order ha sido eliminado correctamente
+                El pedido ha sido eliminado correctamente
               </p>
             </div>
           </Modal.Body>

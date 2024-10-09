@@ -29,7 +29,6 @@ const DeliveryPago = () => {
   const [payment, setPayment] = useState(
     JSON.parse(localStorage.getItem("payment"))
   );
-
   const [orderType, setOrderType] = useState(
     JSON.parse(localStorage.getItem("currentOrder")) || []
   );
@@ -156,7 +155,10 @@ const DeliveryPago = () => {
   };
 
   const initialCustomerData = {
-    amount: "",
+    cashAmount: "",      // Amount for cash payment
+    debitAmount: "",     // Amount for debit payment
+    creditAmount: "",    // Amount for credit payment
+    transferAmount: "",  // Amount for transfer payment
     turn: ""
   };
 
@@ -166,7 +168,11 @@ const DeliveryPago = () => {
   const handleCheckboxChange = (value) => {
     if (selectedCheckboxes.includes(value)) {
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
-      setCustomerData(initialCustomerData);
+      // Do not reset the entire customerData, only the specific amount
+      setCustomerData((prevData) => ({
+        ...prevData,
+        [value + "Amount"]: "" // Reset only the deselected payment type amount
+      }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
     }
@@ -179,12 +185,13 @@ const DeliveryPago = () => {
 
   const handleChange = (event) => {
     let { name, value } = event.target;
-    value = value.replace(/[^0-9/./]/g, "");
+    value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
     setCustomerData((prevState) => ({
       ...prevState,
-      [name]: value,
-      turn: value ? ((parseInt(value) - (finalTotal + taxAmount + tipAmount).toFixed(2))).toFixed(2) : 0
+      [name]: value, // Update the specific payment type amount
+      turn: value ? ((parseFloat(value) - (finalTotal + taxAmount + tipAmount)).toFixed(2)) : 0 // Ensure correct calculation
     }));
+    console.log("Payment",value)
     setFormErrors((prevState) => ({
       ...prevState,
       [name]: undefined
@@ -322,6 +329,7 @@ const DeliveryPago = () => {
 
     return errors;
   };
+  console.log("payment: ", payment.firstname && payment.firstname.trim() !== ""? payment.firstname: payment.business_name,payment)
 
   // submit
   const handleSubmit = async () => {
@@ -346,13 +354,13 @@ const DeliveryPago = () => {
         order_type: orderType.orderType,
         payment_type: selectedCheckboxes[0],
         status: "received",
-        discount: discount, // Use the discount value from your state
-        user_id: userId, // You might want to dynamically set this
-        delivery_cost: 0, // You might want to dynamically set this
+        discount: discount,
+        user_id: userId,
+        delivery_cost: 0,
         customer_name:
           payment.firstname && payment.firstname.trim() !== ""
             ? payment.firstname
-            : payment.businessname,
+            : payment.business_name,
         reason: "",
         person: "",
         tip: tipAmount,
@@ -619,9 +627,9 @@ const DeliveryPago = () => {
                               <br />
                               <input
                                 type="text"
-                                id="name"
-                                name="amount"
-                                value={`$${customerData.amount || ""}`}
+                                id="cashAmount" // change
+                                name="cashAmount" // change
+                                value={`$${customerData.cashAmount || ""}`} // change
                                 onChange={handleChange}
                                 className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
                               />
@@ -652,11 +660,7 @@ const DeliveryPago = () => {
                     <Accordion.Header>
                       <div
                         onClick={() => handleCheckboxChange("debit")}
-                        className={`sj_bg_dark px-4 py-2 sj_w-75 ${selectedCheckboxes.includes(
-                          "debit"
-                        )
-                          ? "active"
-                          : ""}`}
+                        className={`sj_bg_dark px-4 py-2 sj_w-75 ${selectedCheckboxes.includes("debit") ? "active" : ""}`}
                       >
                         <input
                           type="checkbox"
@@ -666,7 +670,6 @@ const DeliveryPago = () => {
                           onChange={() => handleCheckboxChange("debit")}
                           className="me-2 j-change-checkbox"
                         />
-
                         <p className="d-inline px-3">Tarjeta de debito</p>
                       </div>
                     </Accordion.Header>
@@ -678,9 +681,9 @@ const DeliveryPago = () => {
                             <br />
                             <input
                               type="text"
-                              id="name"
-                              name="amount"
-                              value={`$${customerData.amount || ""}`}
+                              id="debitAmount" // Ensure this ID is unique
+                              name="debitAmount" // Ensure this name matches the state
+                              value={`$${customerData.debitAmount || ""}`} // Ensure correct binding
                               onChange={handleChange}
                               className="sj_bg_dark sj_width_input px-4 py-2 text-white"
                             />
@@ -724,9 +727,10 @@ const DeliveryPago = () => {
                               <br />
                               <input
                                 type="text"
-                                id="name"
-                                name="amount"
-                                value={`$${customerData.amount || ""}`}
+                                id="creditAmount"
+                                name="creditAmount"
+                                value={`$${customerData.creditAmount || ""}`}
+                                onChange={handleChange}
                                 className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
                               />
                               {formErrors.amount && (
@@ -769,9 +773,9 @@ const DeliveryPago = () => {
                             <br />
                             <input
                               type="text"
-                              id="name"
-                              name="amount"
-                              value={`$${customerData.amount || ""}`}
+                              id="transferAmount"
+                              name="transferAmount"
+                              value={`$${customerData.transferAmount || ""}`}
                               onChange={handleChange}
                               className="sj_bg_dark sj_width_input px-4 py-2 text-white"
                             />
