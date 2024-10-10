@@ -83,7 +83,7 @@ const TableInformation = () => {
   );
 
 
-  const gettableData = async (tId) => {
+  const gettableData = async () => {
     if (tId) {
       try {
         const response = await axios.get(

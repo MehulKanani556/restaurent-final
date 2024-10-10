@@ -566,7 +566,7 @@ export default function Home_Pedidos_paymet() {
   };
 
   const handleCredit = () => {
-    if (orderData?.status == 'delivered') {
+    if (orderData?.[0]?.status == 'delivered') {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
       alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')

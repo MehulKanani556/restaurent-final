@@ -111,7 +111,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
         getSubFamily();
         setActiveTab(state ? state : "home")
         setIsProcessing(false);
-    }, [noteValues, show1Prod, deleteProductId]);
+    }, [ show1Prod, deleteProductId]);
 
     useEffect(() => {
         if (orderData && items.length > 0) {

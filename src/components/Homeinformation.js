@@ -543,7 +543,8 @@ export default function Homeinformation() {
 
 
   const handleCredit = () => {
-    if (orderData?.status == 'delivered') {
+    {console.log(orderData)}
+    if (orderData?.[0]?.status == 'delivered') {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
       alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')

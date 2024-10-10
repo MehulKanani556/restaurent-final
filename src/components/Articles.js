@@ -191,6 +191,7 @@ export default function Articles() {
         }
       });
       setParentCheck(response.data);
+      setFamilies(response.data);
     } catch (error) {
       console.error(
         "Error fetching roles:",
@@ -257,28 +258,28 @@ export default function Articles() {
   const [families, setFamilies] = useState([]);
   const [subFamilies, setSubFamilies] = useState([]);
 
-  useEffect(
-    () => {
-      let config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: apiUrl + "/family/getFamily",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
+  // useEffect(
+  //   () => {
+  //     let config = {
+  //       method: "get",
+  //       maxBodyLength: Infinity,
+  //       url: apiUrl + "/family/getFamily",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`
+  //       }
+  //     };
 
-      axios
-        .request(config)
-        .then((response) => {
-          setFamilies(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    [apiUrl, token]
-  );
+  //     axios
+  //       .request(config)
+  //       .then((response) => {
+  //         setFamilies(response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.error(error);
+  //       });
+  //   },
+  //   [apiUrl, token]
+  // );
 
   const getSubFamilies = () => {
     let family = [];
@@ -311,7 +312,7 @@ export default function Articles() {
   const [famName, setFamName] = useState("");
   // const [checkedParents, setCheckedParents] = useState({});
   const [checkedParents, setCheckedParents] = useState(
-    parentCheck.reduce((acc, family) => ({ ...acc, [family.id]: true }), {})
+    parentCheck?.reduce((acc, family) => ({ ...acc, [family.id]: true }), {})
   );
 
   const handleParentChange = (parentId) => {
@@ -324,7 +325,7 @@ export default function Articles() {
       const updatedSelectedNames = Object.keys(newCheckedState)
         .filter((key) => newCheckedState[key])
         .map((key) => {
-          const family = parentCheck.find(
+          const family = parentCheck?.find(
             (family) => family.id === parseInt(key)
           );
           return family ? family.name : "";
@@ -358,10 +359,10 @@ export default function Articles() {
           maxBodyLength: Infinity
         }
       )
-      .then(async function (response) {
+      .then(function (response) {
         handleShowCreSuc();
-        await fetchFamilyData(); // Ensure this is awaited
-        await fetchSubFamilyData();
+        fetchFamilyData(); // Ensure this is awaited
+        fetchSubFamilyData();
         setFamName("");
         setFamilyError("");
         //enqueueSnackbar (response.data?.notification, { variant: 'success' })
@@ -411,10 +412,10 @@ export default function Articles() {
           maxBodyLength: Infinity
         }
       )
-      .then(async function (response) {
+      .then(function (response) {
         handleShowCreSubSuc();
-        await fetchFamilyData(); // Ensure this is awaited
-        await fetchSubFamilyData();  // Refresh family data
+        fetchFamilyData(); // Ensure this is awaited
+        fetchSubFamilyData();  // Refresh family data
         setIsProcessing(false);
         setSubFamName("");
         setSubSelectName("");
@@ -464,6 +465,7 @@ export default function Articles() {
         fetchFamilyData();
         fetchSubFamilyData();
         setFamilyError("");
+        // fetchProductionCenters();
       })
       .catch(function (error) {
         console.error(
@@ -811,7 +813,7 @@ export default function Articles() {
   // **********************************************
 
   const handleshowEditSubFamDel2 = (subFamily) => {
-    const familyId = parentCheck.find(family => family.name === subFamily.family_name)?.id;
+    const familyId = parentCheck?.find(family => family.name === subFamily.family_name)?.id;
     setSelectedSubFamily({
       ...subFamily,
       family_id: familyId || "" // Set to empty string if familyId is undefined
@@ -980,7 +982,7 @@ export default function Articles() {
                           }}
                         >
                           <option value="">Seleccionar</option>
-                          {parentCheck.map((ele) => (
+                          {parentCheck?.map((ele) => (
                             <option key={ele.id} value={ele.id}>
                               {ele.name}
                             </option>
@@ -1071,7 +1073,7 @@ export default function Articles() {
                   </Modal>
                   <div className="py-3 b_bring_b mx-3">
                     {Array.isArray(parentCheck) &&
-                      parentCheck.map((parentItem) => (
+                      parentCheck?.map((parentItem) => (
                         <div key={parentItem.id}>
                           <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
                             <div
@@ -1113,7 +1115,7 @@ export default function Articles() {
                                       childItem.family_name ===
                                       parentItem.name
                                   )
-                                  .map((childItem) => (
+                                  ?.map((childItem) => (
                                     <div key={childItem.id}>
                                       <div className="d-flex align-content-center justify-content-between my-2">
                                         <div style={{ fontSize: "14px" }}>
@@ -1350,7 +1352,7 @@ export default function Articles() {
                       }}
                     >
                       <option value="">Seleccionar</option>
-                      {parentCheck.map((family) => (
+                      {parentCheck?.map((family) => (
                         <option key={family.id} value={family.id}>
                           {family.name}
                         </option>
@@ -1593,7 +1595,7 @@ export default function Articles() {
                                 onChange={handleInputChange}
                               >
                                 <option selected>Seleccionar</option>
-                                {productionSel.map((ele) => (
+                                {productionSel?.map((ele) => (
                                   <option key={ele.id} value={ele.id}>
                                     {ele.name}
                                   </option>
@@ -1686,7 +1688,7 @@ export default function Articles() {
                                   }}
                                 >
                                   <option selected>Seleccionar</option>
-                                  {families.map((family) => (
+                                  {families?.map((family) => (
                                     <option key={family.id} value={family.id}>
                                       {family.name}
                                     </option>
@@ -1715,7 +1717,7 @@ export default function Articles() {
                                   onChange={handleInputChange}
                                 >
                                   <option selected>Seleccionar</option>
-                                  {subFamilies.map((subFamily) => (
+                                  {subFamilies?.map((subFamily) => (
                                     <option
                                       key={subFamily.id}
                                       value={subFamily.id}
@@ -1893,7 +1895,7 @@ export default function Articles() {
                           .filter((item) =>
                             selectedSubFamilies.includes(item.sub_family_id)
                           )
-                          .map((ele, index) => (
+                          ?.map((ele, index) => (
                             <div
                               className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                               key={ele.id}
@@ -1918,7 +1920,7 @@ export default function Articles() {
                       obj1.filter((item) => checkedParents[item.family_id]).length > 0 ? (
                         obj1
                           .filter((item) => checkedParents[item.family_id])
-                          .map((ele, index) => (
+                          ?.map((ele, index) => (
                             <div
                               className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                               key={ele.id}
@@ -1943,7 +1945,7 @@ export default function Articles() {
                       </div>
                     )
                   ) : (
-                    obj1.map((ele, index) => (
+                    obj1?.map((ele, index) => (
                       <div
                         className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                         key={ele.id}

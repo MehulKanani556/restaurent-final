@@ -150,7 +150,8 @@ const Caja = () => {
         try {
            const response = await axios.post(`${apiUrl}/box/create`, {
                 name: boxName,
-                user_id: cashierAssigned
+                user_id: cashierAssigned,
+                admin_id: admin_id, // Get the admin_id from sessionStorage
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -275,18 +276,18 @@ const Caja = () => {
                                                 onChange={handleInputChange}
                                             >
                                                 <option value="">Selecciona un cajero</option>
-                                                {/* {cashier.map(user => (
+                                                {cashier.map(user => (
                                                     <option key={user.id} value={user.id}>
                                                         {user.name}
                                                     </option>
-                                                ))} */}
+                                                ))}
                                                 {/* // Filter the cashier array dynamically based on names */}
                                                 {/* {cashier.filter(user => !data.some(d => d.user_id === user.id)).map(order => (
                                                     <option key={order.id} value={order.id}>
                                                         {order.name}
                                                     </option>
                                                 ))} */}
-                                                 {data.length === 0 ? (
+                                                 {/* {data.length === 0 ? (
                                                     cashier.map(order => (
                                                         <option key={order.id} value={order.id}>
                                                             {order.name}
@@ -300,7 +301,7 @@ const Caja = () => {
                                                                 {order.name}
                                                             </option>
                                                         ))
-                                                )}
+                                                )} */}
                                             </select>
                                             {validationErrors.cashierAssigned && (
                                                 <div className="text-danger errormessage">{validationErrors.cashierAssigned}</div>

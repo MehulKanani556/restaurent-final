@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import box from "../Image/Ellipse 20.png";
@@ -186,17 +187,22 @@ const DeliveryPago = () => {
   const handleChange = (event) => {
     let { name, value } = event.target;
     value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
-    setCustomerData((prevState) => ({
-      ...prevState,
-      [name]: value, // Update the specific payment type amount
-      turn: value ? ((parseFloat(value) - (finalTotal + taxAmount + tipAmount)).toFixed(2)) : 0 // Ensure correct calculation
-    }));
-    console.log("Payment",value)
+    setCustomerData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        [name]: value, // Update the specific payment type amount
+      };
+      // New calculation for turn
+      const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
+      updatedState.turn = totalAmount - (finalTotal + taxAmount + tipAmount); // Update turn based on total amounts
+      return updatedState;
+    });
+    console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
       [name]: undefined
     }));
-  };
+};
   useEffect(
     () => {
       if (showCreSuc) {
@@ -320,16 +326,19 @@ const DeliveryPago = () => {
 
     const totalWithTax = finalTotal + taxAmount + tipAmount;
 
+    const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
+  console.log(totalPaymentAmount < totalWithTax,totalPaymentAmount<=0)
     // Validate payment amount
-    if (!customerData.amount || parseFloat(customerData.amount) <= 0) {
+    if (!totalPaymentAmount || totalPaymentAmount <= 0) {
       errors.amount = "Por favor, introduzca un importe de pago válido";
-    } else if (parseFloat(customerData.amount) < totalWithTax.toFixed(2)) {
+    // } else if (parseFloat(customerData.amount) < totalWithTax.toFixed(2)) {
+
+    } else if (totalPaymentAmount < totalWithTax.toFixed(2)) {
       errors.amount = "El monto del pago debe cubrir el costo total";
     }
-
     return errors;
   };
-  console.log("payment: ", payment.firstname && payment.firstname.trim() !== ""? payment.firstname: payment.business_name,payment)
+  
 
   // submit
   const handleSubmit = async () => {
@@ -346,6 +355,7 @@ const DeliveryPago = () => {
       notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : "",
       admin_id: admin_id
     }));
+    const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
 
 
     const orderData = {
@@ -370,8 +380,8 @@ const DeliveryPago = () => {
     };
     const paymentData = {
       ...payment,
-      amount: customerData.amount,
-      type: selectedCheckboxes[0],
+      amount: totalPaymentAmount,
+      type: selectedCheckboxes,
       order_master_id: orderType.orderId,
       return: customerData.turn,
       admin_id: admin_id,
@@ -399,7 +409,7 @@ const DeliveryPago = () => {
             }
           )
           setIsProcessing(false)
-          // console.log(responsePayment.status);
+          // console.log("sbhs",responsePayment);
           if (responsePayment.status) {
             localStorage.removeItem("cartItems");
             localStorage.removeItem("currentOrder");
@@ -646,7 +656,7 @@ const DeliveryPago = () => {
                                 type="email"
                                 id="email"
                                 name="turn"
-                                value={`$${customerData.turn || ""}`}
+                                value={`$${customerData.turn ? customerData.turn.toFixed(2) : ""}`}
                                 onChange={handleChange}
                                 className="input_bg_dark px-4 py-2 text-white sj_width_mobil"
                               />
@@ -1067,6 +1077,7 @@ const DeliveryPago = () => {
                               paymentAmt={customerData}
                               paymentType={selectedCheckboxes}
                             />
+                            {console.log("sas",customerData)}
                           </Modal.Body>
                           <Modal.Footer className="sjmodenone">
                             <Button

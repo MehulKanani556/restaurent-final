@@ -109,7 +109,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
         getFamily();
         getSubFamily();
         setActiveTab(state ? state : "home")
-    }, [noteValues, show1Prod, deleteProductId]);
+    }, [ show1Prod, deleteProductId]);
 
     useEffect(() => {
         if (orderData && items.length > 0) {
@@ -1018,7 +1018,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                     </div>
 
                                     <div className="py-3 m_borbot mx-3  m14 ">
-                                        {parentCheck.map((parentItem) => (
+                                        {parentCheck && parentCheck.map((parentItem) => (
                                             <div key={parentItem.id}>
                                                 <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
                                                     <div className="text-nowrap">
@@ -1115,7 +1115,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                     </div>
                                 </div>
                                 <div className="row p-2">
-                                    {filteredItemsMenu.map((ele, index) => (
+                                    {filteredItemsMenu &&  filteredItemsMenu.map((ele, index) => (
                                         <div
                                             className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
                                             keys={index}

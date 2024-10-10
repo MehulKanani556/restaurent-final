@@ -26,6 +26,7 @@ const Usuarios = () => {
   const role = sessionStorage.getItem("role");
   const [email] = useState(sessionStorage.getItem("email"));
   const navigate = useNavigate();
+  const admin_id = sessionStorage.getItem("admin_id");
   const [showPassword, setShowPassword] = useState(false);
   const [showcomfirmPassword, setShowcomfirmPassword] = useState(false);
   const [editshowPassword, seteditShowPassword] = useState(false);
@@ -457,7 +458,7 @@ const Usuarios = () => {
         }
         handleClose();
         // Create new user
-        const response = await axios.post(`${apiUrl}/create-user`, formData, {
+        const response = await axios.post(`${apiUrl}/create-user`, {...formData,admin_id}, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
