@@ -258,7 +258,7 @@ if(paymentType){
             <br />
             <div className="mt-2 d-flex" style={{ display: 'flex' }}>
               <div className="me-3" style={{ marginRight: '16px' }}>Recibido:  {parseFloat(paymentAmt.cashAmount || 0) + parseFloat(paymentAmt.debitAmount || 0) + parseFloat(paymentAmt.creditAmount || 0) + parseFloat(paymentAmt.transferAmount || 0)}</div>
-              <div>Cambio:{paymentAmt.turn.toFixed(2)}</div>
+              <div>Cambio:{paymentAmt.turn}</div>
             </div>
           </p>
           <div style={{ borderBottom: "1px dashed #000", marginTop: "5px" }} />

@@ -101,7 +101,8 @@ const Login = () => {
           navigate(redirectPath);
         }, 2000);
       } else {
-        setErrorMessage("Credenciales inválidas");
+        setErrorMessage(response?.data?.message || "Credenciales inválidas")
+    
         setShowModal(true);
       }
     } catch (error) {      

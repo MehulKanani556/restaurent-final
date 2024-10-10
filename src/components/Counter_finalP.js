@@ -156,7 +156,10 @@ const Counter_finalP = () => {
   };
 
   const initialCustomerData = {
-    amount: "",
+    cashAmount: "",      // Amount for cash payment
+    debitAmount: "",     // Amount for debit payment
+    creditAmount: "",    // Amount for credit payment
+    transferAmount: "",  // Amount for transfer payment
     turn: ""
   };
 
@@ -167,6 +170,10 @@ const Counter_finalP = () => {
     if (selectedCheckboxes.includes(value)) {
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
       // setCustomerData(initialCustomerData);
+      setCustomerData((prevData) => ({
+        ...prevData,
+        [value + "Amount"]: "" // Reset only the deselected payment type amount
+      }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
     }
@@ -190,21 +197,27 @@ const Counter_finalP = () => {
   const finalTotal = totalCost - discount;
   const taxAmount = finalTotal * 0.19;
 
-  const handleChange = (event) => {
 
+  const handleChange = (event) => {
     let { name, value } = event.target;
-    
-    value = value.replace(/[^0-9/./]/g, "");
-    setCustomerData((prevState) => ({
-      ...prevState,
-      [name]: value,
-      turn: value ? (parseFloat(value) - (finalTotal + taxAmount  + tipAmount)).toFixed(2) : 0
-    }));
+    value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
+    setCustomerData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        [name]: value, // Update the specific payment type amount
+      };
+      // New calculation for turn
+      const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
+      updatedState.turn = totalAmount - (finalTotal + taxAmount + tipAmount); // Update turn based on total amounts
+      return updatedState;
+    });
+    console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
       [name]: undefined
     }));
   };
+
   useEffect(
     () => {
       if (showCreSuc) {
@@ -260,7 +273,7 @@ const Counter_finalP = () => {
     setCartItems(updatedCartItems);
   };
 
- 
+
 
 
   // ==== Get BOX Data =====
@@ -320,21 +333,32 @@ const Counter_finalP = () => {
 
     const totalWithTax = finalTotal + taxAmount + tipAmount;
 
+    const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
+    console.log(totalPaymentAmount < totalWithTax, totalPaymentAmount <= 0)
     // Validate payment amount
-    if (!customerData.amount || parseFloat(customerData.amount) <= 0) {
+    if (!totalPaymentAmount || totalPaymentAmount <= 0) {
       errors.amount = "Por favor, introduzca un importe de pago válido";
-    } else if (parseFloat(customerData.amount) < totalWithTax.toFixed(2)) {
+      // } else if (parseFloat(customerData.amount) < totalWithTax.toFixed(2)) {
+
+    } else if (totalPaymentAmount < totalWithTax.toFixed(2)) {
       errors.amount = "El monto del pago debe cubrir el costo total";
     }
-
     return errors;
+    // // Validate payment amount
+    // if (!customerData.amount || parseFloat(customerData.amount) <= 0) {
+    //   errors.amount = "Por favor, introduzca un importe de pago válido";
+    // } else if (parseFloat(customerData.amount) < totalWithTax.toFixed(2)) {
+    //   errors.amount = "El monto del pago debe cubrir el costo total";
+    // }
+
+    // return errors;
   };
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [navigationPath, setNavigationPath] = useState('');
 
   const navigationPage = () => {
-    console.log(navigationPath,"asgaysg ");
+    console.log(navigationPath, "asgaysg ");
     if (navigationPath) {
       navigate(navigationPath);
     }
@@ -342,7 +366,7 @@ const Counter_finalP = () => {
   };
 
   const handleLinkNavigation = (path) => {
-    console.log("sbhdj",isSubmitted)
+    console.log("sbhdj", isSubmitted)
     if (!isSubmitted) {
       setNavigationPath(path); // Store the path to navigate after confirmation
       setShowDeleteConfirmation(true); // Show confirmation modal
@@ -371,6 +395,9 @@ const Counter_finalP = () => {
       notes: item.note ? item.note.replace(/^Nota:\s*/i, "").trim() : "",
       admin_id: admin_id
     }));
+
+    const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
+
     const orderData = {
       order_details: orderDetails,
       admin_id: admin_id,
@@ -399,7 +426,7 @@ const Counter_finalP = () => {
       const response = await axios.post(`${apiUrl}/order/place_new`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
-     
+
       order_master_id = response.data.kdsOrder.order_id
       console.log("order_master_id", response.data.kdsOrder.id);
       // alert("sdv");
@@ -407,12 +434,13 @@ const Counter_finalP = () => {
 
         const paymentData = {
           ...payment,
-          amount: customerData.amount,
+          amount: totalPaymentAmount,
           type: selectedCheckboxes,
-          order_master_id: order_master_id,
+          order_master_id: orderType.orderId,
           return: customerData.turn,
-          admin_id: admin_id
+          admin_id: admin_id,
         };
+
         const responsePayment = await axios.post(
           `${apiUrl}/payment/insert`,
           paymentData,
@@ -490,7 +518,7 @@ const Counter_finalP = () => {
       <div className="s_bg_dark">
         <div className="j-flex">
           <div>
-          <Sidenav onNavigate={handleLinkNavigation} />
+            <Sidenav onNavigate={handleLinkNavigation} />
           </div>
           <div className="flex-grow-1 sidebar j-position-sticky text-white">
             <div className="j-counter-header j_counter_header_last_change" >
@@ -602,49 +630,49 @@ const Counter_finalP = () => {
                     </div>
                   </Modal.Body>
                 </Modal>
-                 {/* ========= Delete confirmation Modal =========== */}
-              <Modal
-                show={showDeleteConfirmation}
-                onHide={() => setShowDeleteConfirmation(false)}
-                backdrop={true}
-                keyboard={false}
-                className="m_modal jay-modal"
-              >
-                <Modal.Header closeButton className="border-0" />
+                {/* ========= Delete confirmation Modal =========== */}
+                <Modal
+                  show={showDeleteConfirmation}
+                  onHide={() => setShowDeleteConfirmation(false)}
+                  backdrop={true}
+                  keyboard={false}
+                  className="m_modal jay-modal"
+                >
+                  <Modal.Header closeButton className="border-0" />
 
-                <Modal.Body>
-                  <div className="text-center">
-                    {/* <img
+                  <Modal.Body>
+                    <div className="text-center">
+                      {/* <img
                         src={require("../Image/trash-outline-secondary.png")}
                         alt=" "
                       /> */}
-                    <p className="mb-0 mt-3 h6">
-                      {" "}
+                      <p className="mb-0 mt-3 h6">
+                        {" "}
 
-                      ¿Estás segura de que quieres abandonar este pedido?
-                    </p>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer className="border-0 ">
-                  <Button
-                    className="j-tbl-btn-font-1 b_btn_close"
-                    variant="danger"
-                    onClick={() => {
-                      setShowDeleteConfirmation(false);
-                      navigationPage()
-                    }}
-                  >
-                    Si, seguro
-                  </Button>
-                  <Button
-                    className="j-tbl-btn-font-1 "
-                    variant="secondary"
-                    onClick={() => setShowDeleteConfirmation(false)}
-                  >
-                    No, abandonar
-                  </Button>
-                </Modal.Footer>
-              </Modal>
+                        ¿Estás segura de que quieres abandonar este pedido?
+                      </p>
+                    </div>
+                  </Modal.Body>
+                  <Modal.Footer className="border-0 ">
+                    <Button
+                      className="j-tbl-btn-font-1 b_btn_close"
+                      variant="danger"
+                      onClick={() => {
+                        setShowDeleteConfirmation(false);
+                        navigationPage()
+                      }}
+                    >
+                      Si, seguro
+                    </Button>
+                    <Button
+                      className="j-tbl-btn-font-1 "
+                      variant="secondary"
+                      onClick={() => setShowDeleteConfirmation(false)}
+                    >
+                      No, abandonar
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
 
                 <p className="j-final-p sjfs-14 pb-3">
                   Puedes seleccionar uno o mas
@@ -671,7 +699,7 @@ const Counter_finalP = () => {
                           name="receiptType"
                           value="cash"
                           checked={selectedCheckboxes.includes("cash")}
-                          onChange={() => handleCheckboxChange("cash")}
+                          // onChange={() => handleCheckboxChange("cash")}
                           className="me-2 j-change-checkbox"
                         />
 
@@ -687,9 +715,9 @@ const Counter_finalP = () => {
                               <br />
                               <input
                                 type="text"
-                                id="name"
-                                name="amount"
-                                value={`$${customerData.amount || ""}`}
+                                id="cashAmount" // change
+                                name="cashAmount" // change
+                                value={`$${customerData.cashAmount || ""}`} // change
                                 onChange={handleChange}
                                 className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
                               />
@@ -706,7 +734,7 @@ const Counter_finalP = () => {
                                 type="email"
                                 id="email"
                                 name="turn"
-                                value={`$${customerData.turn || ""}`}
+                                value={`$${customerData.turn ? customerData.turn.toFixed(2) : ""}`}
                                 onChange={handleChange}
                                 className="input_bg_dark px-4 py-2 text-white sj_width_mobil"
                               />
@@ -731,7 +759,7 @@ const Counter_finalP = () => {
                           name="receiptType"
                           value="debit"
                           checked={selectedCheckboxes.includes("debit")}
-                          onChange={() => handleCheckboxChange("debit")}
+                          // onChange={() => handleCheckboxChange("debit")}
                           className="me-2 j-change-checkbox"
                         />
 
@@ -761,28 +789,28 @@ const Counter_finalP = () => {
                       //   </div>
                       // </Accordion.Body>
                       <Accordion.Body>
-                      <div className="sj_gay_border px-3 py-4 mt-2">
-                        <form className="j_payment_flex">
-                          <div className=" flex-grow-1 j_paymemnt_margin">
-                            <label className="mb-2">Cantidad</label>
-                            <br />
-                            <input
-                              type="text"
-                              id="name"
-                              name="amount"
-                              value={`$${customerData.amount || ""}`}
-                              onChange={handleChange}
-                              className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
-                            />
-                            {formErrors.amount && (
-                              <p className="errormessage text-danger">
-                                {formErrors.amount}
-                              </p>
-                            )}
-                          </div>
-                        </form>
-                      </div>
-                    </Accordion.Body>
+                        <div className="sj_gay_border px-3 py-4 mt-2">
+                          <form className="j_payment_flex">
+                            <div className=" flex-grow-1 j_paymemnt_margin">
+                              <label className="mb-2">Cantidad</label>
+                              <br />
+                              <input
+                                type="text"
+                                id="debitAmount" // Ensure this ID is unique
+                                name="debitAmount" // Ensure this name matches the state
+                                value={`$${customerData.debitAmount || ""}`} // Ensure correct binding
+                                onChange={handleChange}
+                                className="sj_bg_dark sj_width_input px-4 py-2 text-white"
+                              />
+                              {formErrors.amount && (
+                                <p className="errormessage text-danger">
+                                  {formErrors.amount}
+                                </p>
+                              )}
+                            </div>
+                          </form>
+                        </div>
+                      </Accordion.Body>
                     )}
                   </Accordion.Item>
                   <Accordion.Item eventKey="2" className="mb-2">
@@ -800,7 +828,7 @@ const Counter_finalP = () => {
                           name="receiptType"
                           value="credit"
                           checked={selectedCheckboxes.includes("credit")}
-                          onChange={() => handleCheckboxChange("credit")}
+                          // onChange={() => handleCheckboxChange("credit")}
                           className="me-2 j-change-checkbox"
                         />
                         <p className="d-inline px-3">Tarjeta de credito</p>
@@ -815,9 +843,10 @@ const Counter_finalP = () => {
                               <br />
                               <input
                                 type="text"
-                                id="name"
-                                name="amount"
-                                value={`$${customerData.amount || ""}`}
+                                id="creditAmount"
+                                name="creditAmount"
+                                value={`$${customerData.creditAmount || ""}`}
+                                onChange={handleChange}
                                 className="input_bg_dark w-full px-4 py-2 text-white sj_width_mobil"
                               />
                               {formErrors.amount && (
@@ -846,7 +875,7 @@ const Counter_finalP = () => {
                           name="receiptType"
                           value="4"
                           checked={selectedCheckboxes.includes("transfer")}
-                          onChange={() => handleCheckboxChange("transfer")}
+                          // onChange={() => handleCheckboxChange("transfer")}
                           className="me-2 j-change-checkbox"
                         />
                         <p className="d-inline px-3">Transferencia</p>
@@ -860,9 +889,9 @@ const Counter_finalP = () => {
                             <br />
                             <input
                               type="text"
-                              id="name"
-                              name="amount"
-                              value={`$${customerData.amount || ""}`}
+                              id="transferAmount"
+                              name="transferAmount"
+                              value={`$${customerData.transferAmount || ""}`}
                               onChange={handleChange}
                               className="sj_bg_dark sj_width_input px-4 py-2 text-white"
                             />

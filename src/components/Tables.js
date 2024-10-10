@@ -752,7 +752,8 @@ const Tables = () => {
 
   const handleSubmitNote = async (e, index, oId) => {
     e.preventDefault();
-    const finalNote = e.target.elements[0].value.trim();
+    console.log(e.target.value)
+    const finalNote = e.target.elements[0].value.trim() ||e.target.value;
     if (finalNote) {
       const flatIndex = tableData
         .flatMap((t) => t.items)
@@ -2168,7 +2169,7 @@ const Tables = () => {
                     </div>
                   </div>
                   <div className="j-counter-order">
-                    <h3 className="text-white j-tbl-pop-1">Pedido </h3>
+                    <h3 className="text-white j-tbl-pop-1">Pedido b</h3>
                     <div className={"j-counter-order-data"}>
                       {tableData.map((tableItem) =>
                         tableItem.items
@@ -2200,11 +2201,17 @@ const Tables = () => {
                                   </div>
                                 </div>
                                 <div className="text-white j-order-count-why">
-                                  {item.notes ? (
+                                {item.notes ? (
                                     addNotes[index] ? (
                                       <form
                                         onSubmit={(e) =>
                                           handleSubmitNote(e, index, item.id)}
+                                        onBlur={(e) => {
+                                          // Check if the target is not the input
+                                          if (!e.currentTarget.contains(e.relatedTarget)) {
+                                            handleSubmitNote(e, index, item.id);
+                                          }
+                                        }}
                                       >
                                         <span className="j-nota-blue">
                                           Nota:{" "}
@@ -2228,6 +2235,12 @@ const Tables = () => {
                                         <form
                                           onSubmit={(e) =>
                                             handleSubmitNote(e, index, item.id)}
+                                          onBlur={(e) => {
+                                            // Check if the target is not the input
+                                            if (!e.currentTarget.contains(e.relatedTarget)) {
+                                              handleSubmitNote(e, index, item.id);
+                                            }
+                                          }}
                                         >
                                           <span className="j-nota-blue">
                                             Nota:{" "}
