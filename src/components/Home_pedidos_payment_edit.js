@@ -950,7 +950,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                                         <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Sector</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={sector?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
@@ -960,11 +960,11 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                                         <div className='w-100 b_search flex-grow-1  text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2" style={{ fontSize: "14px" }}>Cliente</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2" value={orderData?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Personas</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={orderData?.person} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/>
                                         </div>
                                     </div>
 

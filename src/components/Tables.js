@@ -1833,7 +1833,7 @@ const Tables = () => {
                       clip-rule="evenodd"
                     />
                   </svg>}
-                  {isEditing ? "Ahorrar" : "Editar"}
+                  {isEditing ? "Guardar" : "Editar"}
                 </div>
               </button>
 
@@ -2169,7 +2169,7 @@ const Tables = () => {
                     </div>
                   </div>
                   <div className="j-counter-order">
-                    <h3 className="text-white j-tbl-pop-1">Pedido b</h3>
+                    <h3 className="text-white j-tbl-pop-1">Pedido</h3>
                     <div className={"j-counter-order-data"}>
                       {tableData.map((tableItem) =>
                         tableItem.items

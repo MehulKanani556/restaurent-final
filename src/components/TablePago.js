@@ -532,9 +532,9 @@ const TablePago = () => {
               setSelectedCheckboxes([]);
               handleShow11();
 
-              // localStorage.removeItem("cartItems");
-              // localStorage.removeItem("currentOrder");
-              // localStorage.removeItem("payment");
+              localStorage.removeItem("cartItems");
+              localStorage.removeItem("currentOrder");
+              localStorage.removeItem("payment");
             } catch (error) {
               console.log("Table Status not Upadte ," + error.message);
             }
@@ -557,7 +557,7 @@ const TablePago = () => {
   const [show11, setShow11] = useState(false);
   const handleClose11 = () => {
     setShow11(false);
-    // navigate("/table"); // Navigate to the desired page after closing the modal
+    navigate("/table"); // Navigate to the desired page after closing the modal
   };
   const handleShow11 = () => setShow11(true);
   const handlePrint = () => {

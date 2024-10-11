@@ -1751,12 +1751,13 @@ const Informacira = () => {
                       <tbody>
                         {data.length > 0 ? (
                           data.map((box, index) => (
+                            console.log(box.close_time),
                             <tr
                               key={box.id}
                               className="sjbordergray j-caja-text-2"
                             >
                               <td className="p-3">{new Date(box.open_time).toLocaleDateString('en-GB')}<span className="ms-3">{new Date(box.open_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></td>
-                              <td className="ps-0">{new Date(box.close_time).toLocaleDateString('en-GB')}<span className="ms-3">{new Date(box.close_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></td>
+                              <td className="ps-0">{box.close_time ? new Date(box.close_time).toLocaleDateString('en-GB') : ''}<span className="ms-3">{box.close_time ? new Date(box.close_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}</span></td>
                               <td>{box.open_amount}</td>
 
                               <td>{box.close_amount || "N/A"}</td>

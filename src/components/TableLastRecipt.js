@@ -1,7 +1,6 @@
 import React from "react";
 
 const TableLastRecipt = ({ data ,itemInfo , payment,paymentAmt}) => {
-  console.log(data,itemInfo,payment,paymentAmt)
   const role = sessionStorage.getItem("role");
 
   const currentDate = new Date();

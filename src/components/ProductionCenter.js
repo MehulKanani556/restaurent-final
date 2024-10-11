@@ -446,7 +446,8 @@ const role = sessionStorage.getItem("role");
           `${apiUrl}/create/production-centers`,
           {
             name: prodName,
-            printer_code: printerCode,admin_id,
+            printer_code: printerCode,
+            admin_id,
           },
           {
             headers: {

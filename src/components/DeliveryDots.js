@@ -35,7 +35,7 @@ const DeliveryDots = () => {
   };
   const [countsoup, setCountsoup] = useState(1);
   const [selectedRadio, setSelectedRadio] = useState("1");
-  const [activeAccordionItem, setActiveAccordionItem] = useState("0");
+  const [activeAccordionItem, setActiveAccordionItem] = useState("1");
   const [itemToDelete, setItemToDelete] = useState(null);
   const [lastOrder, setLastOrder] = useState('');
 

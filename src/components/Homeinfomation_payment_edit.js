@@ -109,7 +109,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
         getFamily();
         getSubFamily();
         setActiveTab(state ? state : "home")
-    }, [ show1Prod, deleteProductId]);
+    }, [show1Prod, deleteProductId]);
 
     useEffect(() => {
         if (orderData && items.length > 0) {
@@ -358,23 +358,27 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
     // // ==== select items section ====
     const handleAddItem = (item) => {
-        console.log(item, "safasf");
-        if (!selectedItemsMenu.some((v) => v.item_id == item.id)) {
-            console.log(selectedItemsMenu);
-            const obj = {
-                item_id: item.id,
-                quantity: 1,
-            }
-            setSelectedItemsMenu((prevArray) => [...prevArray, obj]);
-            console.log(selectedItemsMenu);
-            setSelectedItemsCount(selectedItemsCount + 1);
-            // setItemId((prevArray) => [...prevArray, item.id]);
+        setSelectedItemsMenu((prevArray) => {
+            const itemIndex = prevArray.findIndex((v) => v.item_id === item.id);
 
-            // Perform any other action here when adding an item
-            console.log(`Added item ${item.id}`);
-        } else {
-            console.log(`Item ${item.id} already added`);
-        }
+            if (itemIndex !== -1) {
+                // Item exists, so remove it
+                const newArray = [...prevArray];
+                newArray.splice(itemIndex, 1);
+                setSelectedItemsCount(prevCount => prevCount - 1);
+                console.log(`Removed item ${item.id}`);
+                return newArray;
+            } else {
+                // Item doesn't exist, so add it
+                const newItem = {
+                    item_id: item.id,
+                    quantity: 1,
+                };
+                setSelectedItemsCount(prevCount => prevCount + 1);
+                console.log(`Added item ${item.id}`);
+                return [...prevArray, newItem];
+            }
+        });
     };
 
     // // ==== select items section ====
@@ -931,7 +935,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                                            {console.log("tabke",table)}
+                                            {console.log("tabke", table)}
                                             <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                     </div>
@@ -1115,59 +1119,66 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                     </div>
                                 </div>
                                 <div className="row p-2">
-                                    {filteredItemsMenu &&  filteredItemsMenu.map((ele, index) => (
-                                        <div
-                                            className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
-                                            keys={index}
-                                        >
-                                            <div>
-                                                <div class="card m_bgblack text-white position-relative">
-                                                    <img
-                                                        src={`${API}/images/${ele.image}`}
-                                                        class="card-img-top object-fit-fill rounded"
-                                                        alt="..."
-                                                        style={{ height: "162px" }}
-                                                    />
-                                                    <div class="card-body">
-                                                        <h6 class="card-title">{ele.name}</h6>
-                                                        <h6 class="card-title">${ele.sale_price}</h6>
-                                                        <p class="card-text opacity-50">
-                                                            Codigo: {ele.code}
-                                                        </p>
-                                                        <div class="btn w-100 btn-primary text-white" onClick={() => handleAddItem(ele)}>
-                                                            <a
-                                                                href="# "
-                                                                className="text-white text-decoration-none"
-                                                                style={{ fontSize: "14px" }}
-                                                            >
-                                                                <span className="ms-1">Añadir </span>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-
-                                                    <div
-                                                        className="position-absolute "
-                                                        style={{ cursor: "pointer" }}
-                                                    >
-                                                        <Link
-                                                            to={`/articles/singleatricleproduct/${ele.id}`}
-                                                            className="text-white text-decoration-none"
-                                                        >
-                                                            <p
-                                                                className=" px-1  rounded m-2"
-                                                                style={{ backgroundColor: "#374151" }}
-                                                            >
-                                                                <IoMdInformationCircle />{" "}
-                                                                <span style={{ fontSize: "12px" }}>
-                                                                    Ver información
-                                                                </span>
+                                    {filteredItemsMenu.map((ele, index) => {
+                                        const isAdded = selectedItemsMenu.length > 0 ? selectedItemsMenu.some((v) => v.item_id == ele.id) : false;
+                                        return (
+                                            <div
+                                                className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
+                                                keys={index}
+                                            >
+                                                <div>
+                                                    <div class="card m_bgblack text-white position-relative">
+                                                        <img
+                                                            src={`${API}/images/${ele.image}`}
+                                                            class="card-img-top object-fit-fill rounded"
+                                                            alt="..."
+                                                            style={{ height: "162px" }}
+                                                        />
+                                                        <div class="card-body">
+                                                            <h6 class="card-title">{ele.name}</h6>
+                                                            <h6 class="card-title">${ele.sale_price}</h6>
+                                                            <p class="card-text opacity-50">
+                                                                Codigo: {ele.code}
                                                             </p>
-                                                        </Link>
+                                                            <div class="btn w-100 btn-primary text-white"
+                                                                style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
+                                                                onClick={() => handleAddItem(ele)}>
+                                                                <a
+                                                                    href="# "
+                                                                    className="text-white text-decoration-none"
+                                                                    style={{ fontSize: "14px" }}
+                                                                >
+                                                                    <span className="ms-1">
+                                                                        {isAdded ? 'Agregado' : 'Agregar al menú'}
+                                                                    </span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            className="position-absolute "
+                                                            style={{ cursor: "pointer" }}
+                                                        >
+                                                            <Link
+                                                                to={`/articles/singleatricleproduct/${ele.id}`}
+                                                                className="text-white text-decoration-none"
+                                                            >
+                                                                <p
+                                                                    className=" px-1  rounded m-2"
+                                                                    style={{ backgroundColor: "#374151" }}
+                                                                >
+                                                                    <IoMdInformationCircle />{" "}
+                                                                    <span style={{ fontSize: "12px" }}>
+                                                                        Ver información
+                                                                    </span>
+                                                                </p>
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
                             </div>
                         </div>

@@ -198,6 +198,8 @@ const TableDatos = () => {
         address: parsedData.address || prevState.address,
         email: parsedData.email || prevState.email,
         number: parsedData.phone || prevState.number,
+        bname: parsedData.business_name,
+        ltda: parsedData.ltda,
         rut1: parsedData.receiptType === "1" ? parsedData.rut : prevState.rut,
         rut2: parsedData.receiptType === "2" ? parsedData.rut : prevState.rut
       }));
@@ -205,6 +207,7 @@ const TableDatos = () => {
       setRut2(parsedData.receiptType === "2"? parsedData.rut : "")
       setRut3(parsedData.receiptType === "3"? parsedData.rut : "")
       setSelectedRadio(parsedData.receiptType || "1"); // Set default receipt type if not present
+      setActiveAccordionItem(parsedData.receiptType || "1")
     }
 
   }, [id, role]);
@@ -270,7 +273,7 @@ const TableDatos = () => {
   const handleShowEditFam = () => setShowEditFam(true);
 
   const [selectedRadio, setSelectedRadio] = useState("1");
-  const [activeAccordionItem, setActiveAccordionItem] = useState("0");
+  const [activeAccordionItem, setActiveAccordionItem] = useState("1");
   const handleAccordionClick = (value) => {
     setSelectedRadio(value);
   };
@@ -605,8 +608,8 @@ const TableDatos = () => {
                 <p className="mb-2">Datos cliente</p>
                 <p>Tipos de comprobantes</p>
                 <hr className="sj_bottom" />
-                <Accordion className="sj_accordion" defaultActiveKey={["0"]}>
-                  <Accordion.Item eventKey="0" className="mb-3">
+                <Accordion className="sj_accordion" activeKey={activeAccordionItem}>
+                  <Accordion.Item eventKey="1" className="mb-3">
                     <Accordion.Header>
                       {" "}
                       <div
@@ -723,7 +726,7 @@ const TableDatos = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
-                  <Accordion.Item eventKey="1" className="mb-3">
+                  <Accordion.Item eventKey="2" className="mb-3">
                     <Accordion.Header>
                       {" "}
 
@@ -842,7 +845,7 @@ const TableDatos = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
-                  <Accordion.Item eventKey="2" className="mb-3">
+                  <Accordion.Item eventKey="3" className="mb-3">
                     <Accordion.Header>
                       {" "}
                       {/* <div className="sj_bg_dark px-4 py-2 mt-3 sj_w-75">
@@ -854,7 +857,7 @@ const TableDatos = () => {
                       <div
                         onClick={() => handleAccordionClick("3")}
                         className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
-                          "2"
+                          "3"
                           ? "active"
                           : ""}`}
                       >
