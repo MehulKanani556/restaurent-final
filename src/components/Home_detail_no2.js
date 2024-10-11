@@ -14,6 +14,7 @@ function Home_detail_no2() {
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
     const token = sessionStorage.getItem("token");
+    const admin_id = sessionStorage.getItem("admin_id");
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
     const { state } = useLocation();
@@ -24,17 +25,38 @@ function Home_detail_no2() {
     const [creditNote, setCreditNote] = useState();
     const [items, setItems] = useState([]);
     const [returnDetails, setReturnDetail] = useState();
+    const [orderAlldata, setOrderAlldata] = useState([]);
 
 
     useEffect(() => {
         fetchCredit();
         getItems();
+        getAllOrder();
     }, [id])
+
+    const getAllOrder = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(`${apiUrl}/order/getAll`, { admin_id: admin_id }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setOrderAlldata(response.data);
+        } catch (error) {
+            console.error(
+                "Error fetching allOrders:",
+                error.response ? error.response.data : error.message
+            );
+        }
+        setIsProcessing(false);
+    };
 
 
     const fetchCredit = async () => {
+        setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/order/getCredit`, {
+            const response = await axios.post(`${apiUrl}/order/getCredit`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -43,10 +65,10 @@ function Home_detail_no2() {
             console.log(response.data.data);
 
 
-            const credit = response.data.data.find((v) => v.order_id == id);
+            const credit = response.data.data?.find((v) => v.order_id == id);
 
             setCreditNote(credit);
-            console.log(credit);
+            // console.log(credit);
 
         } catch (error) {
             console.error(
@@ -54,12 +76,17 @@ function Home_detail_no2() {
                 error.response ? error.response.data : error.message
             );
         }
+        setIsProcessing(false);
     }
 
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`);
+            const response = await axios.get(`${apiUrl}/item/getAll`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setItems(response.data.items);
             // setObj1(response.data.items);
             // setFilteredItemsMenu(response.data.items);
@@ -127,9 +154,7 @@ function Home_detail_no2() {
     };
 
     const handleNavigate = () => {
-
         navigate("/home/client/detail", { state });
-
     }
 
 

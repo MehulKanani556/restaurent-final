@@ -535,7 +535,9 @@ const TableInformation = () => {
   const [showEdittable, setShowEdittable] = useState(false);
 
   const handleCloseEdittable = () => setShowEdittable(false);
-  const handleShowEdittable = () => setShowEdittable(true);
+  const handleShowEdittable = () => {setShowEdittable(true);
+    setTableName(tableData.name || '')
+  }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -717,7 +719,7 @@ const TableInformation = () => {
                       className="j-canvas-btn2 j-tbl-font-3 b_border_out"
                       style={{ borderRadius: "8px" }}
                       variant="outline-primary"
-                      onClick={() => setShowEdittable(true)}
+                      onClick={() => handleShowEdittable(true)}
                     >
                       <div className="d-flex align-items-center">
                         <svg
@@ -1292,7 +1294,7 @@ const TableInformation = () => {
 
                   className="form-control j-table_input"
                   id="exampleFormControlInput1"
-                  placeholder={tableData?.name}
+                  placeholder={"-"}
                   value={tableName}
                   name="name"
                   onChange={handleEditChange}
