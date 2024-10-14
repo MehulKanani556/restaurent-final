@@ -21,8 +21,9 @@ export const EnlaceAdmin = () => {
   // Fetch email session on component mount
   useEffect(() => {
     const email = sessionStorage.getItem("email");
+    const role = sessionStorage.getItem("role");
     setEmailSession(email);
-    if (email === "superadmin@gmail.com") {
+    if (role === "superadmin") {
       setIsAuthorized(true);
     } else {
       setIsAuthorized(false);

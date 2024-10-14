@@ -73,6 +73,9 @@ export default function Header() {
   if (!token) {
     return null;
   }
+  if(role =="superadmin"){
+    navigate('/enlaceAdmin');
+  }
 
 
 

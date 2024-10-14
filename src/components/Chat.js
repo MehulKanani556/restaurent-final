@@ -252,7 +252,8 @@ const Chat = () => {
 
             try {
                 await axios.post(`${apiUrl}/mark-as-read`, {
-                    chat_id: cardIds
+                    chat_id: cardIds,
+                    admin_id:admin_id
                 });
                 fetchAllUsers();
                 // console.log('Marked as read successfully');

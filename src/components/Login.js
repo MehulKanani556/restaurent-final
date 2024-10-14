@@ -94,6 +94,10 @@ const Login = () => {
         updateActiveStatus(id,name,email,access_token);
         // Play notification sound
         // playNotificationSound();;
+        if(role=="superadmin"){
+          setShowSuccessModal(false);
+          navigate('/enlaceAdmin');
+        }
 
         setTimeout(() => {
           setShowSuccessModal(false);
