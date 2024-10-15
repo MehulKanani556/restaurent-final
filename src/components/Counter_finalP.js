@@ -533,7 +533,7 @@ const Counter_finalP = () => {
                   </div>
                   <div className="  flex-grow-1 text-center">
                     <Link
-                      to={"#"}
+                      to={"/counter/mostrador"}
                       className="text-decoration-none px-2 sj_text_dark"
                     >
                       <FaCircleCheck className="mx-1" />

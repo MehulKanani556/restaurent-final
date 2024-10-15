@@ -150,10 +150,8 @@ export default function Homeinformation() {
   };
 
   useEffect(() => {
-
     getOrder();
     getItems();
-
     getOrderStatus();
     getRole();
     getFamily();
@@ -176,6 +174,33 @@ export default function Homeinformation() {
       getuserRole();
     }
   }, [user, roles]);
+
+  useEffect(() => {
+    getPaymentsData();
+  }, [admin_id, id]);
+
+  const [pamentDone, setPaymentDone] = useState(false)
+
+  const getPaymentsData = async () => {
+    // console.log(admin_id,id); 
+    try {
+      const response = await axios.get(`${API_URL}/getsinglepayments/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Payments Data:", response);
+      if (response.data.success) {
+        // console.log("true");
+        setPaymentDone(true);
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching PaymentsData:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
 
   const getOrder = async () => {
     try {
@@ -601,6 +626,41 @@ export default function Homeinformation() {
     };
     return translations[orderType?.toLowerCase()] || orderType; // Fallback to original if not found
   };
+
+
+  const handlePayment = () => {
+
+    console.log(orderDetails, orderData[0]);
+
+    const currentOrder = {
+      orderType: orderData[0]?.order_type,
+      orderId: orderData[0]?.id,
+      name: orderData[0]?.customer_name,
+      order: "old"
+    }
+    let cartItems = [];
+    orderDetails?.map((v) => {
+      const obj = {
+        orderId: orderData[0]?.id,
+        id: v.item_id,
+        image: v.image,
+        name: v.name,
+        price: v.amount,
+        // "code": "89874934",
+        count: v.quantity,
+        note: v.notes ? v.notes : "",
+        isEditing: false,
+        OdId:v.id
+      }
+      cartItems.push(obj)
+    })
+
+    localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+    navigate("/home/usa/bhomedelivery/datos");
+  }
+
   return (
     <div>
       <div className="m_bg_black">
@@ -622,7 +682,7 @@ export default function Homeinformation() {
                     !(orderData?.[0].status == 'delivered' || orderData?.[0].status == 'finalized' || orderData?.[0].status == "cancelled") &&
                     <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancelar Pedido</div>
                   ) : (
-                    !(orderData?.[0].status == "cancelled") && <>
+                    !(orderData?.[0].status == "cancelled" || pamentDone) && <>
                       <Link className='text-decoration-none' to={`/home/usa/information/payment_edit/${id}`}>
                         <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div>
                       </Link>
@@ -901,313 +961,316 @@ export default function Homeinformation() {
                         </div>
                         <div className='mx-auto text-center mt-3'>
                           {!(orderData?.[0].status == "cancelled") &&
-                            < Link to="/home/usa" className='d-flex text-decoration-none'>
-                          <div className='btn btn-primary w-100 my-4 bj-delivery-text-3 border-0' style={{ backgroundColor: "#147BDE", borderRadius: "8px", padding: "10px 20px" }}>Cobrar ahora</div>
-                        </Link>
+                            < div className='d-flex text-decoration-none'>
+                              {!pamentDone ?
+                                <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147BDE", borderRadius: "8px", padding: "10px 20px" }} onClick={handlePayment} >Cobrar ahora</div> :
+                                <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147bdea8", borderRadius: "8px", padding: "10px 20px", cursor: "not-allowed" }}>Pago completado</div>
+                              }
+                            </div>
                           }
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-            </Tab>
+              </Tab>
 
-            <Tab eventKey="profile" title="Información del cliente" className='b_border ' style={{ marginTop: "2px" }}>
-              <div className='b-bg-color1'>
-                <div className='text-white ms-4 pt-4' >
-                  <h5 >Información del pedido</h5>
-                </div>
-
-                <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
-                  <div className='w-100 b_search flex-grow-1  text-white'>
-                    <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Cliente</label>
-                    <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.[0]?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+              <Tab eventKey="profile" title="Información del cliente" className='b_border ' style={{ marginTop: "2px" }}>
+                <div className='b-bg-color1'>
+                  <div className='text-white ms-4 pt-4' >
+                    <h5 >Información del pedido</h5>
                   </div>
-                  <div className='w-100 flex-grow-1 b_search text-white'>
-                    <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Plataforma</label>
-                    <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={translateOrderType(orderData?.[0]?.order_type)} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
-                    {/* <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.[0]?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/> */}
-                  </div>
-                </div>
 
-                <div className='b_table1 mx-4 mt-2' >
-                  <div className='text-white mt-4'>
-                    <h5 style={{ fontSize: "16px" }}>Historia del Estado</h5>
+                  <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
+                    <div className='w-100 b_search flex-grow-1  text-white'>
+                      <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Cliente</label>
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={orderData?.[0]?.customer_name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+                    </div>
+                    <div className='w-100 flex-grow-1 b_search text-white'>
+                      <label htmlFor="inputPassword2" className="mb-2 bj-delivery-text-3">Plataforma</label>
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={translateOrderType(orderData?.[0]?.order_type)} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+                      {/* <input type="text" className="form-control bg-gray border-0 mt-2 py-3 " value={orderData?.[0]?.order_type} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled/> */}
+                    </div>
                   </div>
-                  <table className='b_table '>
-                    <thead>
-                      <tr className='b_thcolor'>
-                        <th>Fecha</th>
-                        <th>hora </th>
-                        <th>usuarios</th>
-                        <th>estado</th>
 
-                      </tr>
-                    </thead>
-                    <tbody className='text-white b_btnn '>
-                      {orderStatus.logs?.map((order) => (
-                        <tr key={id} className='b_row'>
-                          <td className='mb-4 j-caja-text-2 '>{new Date(order?.created_at).toLocaleDateString('en-GB')}</td>
-                          <td className='text-nowrap j-caja-text-2 '>{new Date(order?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                          <td className='j-caja-text-2 '>{userRole}</td>
-                          <td className={` mt-3 bj-delivery-text-2 mb-3 b_text_w b_btn1 d-flex align-items-center justify-content-center mt-0 
+                  <div className='b_table1 mx-4 mt-2' >
+                    <div className='text-white mt-4'>
+                      <h5 style={{ fontSize: "16px" }}>Historia del Estado</h5>
+                    </div>
+                    <table className='b_table '>
+                      <thead>
+                        <tr className='b_thcolor'>
+                          <th>Fecha</th>
+                          <th>hora </th>
+                          <th>usuarios</th>
+                          <th>estado</th>
+
+                        </tr>
+                      </thead>
+                      <tbody className='text-white b_btnn '>
+                        {orderStatus.logs?.map((order) => (
+                          <tr key={id} className='b_row'>
+                            <td className='mb-4 j-caja-text-2 '>{new Date(order?.created_at).toLocaleDateString('en-GB')}</td>
+                            <td className='text-nowrap j-caja-text-2 '>{new Date(order?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                            <td className='j-caja-text-2 '>{userRole}</td>
+                            <td className={` mt-3 bj-delivery-text-2 mb-3 b_text_w b_btn1 d-flex align-items-center justify-content-center mt-0 
                               ${order.status.toLowerCase() === 'received' ? 'b_indigo' : order.status.toLowerCase() === 'prepared' ? 'b_ora ' : order.status.toLowerCase() === 'delivered' ? 'b_blue' : order.status.toLowerCase() === 'finalized' ? 'b_green' : order.status.toLowerCase() === 'withdraw' ? 'b_indigo' : order.status.toLowerCase() === 'local' ? 'b_purple' : 'b_ora text-danger'}`}>
-                            {order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : order.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}</td>
-                          {/* <td className='b_text_w'>
+                              {order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : order.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}</td>
+                            {/* <td className='b_text_w'>
                               <button className='b_edit' onClick={() => handleEditClick(id)}><MdEditSquare /></button>
                               <button className='b_edit b_delete' onClick={() => handleDeleteClick(id)}><RiDeleteBin5Fill /></button>
                             </td> */}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </Tab>
-          </Tabs>
-
-        </div>
-      </div>
-
-      <Modal
-        show={show1Prod}
-        onHide={handleClose1Prod}
-        backdrop={true}
-        keyboard={false}
-        className="m_modal m1 jm-modal_jjjj"
-      >
-        <Modal.Header
-          closeButton
-          className="m_borbot "
-          style={{ backgroundColor: "#111928" }}
-        >
-          <Modal.Title className="m18">
-            Agregar artículos
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body
-          className="border-0 p-0 "
-          style={{ backgroundColor: "#111928" }}
-        >
-          <div className="row ">
-            <div
-              className="col-sm-2 col-4    m-0 p-0  m_borrig "
-              style={{ backgroundColor: "#111928" }}
-            >
-              <div>
-                <div className="ms-3 pe-3 mt-2">
-                  <div className="m_borbot ">
-                    <p className="text-white m14 my-2 mb-3">
-                      Familias y subfamilias
-                    </p>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
+              </Tab>
+            </Tabs>
 
-                <div className="py-3 m_borbot mx-3  m14 ">
-                  {parentCheck.map((parentItem) => (
-                    <div key={parentItem.id}>
-                      <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                        <div className="text-nowrap">
-                          <label>
-                            <input
-                              type="checkbox"
-                              checked={checkedParents[parentItem.id]}
-                              onChange={() => handleParentChangeMenu(parentItem.id)}
-                              className="me-2 custom-checkbox"
-                            />
-                            <span className="text-white">{parentItem.name}</span>
-                          </label>
+          </div>
+        </div>
+
+        <Modal
+          show={show1Prod}
+          onHide={handleClose1Prod}
+          backdrop={true}
+          keyboard={false}
+          className="m_modal m1 jm-modal_jjjj"
+        >
+          <Modal.Header
+            closeButton
+            className="m_borbot "
+            style={{ backgroundColor: "#111928" }}
+          >
+            <Modal.Title className="m18">
+              Agregar artículos
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            className="border-0 p-0 "
+            style={{ backgroundColor: "#111928" }}
+          >
+            <div className="row ">
+              <div
+                className="col-sm-2 col-4    m-0 p-0  m_borrig "
+                style={{ backgroundColor: "#111928" }}
+              >
+                <div>
+                  <div className="ms-3 pe-3 mt-2">
+                    <div className="m_borbot ">
+                      <p className="text-white m14 my-2 mb-3">
+                        Familias y subfamilias
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="py-3 m_borbot mx-3  m14 ">
+                    {parentCheck.map((parentItem) => (
+                      <div key={parentItem.id}>
+                        <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                          <div className="text-nowrap">
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={checkedParents[parentItem.id]}
+                                onChange={() => handleParentChangeMenu(parentItem.id)}
+                                className="me-2 custom-checkbox"
+                              />
+                              <span className="text-white">{parentItem.name}</span>
+                            </label>
+                          </div>
                         </div>
-                      </div>
-                      {checkedParents[parentItem.id] && (
-                        <div style={{ marginLeft: "20px" }}>
-                          {childCheck
-                            .filter((childItem) => childItem.family_name === parentItem.name)
-                            .map((childItem) => (
-                              <div key={childItem.id}>
-                                <div className="d-flex align-content-center justify-content-between my-2 m14">
-                                  <div>
-                                    <label className="text-white ">
-                                      <input
-                                        type="checkbox"
-                                        checked={checkedChildren[childItem.id]}
-                                        className="mx-2"
-                                        onChange={() => handleChildChangeMenu(childItem.id, parentItem.name)}
-                                      />
-                                      {childItem.name}
-                                    </label>
+                        {checkedParents[parentItem.id] && (
+                          <div style={{ marginLeft: "20px" }}>
+                            {childCheck
+                              .filter((childItem) => childItem.family_name === parentItem.name)
+                              .map((childItem) => (
+                                <div key={childItem.id}>
+                                  <div className="d-flex align-content-center justify-content-between my-2 m14">
+                                    <div>
+                                      <label className="text-white ">
+                                        <input
+                                          type="checkbox"
+                                          checked={checkedChildren[childItem.id]}
+                                          className="mx-2"
+                                          onChange={() => handleChildChangeMenu(childItem.id, parentItem.name)}
+                                        />
+                                        {childItem.name}
+                                      </label>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-10 col-8 m-0 p-0">
-              <div className="p-3   text-white  flex-wrap">
-                <div className="mb-3">
-                  <h6>Bebidas</h6>
-                </div>
-                <div>
-                  <div className="d-flex justify-content-between">
-                    <div>
-                      <div className="">
-                        <div class="m_group">
-                          <svg
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                            class="m_icon"
-                          >
-                            <g>
-                              <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
-                            </g>
-                          </svg>
-                          <input
-                            class="m_input ps-5"
-                            type="search"
-                            placeholder="Buscar"
-                            value={searchTermMenu}
-                            onChange={handleSearchMenu}
-                          />
-                        </div>
+                              ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div>
-                      <Button
-                        className="mgreenbtn pt-2  m14 border-0 text-nowrap"
-                        onClick={() => {
-                          // handleClose1Prod();
-                          handleAddMenu();
-                        }}
-                      >
-                        Añadir nuevos
-                        <Badge
-                          bg="light"
-                          className="ms-2 text-success rounded-circle m12"
-                        >
-                          {selectedItemsCount}
-                        </Badge>
-                        <span className="visually-hidden">
-                          unread messages
-                        </span>
-                      </Button>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
-              <div className="row p-2">
-                {filteredItemsMenu.map((ele, index) => {
-                  const isAdded = selectedItemsMenu.length > 0 ? selectedItemsMenu.some((v) => v.item_id == ele.id) : false;
-                  return (
-                    <div
-                      className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
-                      keys={index}
-                    >
+              <div className="col-sm-10 col-8 m-0 p-0">
+                <div className="p-3   text-white  flex-wrap">
+                  <div className="mb-3">
+                    <h6>Bebidas</h6>
+                  </div>
+                  <div>
+                    <div className="d-flex justify-content-between">
                       <div>
-                        <div class="card m_bgblack text-white position-relative">
-                          <img
-                            src={`${API}/images/${ele.image}`}
-                            class="card-img-top object-fit-fill rounded"
-                            alt="..."
-                            style={{ height: "162px" }}
-                          />
-                          <div class="card-body">
-                            <h6 class="card-title">{ele.name}</h6>
-                            <h6 class="card-title">${ele.sale_price}</h6>
-                            <p class="card-text opacity-50">
-                              Codigo: {ele.code}
-                            </p>
-                            <div class="btn w-100 btn-primary text-white"
-                              style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
-                              onClick={() => handleAddItem(ele)}>
-                              <a
-                                href="# "
-                                className="text-white text-decoration-none"
-                                style={{ fontSize: "14px" }}
-                              >
-                                <span className="ms-1">
-                                  {isAdded ? 'Agregado' : 'Agregar al menú'}
-                                </span>
-                              </a>
-                            </div>
-                          </div>
-
-                          <div
-                            className="position-absolute "
-                            style={{ cursor: "pointer" }}
-                          >
-                            <Link
-                              to={`/articles/singleatricleproduct/${ele.id}`}
-                              className="text-white text-decoration-none"
+                        <div className="">
+                          <div class="m_group">
+                            <svg
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                              class="m_icon"
                             >
-                              <p
-                                className=" px-1  rounded m-2"
-                                style={{ backgroundColor: "#374151" }}
-                              >
-                                <IoMdInformationCircle />{" "}
-                                <span style={{ fontSize: "12px" }}>
-                                  Ver información
-                                </span>
-                              </p>
-                            </Link>
+                              <g>
+                                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
+                              </g>
+                            </svg>
+                            <input
+                              class="m_input ps-5"
+                              type="search"
+                              placeholder="Buscar"
+                              value={searchTermMenu}
+                              onChange={handleSearchMenu}
+                            />
                           </div>
                         </div>
                       </div>
+                      <div>
+                        <Button
+                          className="mgreenbtn pt-2  m14 border-0 text-nowrap"
+                          onClick={() => {
+                            // handleClose1Prod();
+                            handleAddMenu();
+                          }}
+                        >
+                          Añadir nuevos
+                          <Badge
+                            bg="light"
+                            className="ms-2 text-success rounded-circle m12"
+                          >
+                            {selectedItemsCount}
+                          </Badge>
+                          <span className="visually-hidden">
+                            unread messages
+                          </span>
+                        </Button>
+                      </div>
                     </div>
-                  )
-                })}
+                  </div>
+                </div>
+                <div className="row p-2">
+                  {filteredItemsMenu.map((ele, index) => {
+                    const isAdded = selectedItemsMenu.length > 0 ? selectedItemsMenu.some((v) => v.item_id == ele.id) : false;
+                    return (
+                      <div
+                        className="col-md-4 col-xl-3 col-sm-6 col-12 g-3"
+                        keys={index}
+                      >
+                        <div>
+                          <div class="card m_bgblack text-white position-relative">
+                            <img
+                              src={`${API}/images/${ele.image}`}
+                              class="card-img-top object-fit-fill rounded"
+                              alt="..."
+                              style={{ height: "162px" }}
+                            />
+                            <div class="card-body">
+                              <h6 class="card-title">{ele.name}</h6>
+                              <h6 class="card-title">${ele.sale_price}</h6>
+                              <p class="card-text opacity-50">
+                                Codigo: {ele.code}
+                              </p>
+                              <div class="btn w-100 btn-primary text-white"
+                                style={{ backgroundColor: isAdded ? "#063f93" : "#0d6efd" }}
+                                onClick={() => handleAddItem(ele)}>
+                                <a
+                                  href="# "
+                                  className="text-white text-decoration-none"
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  <span className="ms-1">
+                                    {isAdded ? 'Agregado' : 'Agregar al menú'}
+                                  </span>
+                                </a>
+                              </div>
+                            </div>
+
+                            <div
+                              className="position-absolute "
+                              style={{ cursor: "pointer" }}
+                            >
+                              <Link
+                                to={`/articles/singleatricleproduct/${ele.id}`}
+                                className="text-white text-decoration-none"
+                              >
+                                <p
+                                  className=" px-1  rounded m-2"
+                                  style={{ backgroundColor: "#374151" }}
+                                >
+                                  <IoMdInformationCircle />{" "}
+                                  <span style={{ fontSize: "12px" }}>
+                                    Ver información
+                                  </span>
+                                </p>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        </Modal.Body>
+          </Modal.Body>
 
-      </Modal>
+        </Modal>
 
-      {/* add production success */}
-      <Modal
-        show={show1AddSuc}
-        onHide={handleClose1AddSuc}
-        backdrop={true}
+        {/* add production success */}
+        <Modal
+          show={show1AddSuc}
+          onHide={handleClose1AddSuc}
+          backdrop={true}
 
-        keyboard={false}
-        className="m_modal"
-      >
-        <Modal.Header closeButton className="border-0" />
-        <Modal.Body>
-          <div className="text-center">
-            <img
-              src={require("../Image/check-circle.png")}
-              alt=""
-            />
-            <p className="mb-0 mt-2 h6">Nuevos platillos</p>
-            <p className="opacity-75">
-              Han sido agregados exitosamente
-            </p>
-          </div>
-        </Modal.Body>
-      </Modal>
+          keyboard={false}
+          className="m_modal"
+        >
+          <Modal.Header closeButton className="border-0" />
+          <Modal.Body>
+            <div className="text-center">
+              <img
+                src={require("../Image/check-circle.png")}
+                alt=""
+              />
+              <p className="mb-0 mt-2 h6">Nuevos platillos</p>
+              <p className="opacity-75">
+                Han sido agregados exitosamente
+              </p>
+            </div>
+          </Modal.Body>
+        </Modal>
 
-      {/* processing */}
-      <Modal
-        show={isProcessing}
-        keyboard={false}
-        backdrop={true}
-        className="m_modal  m_user "
-      >
-        <Modal.Body className="text-center">
-          <p></p>
-          <Spinner animation="border" role="status" style={{ height: '85px', width: '85px', borderWidth: '6px' }} />
-          <p className="mt-2">Procesando solicitud...</p>
-        </Modal.Body>
-      </Modal>
+        {/* processing */}
+        <Modal
+          show={isProcessing}
+          keyboard={false}
+          backdrop={true}
+          className="m_modal  m_user "
+        >
+          <Modal.Body className="text-center">
+            <p></p>
+            <Spinner animation="border" role="status" style={{ height: '85px', width: '85px', borderWidth: '6px' }} />
+            <p className="mt-2">Procesando solicitud...</p>
+          </Modal.Body>
+        </Modal>
 
 
-    </div>
+      </div>
     </div >
   )
 }

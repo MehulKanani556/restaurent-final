@@ -734,8 +734,38 @@ const Dashboard = () => {
     ];
   };
   const transformOrderDetails = (orderDetails) => {
-    if (!Array.isArray(orderDetails)) {
-      return [{ date: new Date().toLocaleDateString(), total: 0, quantity: 0 }]; // Return an array with 0 values if orderDetails is not defined or not an array
+    // Check if orderDetails is defined and is an array
+    if (!Array.isArray(orderDetails) || orderDetails.length === 0) { // Updated condition to check for empty array
+      if (revData === 'week') {
+        const completeResults = [];
+        const startDate = new Date();
+        const currentDay = startDate.getDay(); // Get current day of the week
+        const weekStart = new Date(startDate.setDate(startDate.getDate() - currentDay)); // Start of the week
+        const today = new Date(); // Get today's date
+        const weekEnd = today; // Set weekEnd to today
+
+        for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
+          const dateString = d.toLocaleDateString();
+          completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the week
+        }
+        return completeResults; // Return the complete results for the week
+      } else if (revData === 'month') { // Added condition for month
+        const completeResults = [];
+        const startDate = new Date();
+        const currentMonth = selectedRevMonth - 1;
+        const currentYear = startDate.getFullYear();
+        const today = startDate.getDate(); // Get today's date
+        const cn = startDate.getMonth()+1; // Get the current month number
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in the current month
+        let endDay = selectedRevMonth === cn ? today : daysInMonth; // Determine the end day based on the condition
+        console.log(endDay,selectedRevMonth,cn,selectedRevMonth === cn)
+        for (let day = 1; day <= endDay; day++) {
+          const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString();
+          completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the month
+        }
+        return completeResults; // Return the complete results for the month
+      }
+      return [{ date: new Date().toLocaleDateString(), total: 0, quantity: 0 }]; // Return a default value
     }
 
     const result = orderDetails.reduce((acc, order) => {
@@ -745,6 +775,7 @@ const Dashboard = () => {
       if (!acc[date]) {
         acc[date] = { date, total: 0, quantity: 0 }; // Start with 0
       }
+
       acc[date].total += amount;
       acc[date].quantity += order.quantity || 0; // Ensure quantity starts with 0
 
@@ -753,16 +784,62 @@ const Dashboard = () => {
 
     const sortedResults = Object.values(result).sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
 
-    // Ensure the chart starts with a 0 value entry
-    if (sortedResults.length === 0 || sortedResults[0].total !== 0) {
-      sortedResults.unshift({ date: new Date().toLocaleDateString(), total: 0, quantity: 0 });
+    const completeResults = [];
+    const startDate = new Date(); // Current date
+
+    if (revData === 'day') {
+      // Show only current date
+      const dateString = startDate.toLocaleDateString();
+      completeResults.push(result[dateString]); // Fill with 0 for the current date
+    } else if (revData === 'week') {
+      const currentDay = startDate.getDay(); // Get current day of the week
+      const weekStart = new Date(startDate.setDate(startDate.getDate() - currentDay)); // Start of the week
+      const today = new Date(); // Get today's date
+      const weekEnd = today; // Set weekEnd to today
+      let hasData = false; // Flag to check if there's any data for the week
+
+      for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
+        const dateString = d.toLocaleDateString();
+        if (!result[dateString]) {
+          completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
+        } else {
+          completeResults.push(result[dateString]); // Use existing data
+          hasData = true; // Set flag to true if data exists for the week
+        }
+      }
+
+      // If no data exists for the week, fill with 0s for each day of the week
+      if (!hasData) {
+        for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
+          const dateString = d.toLocaleDateString();
+          completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
+        }
+      }
+    } else if (revData === 'month') {
+      // Show current month dates up to today's date or the end of the month
+      const currentMonth = selectedRevMonth - 1; // Adjust for zero-based index
+      const currentYear = startDate.getFullYear();
+      const today = startDate.getDate(); // Get today's date
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in the current month
+      const cn = startDate.getMonth()+1; // Get the current month number
+
+      let endDay = selectedRevMonth == cn ? today : daysInMonth; // Determine the end day based on the condition
+
+      for (let day = 1; day <= endDay; day++) { // Loop until the last day of the month or today's date
+        const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString();
+        if (!result[dateString]) {
+          completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
+        } else {
+          completeResults.push(result[dateString]); // Use existing data
+        }
+      }
     }
 
-    return sortedResults;
+    return completeResults;
   };
 
   // Use the transformed data in the chart
-  const chartData = transformOrderDetails(totalRevenue.order_details);
+  const chartData = transformOrderDetails(totalRevenue?.order_details);
 
   // console.log(chartData);
 
@@ -1735,35 +1812,58 @@ const Dashboard = () => {
                 </div>
                 <div className="j-payment-body">
 
-                  <ResponsiveContainer width="100%" height={450}>
-                    <AreaChart data={chartData}>
-                      <defs>
-                        <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="10%" stopColor="#1c64f2" stopOpacity={0.4} />
-                          <stop offset="90%" stopColor="#395692" stopOpacity={0.0} />
-                        </linearGradient>
-                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="10%" stopColor="#16bdca" stopOpacity={0.4} />
-                          <stop offset="90%" stopColor="#1c506a" stopOpacity={0.0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgb(55, 65, 82)" horizontal={true} vertical={false} />
+                <ResponsiveContainer width="100%" height={450}>
+          <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>  
+            <defs>
+              <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="10%" stopColor="#1c64f2" stopOpacity={0.5} />
+                <stop offset="90%" stopColor="#395692" stopOpacity={0.0} />
+              </linearGradient>
+              <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="10%" stopColor="#16bdca" stopOpacity={0.5} />
+                <stop offset="90%" stopColor="#1c506a" stopOpacity={0.0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgb(55, 65, 82)" horizontal={true} vertical={false} />
+            {/* {chartData[0]!=undefined && ( */}
 
-                      <XAxis
-                        dataKey="date"
-                        axisLine={false}
-                        tickFormatter={(date) => {
-                          const d = new Date(date);
-                          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-                        }}
-                      />
-                      {/* <YAxis domain={[0, 'dataMax']} axisLine={false} yAxisId="left" /> */}
-                      {/* <YAxis domain={[0, 'dataMax']} axisLine={false} orientation="right" yAxisId="right" /> */}
-                      <Tooltip cursor={false} formatter={(value, name) => [value, name === 'total' ? 'Total' : 'Quantity']} />
-                      <Area dataKey="total" stroke="#1c64f2" strokeWidth={3} fill="url(#colorOrder)" dot={false} yAxisId="left" />
-                      <Area dataKey="quantity" stroke="#16bdca" strokeWidth={3} fill="url(#colorTotal)" dot={false} yAxisId="right" />
-                    </AreaChart>
-                  </ResponsiveContainer>
+            <XAxis
+              dataKey="date"
+              axisLine={false}
+              tickFormatter={(date) => {
+                const d = new Date(date);
+                // Check if revData is 'day' and return today's date
+                return revData === 'day' ? `${String(new Date().getDate()).padStart(2, '0')}` : `${String(d.getDate()).padStart(2, '0')}`;
+              }}
+              // tick={{ fill: 'white' }}
+              interval={0}
+              padding={{ left: 25, right: 10 }}
+              domain={['dataMin', 'dataMax']}
+            />
+            {/* )} */}
+            <YAxis yAxisId="left" orientation="left" stroke="#1c64f2" hide />
+            <YAxis yAxisId="right" orientation="right" stroke="#16bdca" hide />
+            <Tooltip cursor={false} formatter={(value, name) => [value, name === 'total' ? 'Total' : 'Quantity']} />
+            <Area 
+              // type="monotone"
+              dataKey="total" 
+              stroke="#1c64f2" 
+              strokeWidth={3} 
+              fill="url(#colorOrder)" 
+              dot={false} 
+              yAxisId="left"
+            />
+            <Area 
+              // type="monotone"
+              dataKey="quantity" 
+              stroke="#16bdca" 
+              strokeWidth={3} 
+              fill="url(#colorTotal)" 
+              dot={false} 
+              yAxisId="right"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
                 </div>
                 <div className="j-foot-text text-end" onClick={totalrevenueReport}>
                   <button className="sjfs-14">

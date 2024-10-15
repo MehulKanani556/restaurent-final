@@ -281,8 +281,9 @@ export default function Articles() {
         .map((menu) => {
           const filteredItems = menu.items.filter(
             (ele) =>
-              ele.name.toLowerCase().includes(searchTerm) ||
-              menu.name.toLowerCase().includes(searchTerm)
+              ele.name.toLowerCase().includes(searchTerm) || // Search by name
+              menu.name.toLowerCase().includes(searchTerm) || // Search by menu name
+              ele.code.toLowerCase().includes(searchTerm) // {{ edit_1 }}: Added search by code
           );
           return {
             ...menu,
@@ -664,9 +665,9 @@ export default function Articles() {
 
   const filterItems = (searchTerm, checkedParents, childCheck) => {
     return obj1.filter((item) => {
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      const matchesSearch = 
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.code.toLowerCase().includes(searchTerm.toLowerCase()); 
       const matchesCheckbox =
         checkedParents[item.family_id] ||
         (childCheck &&

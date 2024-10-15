@@ -86,6 +86,7 @@ const Informacira = () => {
       value = value.substring(1);
     }
     setpricesecond(value);
+    setErrorCashPrice('');
   };
 
   const [showModal12, setShowModal12] = useState(false);

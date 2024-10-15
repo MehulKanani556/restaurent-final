@@ -817,9 +817,10 @@ const role = sessionStorage.getItem("role");
 
   const filterItems = (searchTerm, checkedParents, childCheck) => {
     return obj1.filter((item) => {
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      const matchesSearch = 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchTerm.toLowerCase()); // Added search by code
+
       const matchesCheckbox =
         checkedParents[item.family_id] ||
         (childCheck &&
@@ -1217,7 +1218,7 @@ const role = sessionStorage.getItem("role");
                             Cambios centro de producción
                           </p>
                           <p className="opacity-75">
-                            Tus cambios no tuvieron éxito
+                            Centro de producción eliminado exitosamente
                           </p>
                         </div>
                       </Modal.Body>

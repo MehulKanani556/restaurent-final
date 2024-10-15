@@ -231,7 +231,7 @@ const Counter = () => {
         .split(/\s+/)
         .filter((term) => term.length > 0);
       itemsToRender = itemsToRender.filter((item) =>
-        searchTerms.every((term) => item.name.toLowerCase().includes(term))
+        searchTerms.every((term) => item.name.toLowerCase().includes(term) || item.code.toLowerCase().includes(term))
       );
     }
 

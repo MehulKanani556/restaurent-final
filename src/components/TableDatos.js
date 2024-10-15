@@ -276,6 +276,7 @@ const TableDatos = () => {
   const [activeAccordionItem, setActiveAccordionItem] = useState("1");
   const handleAccordionClick = (value) => {
     setSelectedRadio(value);
+    setActiveAccordionItem(value);
   };
 
  

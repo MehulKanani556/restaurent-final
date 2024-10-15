@@ -180,6 +180,34 @@ export default function Home_Pedidos_paymet() {
     }
   }, [user, roles]);
 
+  useEffect(() => {
+    getPaymentsData();
+  }, [admin_id, id]);
+
+  const [pamentDone, setPaymentDone] = useState(false)
+
+  const getPaymentsData = async () => {
+    console.log(admin_id, admin_id);
+
+    try {
+      const response = await axios.get(`${apiUrl}/getsinglepayments/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Payments Data:", response);
+      if (response.data.success) {
+        // console.log("true");
+        setPaymentDone(true);
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching PaymentsData:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
+
   const getOrder = async () => {
     setIsProcessing(true);
     try {
@@ -581,17 +609,40 @@ export default function Home_Pedidos_paymet() {
     }
   }
 
-
   const handlePayment = () => {
-    // navigate(`/table/datos?oId=${id}`, { state:  orderData });
+
+    console.log(orderDetails, orderData);
+
+    const currentOrder = {
+      orderType: orderData?.order_type,
+      orderId: orderData?.id,
+      name: orderData?.customer_name,
+      order: "old"
+    }
+    let cartItems = [];
+    orderDetails?.map((v) => {
+      const obj = {
+        orderId: orderData?.id,
+        id: v.item_id,
+        image: v.image,
+        name: v.name,
+        price: v.amount,
+        // "code": "89874934",
+        count: v.quantity,
+        note: v.notes ? v.notes : "",
+        isEditing: false,
+        OdId: v.id
+      }
+      cartItems.push(obj)
+    })
+
+    localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+
+    navigate("/home/usa/bhomedelivery/datos");
+
   }
-
-
   // =============== End ============
-
-
-
-
   return (
     <div>
       <div className="m_bg_black">
@@ -615,7 +666,7 @@ export default function Home_Pedidos_paymet() {
                     !(orderData?.status == 'delivered' || orderData?.status == 'finalized' || orderData?.status == "cancelled") &&
                     <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
                   ) : (
-                    !(orderData?.status == "cancelled") && <>
+                    !(orderData?.status == "cancelled" || pamentDone) && <>
                       <Link className='text-decoration-none'
                         to={`/home_Pedidos/payment_edit/${id}`}
                       >
@@ -897,7 +948,10 @@ export default function Home_Pedidos_paymet() {
                         </div>
                         {!orderData?.reason &&
                           <div className='mx-auto text-center mt-3'>
-                            <div className='btn text-white j-btn-primary w-100  border-0' style={{ padding: "8px 12px", borderRadius: "8px" }} onClick={handlePayment}>Pagar ahora</div>
+                            {!pamentDone ?
+                              <div className='btn text-white j-btn-primary w-100' style={{ padding: "8px 12px", borderRadius: "8px" }} onClick={handlePayment}>Pagar ahora</div> :
+                              <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147bdea8", borderRadius: "8px", padding: "10px 20px", cursor: "not-allowed" }}>Pago completado</div>
+                            }
                           </div>
                         }
                       </div>

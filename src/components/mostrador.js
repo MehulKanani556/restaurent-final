@@ -1008,7 +1008,7 @@ const Mostrador = () => {
                         Continuar
                       </div>
                     </div>
-                    <Modal
+                    {/* <Modal
                       show={showEditFam}
                       onHide={handleCloseEditFam}
                       backdrop={true}
@@ -1038,7 +1038,7 @@ const Mostrador = () => {
                             handleShowEditFamDel();
                           }}
                         >
-                          Si, seguro
+                          Si, seguroaa
                         </Button>
                         <Button
                           className="j-tbl-btn-font-1 "
@@ -1050,7 +1050,7 @@ const Mostrador = () => {
                           No, cancelar
                         </Button>
                       </Modal.Footer>
-                    </Modal>
+                    </Modal> */}
                     {/* <Modal
                       show={showEditFamDel}
                       onHide={handleCloseEditFamDel}
@@ -1087,7 +1087,7 @@ const Mostrador = () => {
                   <Modal.Body className="border-0">
                     <div className="text-center">
                       <img
-                        className="j-trash-img-late"
+                        // className="j-trash-img-late"
                         src={require("../Image/trash-outline-secondary.png")}
                         alt=""
                       />
