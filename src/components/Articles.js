@@ -807,7 +807,7 @@ export default function Articles() {
   };
 
   // Filter sub-family options based on selected family name
-  const filteredSubFamilies = childCheck.filter(
+  const filteredSubFamilies = childCheck?.filter(
     (childItem) => childItem.family_name === selectedFamily
   );
   // **********************************************

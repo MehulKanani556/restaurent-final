@@ -462,7 +462,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                                 </div>
                                 <div className="sjcontact-info ms-2">
                                     <div className="sjcontact-name">{group.name}</div>
-                                    <div className="sjcontact-message">{groupChats?.[0]?.message}</div>
+                                    <div className="sjcontact-message">{group?.messages[0].message}</div>
                                 </div>
                             </div>
                             {/* {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (

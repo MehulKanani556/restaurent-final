@@ -745,7 +745,7 @@ const Dashboard = () => {
         const weekEnd = today; // Set weekEnd to today
 
         for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
-          const dateString = d.toLocaleDateString();
+          const dateString = d.toLocaleDateString('en-US');
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the week
         }
         return completeResults; // Return the complete results for the week
@@ -760,16 +760,16 @@ const Dashboard = () => {
         let endDay = selectedRevMonth === cn ? today : daysInMonth; // Determine the end day based on the condition
         console.log(endDay,selectedRevMonth,cn,selectedRevMonth === cn)
         for (let day = 1; day <= endDay; day++) {
-          const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString();
+          const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString('en-US'); // Specify locale
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the month
         }
         return completeResults; // Return the complete results for the month
       }
-      return [{ date: new Date().toLocaleDateString(), total: 0, quantity: 0 }]; // Return a default value
+      return [{ date: new Date().toLocaleDateString('en-US'), total: 0, quantity: 0 }]; // Return a default value
     }
 
     const result = orderDetails.reduce((acc, order) => {
-      const date = new Date(order.created_at).toLocaleDateString();
+      const date = new Date(order.created_at).toLocaleDateString('en-US');
       const amount = parseFloat(order.amount) || 0; // Handle null amounts
 
       if (!acc[date]) {
@@ -789,7 +789,7 @@ const Dashboard = () => {
 
     if (revData === 'day') {
       // Show only current date
-      const dateString = startDate.toLocaleDateString();
+      const dateString = startDate.toLocaleDateString('en-US');
       completeResults.push(result[dateString]); // Fill with 0 for the current date
     } else if (revData === 'week') {
       const currentDay = startDate.getDay(); // Get current day of the week
@@ -799,7 +799,7 @@ const Dashboard = () => {
       let hasData = false; // Flag to check if there's any data for the week
 
       for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
-        const dateString = d.toLocaleDateString();
+        const dateString = d.toLocaleDateString('en-US');
         if (!result[dateString]) {
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
         } else {
@@ -811,7 +811,7 @@ const Dashboard = () => {
       // If no data exists for the week, fill with 0s for each day of the week
       if (!hasData) {
         for (let d = weekStart; d <= weekEnd; d.setDate(d.getDate() + 1)) {
-          const dateString = d.toLocaleDateString();
+          const dateString = d.toLocaleDateString('en-US');
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
         }
       }
@@ -826,7 +826,7 @@ const Dashboard = () => {
       let endDay = selectedRevMonth == cn ? today : daysInMonth; // Determine the end day based on the condition
 
       for (let day = 1; day <= endDay; day++) { // Loop until the last day of the month or today's date
-        const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString();
+        const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString('en-US'); // Specify locale
         if (!result[dateString]) {
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill missing dates with 0
         } else {
@@ -1671,7 +1671,7 @@ const Dashboard = () => {
                 <div>{/* <Chart /> */}</div>
                 <div className="j-foot-border py-3">
                   <div className="j-payment-foot text-white row">
-                    <div className="d-flex align-items-center justify-content-center col-md-6">
+                    <div className="d-flex align-items-center  col-md-6">
                       <img src={chart1} className="ss_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Efectivo:{" "}
@@ -1680,7 +1680,7 @@ const Dashboard = () => {
                         </span>
                       </p>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center  col-md-6">
+                    <div className="d-flex align-items-center   col-md-6">
                       <img src={chart3} className="ssj_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Tarjeta debito:{" "}
@@ -1689,7 +1689,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="j-payment-foot text-white row">
-                    <div className="d-flex align-items-center justify-content-center col-md-6 ">
+                    <div className="d-flex align-items-center  col-md-6 ">
                       <img src={chart4} className="ss_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Tarjeta crédito:{" "}
@@ -1698,7 +1698,7 @@ const Dashboard = () => {
                         </span>
                       </p>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center col-md-6">
+                    <div className="d-flex align-items-center  col-md-6">
                       <img src={chart2} className="ssj_img" />
                       <p className="ss_fontsize mb-0 sjfs-14">
                         Transferencias:{" "}

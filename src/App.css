@@ -520,6 +520,7 @@
 .j-order-img img {
   height: 70px;
   width: 70px;
+  object-fit:cover;
 }
 
 .j-delivery-data {
@@ -2265,14 +2266,14 @@ td {
 .ss_img {
   width: 6px;
   height: 6px;
-  margin-top: 8px;
+  /* margin-top: 8px; */
   margin-right: 5px;
 }
 
 .ssj_img {
   width: 6px;
   height: 6px;
-  margin-top: 8px;
+  /* margin-top: 8px; */
   margin-right: 5px;
   margin-left: 10px;
 }
