@@ -1113,7 +1113,7 @@ const Tables = () => {
     //   }
     // });
     echo.channel('box-channel').listen('.CardClick', (event) => {
-      console.log(event);
+      // console.log(event);
       if (event.selected) {
         setSelectedCards(prev => [...prev ? prev : [], event.card_id]);
 
@@ -1584,6 +1584,7 @@ const Tables = () => {
                 name="noOfTables"
                 value={selectedFamily.noOfTables}
                 onChange={handleEditChange}
+                disabled
               />
               {editErrors.noOfTables && (
                 <div className="text-danger errormessage">
@@ -1923,7 +1924,7 @@ const Tables = () => {
                     <div className={"j-counter-order-data"}>
                       {tableData.map((tableItem) =>
                         tableItem.items
-                          .slice(0, showAll ? tableItem.items.length : 2)
+                          .slice(0, showAll ? tableItem.items.length : 3)
                           .map((item, index) => {
                             const itemInfo = getItemInfo(item.item_id);
                             return (
@@ -2038,6 +2039,7 @@ const Tables = () => {
                             );
                           })
                       )}
+                     
                       {tableData[0]?.items.length >= 4 &&
                         <a
                           href="#"

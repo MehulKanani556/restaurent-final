@@ -167,7 +167,17 @@ const Counter_finalP = () => {
   const [customerData, setCustomerData] = useState(initialCustomerData);
 
   const handleCheckboxChange = (value) => {
+    // console.log(value);
+
     if (selectedCheckboxes.includes(value)) {
+
+      if (customerData?.[value + "Amount"] ) {
+        setCustomerData((prevData) => ({
+          ...prevData,
+          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : ""
+        }));
+      }
+
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
       // setCustomerData(initialCustomerData);
       setCustomerData((prevData) => ({
@@ -176,6 +186,7 @@ const Counter_finalP = () => {
       }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
+      setCustomerData({ ...customerData, [value + "Amount"]: customerData?.turn ? (Math.abs(customerData?.turn.toFixed(2))).toString() : '', turn: '' });
     }
     // Clear the payment type error when a type is selected
     setFormErrors((prevErrors) => ({
@@ -397,7 +408,7 @@ const Counter_finalP = () => {
     }));
 
     const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
-
+console.log("payment",payment);
     const orderData = {
       order_details: orderDetails,
       admin_id: admin_id,
@@ -411,7 +422,7 @@ const Counter_finalP = () => {
         customer_name:
           payment.firstname && payment.firstname.trim() !== ""
             ? payment.firstname
-            : payment.businessname,
+            : payment.business_name,
         reason: "",
         person: "",
         tip: tipAmount,

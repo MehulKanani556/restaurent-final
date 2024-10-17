@@ -144,13 +144,18 @@ const Home_Pedidos = () => {
                 let flages = 0;
                 let flageb = 0;
                 sectordata.map(s => s.tables.map((a) => {
-                    if (a.id == v.table_id) {
+                    console.log("order", s);
+
+                    if (a.id === v.table_id) { // Changed '==' to '===' for strict equality
                         obj.sector = s.name;
-                        obj.table = a.name
-                        obj.table_status = a.status
+                        obj.table = a.name;
+                        obj.table_status = a.status; // Ensure to capture the table status
                         flages = 1;
+
                     }
                 }));
+          
+                
                 users.map((b) => {
                     if (b.id == v.user_id) {
                         obj.box = b.name;
@@ -183,118 +188,7 @@ const Home_Pedidos = () => {
 
     // =========end=========
 
-    // const [data, setData] = useState([
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Recibido',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Recibido',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Preparado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Entregado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Finalizado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Preparado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Recibido',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Finalizado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Entregado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    //     {
-    //         id: '01234',
-    //         sector: '4 ',
-    //         mesa: '1',
-    //         usuario: 'Caja 1',
-    //         estado: 'Entregado',
-    //         fecha: '17/03/2024',
-    //         hora: '08:00 am',
-    //         tipo: 'Delivery',
-    //         ver: "Ver detalles"
-    //     },
-    // ]);
+  
 
 
 
@@ -316,6 +210,7 @@ const Home_Pedidos = () => {
             [name]: false,
         }));
     };
+
 
     let filteredItems = orderData.filter((item) => {
 
@@ -634,14 +529,17 @@ const Home_Pedidos = () => {
                                 </thead>
                                 <tbody className='text-white b_btnn '>
                                     {/* new========== */}
+                                    {console.log(currentItems)}
                                     {currentItems.length > 0 ?
                                          currentItems.map((order) => (
-                                            <tr key={order.id} className='b_row'>
+                                             <tr key={order.id} className='b_row'>
                                                 {/* <Link to={"/home_Pedidos/paymet"}> */}
                                                 <Link to={`/home_Pedidos/paymet/${order.id}`}>
                                                     <td className='b_idbtn bj-delivery-text-2 ms-3' style={{ borderRadius: "10px" }}>{order.id}</td>
                                                 </Link>
                                                 <td>{order.sector}</td>
+                                                {console.log(order.sector)}
+                                             
                                                 <td className='b_text_w  bj-delivery-text-2'>{order.table}</td>
                                                 <td className='b_text_w  bj-delivery-text-2'>{order.box}</td>
                                                 {/* <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center ${order.estado === 'Recibido' ? 'b_indigo' : order.estado === 'Preparado' ? 'b_ora ' : order.estado === 'Entregado' ? 'b_blue' : order.estado === 'Finalizado' ? 'b_green' : order.estado === 'Retirar' ? 'b_indigo' : order.estado === 'Local' ? 'b_purple' : 'text-danger'}`}>{order.estado}</td> */}

@@ -94,7 +94,7 @@ export default function Homeinformation() {
     setShow12(true)
     setTimeout(() => {
       setShow12(false)
-      navigate(`/home_Pedidos/payment_edit/${id}`, { replace: true, state: "profile" });
+      // navigate(`/home_Pedidos/payment_edit/${id}`, { replace: true, state: "profile" });
     }, 2000);
   };
 
@@ -981,6 +981,12 @@ export default function Homeinformation() {
                   <div className='text-white ms-4 pt-4' >
                     <h5 >Información del pedido</h5>
                   </div>
+                {orderData?.[0]?.reason &&
+                    <div className='text-white ms-4 pt-4' >
+                      <h5 className='bj-delivery-text-15'>Nota anulación</h5>
+                      <textarea type="text" className="form-control bg-gray border-0 mt-4 py-2" id="inputPassword2" placeholder={orderData?.[0]?.reason != null ? orderData?.[0]?.reason : "Estaba sin sal"} style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled></textarea>
+                    </div>
+                  }
 
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
                     <div className='w-100 b_search flex-grow-1  text-white'>

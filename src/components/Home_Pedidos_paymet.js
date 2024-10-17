@@ -600,9 +600,9 @@ export default function Home_Pedidos_paymet() {
       setShowCancelOrderButton(false);
     }
   };
-
+console.log(orderData)
   const handleCredit = () => {
-    if (orderData?.[0]?.status == 'delivered') {
+    if (orderData?.status == 'delivered' || orderData?.status == "cancelled") {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
       alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')

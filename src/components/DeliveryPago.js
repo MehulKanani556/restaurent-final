@@ -166,16 +166,28 @@ const DeliveryPago = () => {
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
   const [customerData, setCustomerData] = useState(initialCustomerData);
 
+
   const handleCheckboxChange = (value) => {
+    // console.log(value);
+
     if (selectedCheckboxes.includes(value)) {
+
+      if (customerData?.[value + "Amount"] ) {
+        setCustomerData((prevData) => ({
+          ...prevData,
+          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : ""
+        }));
+      }
+
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
-      // Do not reset the entire customerData, only the specific amount
+      // setCustomerData(initialCustomerData);
       setCustomerData((prevData) => ({
         ...prevData,
         [value + "Amount"]: "" // Reset only the deselected payment type amount
       }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
+      setCustomerData({ ...customerData, [value + "Amount"]: customerData?.turn ? (Math.abs(customerData?.turn.toFixed(2))).toString() : '', turn: '' });
     }
     // Clear the payment type error when a type is selected
     setFormErrors((prevErrors) => ({

@@ -56,8 +56,8 @@ const CajaOrderRecipe = ({ data }) => {
       type: "REIMPRESION"
     },
     cashier: role,
-    date: formattedDate,
-    time: formattedTime,
+    date: new Date(data.created_at).toLocaleDateString('en-GB'),
+    time: new Date(data.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     customer: {
       name: user.firstname ,
       email:user.email ,

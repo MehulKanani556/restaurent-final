@@ -107,7 +107,7 @@ function Home_Usuarios() {
                     Hora: formattedTime, // Add time
                     Cliente: order.customer_name, // Changed to Spanish
                     Pago: "$" + order.total, // Changed to Spanish
-                    Metodo: order.payment_type == 'cash' ? 'Caso' :
+                    Metodo: order.payment_type == 'cash' ? 'Efectivo' :
                             order.payment_type == 'debit' ? 'Débito' :
                             order.payment_type == 'credit' ? 'Crédito' :
                             order.payment_type == 'transfer' ? 'Transferir' : " ",
@@ -401,9 +401,9 @@ function Home_Usuarios() {
                                     <li className="nav-item" role="presentation">
                                         <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-local-tab4" data-bs-toggle="pill" data-bs-target="#pills-local" type="button" role="tab" aria-controls="pills-local" aria-selected="false" onClick={() => handleType("local")} >Local</button>
                                     </li>
-                                    <li className="nav-item" role="presentation">
+                                    {/* <li className="nav-item" role="presentation">
                                         <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-paltform-tab5" data-bs-toggle="pill" data-bs-target="#pills-paltform" type="button" role="tab" aria-controls="pills-paltform" aria-selected="false" onClick={() => handleType("Plat")} >Plataforma</button>
-                                    </li>
+                                    </li> */}
                                 </ul>
                                 {/* <div className='text-white fs-5 fw- d-flex b_arrow align-item-center justify-content-center'>
                                     <div className='text-white  d-flex  b_arrow' style={{ alignItems: "baseline" }}>
@@ -487,7 +487,7 @@ function Home_Usuarios() {
                                                             {/* <td className='b_text_w'>{order.payment_type}</td> */}
                                                             <td className='b_text_w'>
                                                                 {
-                                                                order.payment_type == 'cash' ? 'Caso' :
+                                                                order.payment_type == 'cash' ? 'Efectivo' :
                                                                 order.payment_type == 'debit' ? 'Débito' :
                                                                 order.payment_type == 'credit' ? 'Crédito' :
                                                                 order.payment_type == 'transfer' ? 'Transferir' : " "

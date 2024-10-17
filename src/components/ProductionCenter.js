@@ -864,9 +864,10 @@ const role = sessionStorage.getItem("role");
 
     localStorage.setItem("cartItems", JSON.stringify([{ image, price, name, code, id, count: 1, isEditing: false, note: "" }]));
     try {
-      const response = await axios.get(`${apiUrl}/orders/last`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+     
+  const response = await axios.post(`${apiUrl}/orders/last`,{admin_id}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 
       // console.log(response.data);
       if (response.status == 200) {

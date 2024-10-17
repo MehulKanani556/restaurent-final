@@ -1,8 +1,8 @@
 import React from "react";
 
-const TableLastRecipt = ({ data ,itemInfo , payment,paymentAmt}) => {
+const TableLastRecipt = ({ data ,itemInfo , payment}) => {
   const role = sessionStorage.getItem("role");
-
+console.log(data,itemInfo,payment);
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
   const currentMinute = currentDate.getMinutes();
@@ -37,7 +37,7 @@ const TableLastRecipt = ({ data ,itemInfo , payment,paymentAmt}) => {
     date: formattedDate,
     time: formattedTime,
     customer: {
-      name: payment.firstname,
+      name:data[0].customer_name|| payment.firstname,
       email:payment.email,
       phone: payment.phone,
       address:payment.address,
