@@ -10,11 +10,11 @@ import axios from "axios";
 
 const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
+  const [token] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
   const API = process.env.REACT_APP_IMAGE_URL;
-  const userId = sessionStorage.getItem("userId");
-  const admin_id = sessionStorage.getItem("admin_id");
+  const userId = localStorage.getItem("userId");
+  const admin_id = localStorage.getItem("admin_id");
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(
     JSON.parse(localStorage.getItem("cartItems")) || []

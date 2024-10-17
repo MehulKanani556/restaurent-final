@@ -24,10 +24,10 @@ import useAudioManager from "./audioManager";
 const Tables = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
+  const [token] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
   const [isProcessing, setIsProcessing] = useState(false);
-  const admin_id = sessionStorage.getItem("admin_id");
+  const admin_id = localStorage.getItem("admin_id");
   const [secTab, setSecTab] = useState([]);
   const [checkboxes, setCheckboxes] = useState([]);
   const [selectedFamily, setSelectedFamily] = useState({});

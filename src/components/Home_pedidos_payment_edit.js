@@ -25,12 +25,12 @@ const Home_pedidos_payment_edit = ({ item }) => {
 
     const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
     const API = process.env.REACT_APP_IMAGE_URL;
-    const [token] = useState(sessionStorage.getItem("token"));
+    const [token] = useState(localStorage.getItem("token"));
     const [isProcessing, setIsProcessing] = useState(false);
     const { id } = useParams();
     const { state, replace } = useLocation();
     const navigate = useNavigate();
-    const admin_id = sessionStorage.getItem("admin_id");
+    const admin_id = localStorage.getItem("admin_id");
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);

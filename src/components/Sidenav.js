@@ -36,7 +36,7 @@ const Sidenav = ({ children, onNavigate }) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isClose, setIsClose] = useState(false);
-  const role = sessionStorage.getItem('role');
+  const role = localStorage.getItem('role');
   // const path = usePathname();
   const menuItem = [
     {

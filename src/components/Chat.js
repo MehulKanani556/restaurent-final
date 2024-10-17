@@ -104,9 +104,9 @@ const styles = {
 
 const Chat = () => {
     const [selectedContact, setSelectedContact] = useState(null);
-    const [userId, setUserId] = useState(sessionStorage.getItem('userId'));
-    const admin_id = sessionStorage.getItem('admin_id');
-    const [token, setToken] = useState(sessionStorage.getItem('token'));
+    const [userId, setUserId] = useState(localStorage.getItem('userId'));
+    const admin_id = localStorage.getItem('admin_id');
+    const [token, setToken] = useState(localStorage.getItem('token'));
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [searchTerm, setSearchTerm] = useState("");

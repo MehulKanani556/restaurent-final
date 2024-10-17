@@ -18,8 +18,8 @@ function Home_detail_no() {
     const { id } = useParams();
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
-    const token = sessionStorage.getItem("token");
-    const admin_id = sessionStorage.getItem("admin_id");
+    const token = localStorage.getItem("token");
+    const admin_id = localStorage.getItem("admin_id");
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
     const { state } = useLocation();

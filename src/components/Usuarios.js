@@ -22,11 +22,11 @@ import useAudioManager from "./audioManager";
 
 const Usuarios = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const role = sessionStorage.getItem("role");
-  const [email] = useState(sessionStorage.getItem("email"));
+  const [token] = useState(localStorage.getItem("token"));
+  const role = localStorage.getItem("role");
+  const [email] = useState(localStorage.getItem("email"));
   const navigate = useNavigate();
-  const admin_id = sessionStorage.getItem("admin_id");
+  const admin_id = localStorage.getItem("admin_id");
   const [showPassword, setShowPassword] = useState(false);
   const [showcomfirmPassword, setShowcomfirmPassword] = useState(false);
   const [editshowPassword, seteditShowPassword] = useState(false);

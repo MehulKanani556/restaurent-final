@@ -9,13 +9,13 @@ import useAudioManager from "./audioManager";
 
 export default function Header() {
 
-  const [email] = useState(sessionStorage.getItem("email"));
-  const [role] = useState(sessionStorage.getItem("role"));
-  const [token] = useState(sessionStorage.getItem("token"));
-  const admin_id = sessionStorage.getItem("admin_id");
-  const user_id = sessionStorage.getItem("userId");
+  const [email] = useState(localStorage.getItem("email"));
+  const [role] = useState(localStorage.getItem("role"));
+  const [token] = useState(localStorage.getItem("token"));
+  const admin_id = localStorage.getItem("admin_id");
+  const user_id = localStorage.getItem("userId");
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [name] = useState(sessionStorage.getItem("name"));
+  const [name] = useState(localStorage.getItem("name"));
   const [show, setShow] = useState(false);
   const [showA, setShowA] = useState(false);
   const location = useLocation();
@@ -65,7 +65,7 @@ export default function Header() {
   }
   useEffect(() => {
     fetchNotifications();
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
     if (!token) {
       navigate('/', { state: { from: location } });
     }
@@ -101,10 +101,10 @@ export default function Header() {
       )
       if (responce.status == 200) {
         echo.leaveChannel(`chat.${user_id}`);
-        sessionStorage.removeItem("email");
-        sessionStorage.removeItem("role");
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("name");
+        localStorage.removeItem("email");
+        localStorage.removeItem("role");
+        localStorage.removeItem("token");
+        localStorage.removeItem("name");
         window.location.href = "/";
       }
     } catch (error) {

@@ -18,10 +18,10 @@ const BHomeDelivery = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
-  const admin_id = sessionStorage.getItem("admin_id");
+  const admin_id = localStorage.getItem("admin_id");
 
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
@@ -74,8 +74,8 @@ const BHomeDelivery = () => {
   const [userId, setUserId] = useState('')
 
   useEffect(() => {
-    // Retrieve the username from sessionStorage
-    const userId = sessionStorage.getItem('userId');
+    // Retrieve the username from localStorage
+    const userId = localStorage.getItem('userId');
     if (userId) {
       setUserId(userId);
     }

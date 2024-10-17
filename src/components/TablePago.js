@@ -23,10 +23,10 @@ const TablePago = () => {
   const [payment, setPayment] = useState(
     JSON.parse(localStorage.getItem("tablePayment"))
   );
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
-  const [userId] = useState(sessionStorage.getItem("userId"));
-  const admin_id = sessionStorage.getItem("admin_id");
+  const [token] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
+  const [userId] = useState(localStorage.getItem("userId"));
+  const admin_id = localStorage.getItem("admin_id");
   // console.log(userId);
 
 

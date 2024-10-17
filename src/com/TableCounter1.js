@@ -17,8 +17,8 @@ const TableCounter1 = () => {
   const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
   const API = process.env.REACT_APP_IMAGE_URL;
 
-  const token = sessionStorage.getItem("token");
-  const userId = sessionStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
   const [ isLoading, setIsLoading ] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

@@ -11,8 +11,8 @@ import { Modal, Spinner } from 'react-bootstrap';
 
 const KdsPreparado = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    const token = sessionStorage.getItem('token');
-    const admin_id = sessionStorage.getItem('admin_id');
+    const token = localStorage.getItem('token');
+    const admin_id = localStorage.getItem('admin_id');
     const [allOrder, setAllOrder] = useState([]);
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);

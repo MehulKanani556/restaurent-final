@@ -1,7 +1,7 @@
 import React from "react";
 
 const TableLastRecipt = ({ data ,itemInfo , payment}) => {
-  const role = sessionStorage.getItem("role");
+  const role = localStorage.getItem("role");
 console.log(data,itemInfo,payment);
   const currentDate = new Date();
   const currentHour = currentDate.getHours();

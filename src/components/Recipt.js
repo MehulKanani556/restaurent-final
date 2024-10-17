@@ -1,7 +1,7 @@
 import React from "react";
 
 const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
-  const role = sessionStorage.getItem("role");
+  const role = localStorage.getItem("role");
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
   const currentMinute = currentDate.getMinutes();

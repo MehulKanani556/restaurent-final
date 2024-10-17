@@ -13,15 +13,15 @@ export const EnlaceAdmin = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [emailSession, setEmailSession] = useState(sessionStorage.getItem("email"));
+  const [emailSession, setEmailSession] = useState(localStorage.getItem("email"));
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   const [errors, setErrors] = useState({});
 
   // Fetch email session on component mount
   useEffect(() => {
-    const email = sessionStorage.getItem("email");
-    const role = sessionStorage.getItem("role");
+    const email = localStorage.getItem("email");
+    const role = localStorage.getItem("role");
     setEmailSession(email);
     if (role === "superadmin") {
       setIsAuthorized(true);

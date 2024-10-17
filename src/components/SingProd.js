@@ -9,9 +9,9 @@ import axios from "axios";
 export default function SingProd({ image, price, name, code, id }) {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const navigate = useNavigate();
-  const [admin_id, setAdmin_id] = useState(sessionStorage.getItem("admin_id"));
+  const [admin_id, setAdmin_id] = useState(localStorage.getItem("admin_id"));
 
 
   const handleClick = async () => {

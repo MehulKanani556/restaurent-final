@@ -14,7 +14,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi2";
 const DeliveryDots = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const [errors, setErrors] = useState({});
     const [cartItems, setCartItems] = useState(
         JSON.parse(localStorage.getItem("cartItems")) || []

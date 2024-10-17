@@ -11,9 +11,9 @@ import { Modal, Spinner } from 'react-bootstrap';
 
 const Kds = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const [allOrder, setAllOrder] = useState([]);
-    const admin_id = sessionStorage.getItem('admin_id');
+    const admin_id = localStorage.getItem('admin_id');
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);
     const [allItems, setAllItems] = useState([]);

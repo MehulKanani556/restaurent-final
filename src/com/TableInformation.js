@@ -11,7 +11,7 @@ import { RiCloseLargeFill } from "react-icons/ri";
 
 const TableInformation = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   const location = useLocation();
     const tableData = location.state?.tableData;
   const [ mapVal, setMapVal ] = useState([ [] ]);

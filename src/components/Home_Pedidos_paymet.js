@@ -22,8 +22,8 @@ export default function Home_Pedidos_paymet() {
 
   const apiUrl = process.env.REACT_APP_API_URL; // Laravel API URL
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const admin_id = sessionStorage.getItem("admin_id");
+  const [token] = useState(localStorage.getItem("token"));
+  const admin_id = localStorage.getItem("admin_id");
 
   const { id } = useParams();
 

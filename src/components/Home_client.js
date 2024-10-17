@@ -13,9 +13,9 @@ import { Modal, Spinner } from "react-bootstrap";
 
 function Home_client() {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   const [isProcessing, setIsProcessing] = useState(false);
-  const admin_id = sessionStorage.getItem("admin_id");
+  const admin_id = localStorage.getItem("admin_id");
   const navigate = useNavigate()
 
   const [searchTerm, setSearchTerm] = useState("");

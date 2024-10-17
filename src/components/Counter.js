@@ -19,8 +19,8 @@ import axios from "axios";
 const Counter = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ const Counter = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [orderType, setOrderType] = useState("");
   const [orType, setOrType] = useState([]);
-  const [admin_id, setAdminId] = useState(sessionStorage.getItem("admin_id"));
+  const [admin_id, setAdminId] = useState(localStorage.getItem("admin_id"));
   useEffect(() => {
 
     const fetchData = async () => {

@@ -20,9 +20,9 @@ export default function Home_crear({ item }) {
     const { id } = useParams();
     const apiUrl = process.env.REACT_APP_API_URL;
     const API = process.env.REACT_APP_IMAGE_URL;
-    const admin_id = sessionStorage.getItem("admin_id");
+    const admin_id = localStorage.getItem("admin_id");
 
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
     const { state } = useLocation();

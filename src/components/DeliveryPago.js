@@ -18,10 +18,10 @@ import { FaCalendarAlt } from "react-icons/fa";
 
 const DeliveryPago = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   const API = process.env.REACT_APP_IMAGE_URL;
-  const userId = sessionStorage.getItem("userId");
-  const admin_id = sessionStorage.getItem("admin_id");
+  const userId = localStorage.getItem("userId");
+  const admin_id = localStorage.getItem("admin_id");
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(
     JSON.parse(localStorage.getItem("cartItems")) || []

@@ -6,7 +6,7 @@ import { Modal, Spinner } from 'react-bootstrap';
 
 const Home_contMes = ({ className = "" }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem('token'));
+  const [token] = useState(localStorage.getItem('token'));
 
 
   const [messages, setMessages] = useState([]);

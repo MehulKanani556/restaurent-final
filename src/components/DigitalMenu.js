@@ -18,9 +18,9 @@ import useAudioManager from "./audioManager";
 export default function Articles() {
   const API = process.env.REACT_APP_IMAGE_URL; // Laravel Image URL
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role]= useState(sessionStorage.getItem("role"));
-  const admin_id=sessionStorage.getItem("admin_id");
+  const [token] = useState(localStorage.getItem("token"));
+  const [role]= useState(localStorage.getItem("role"));
+  const admin_id=localStorage.getItem("admin_id");
   const [createMenuError, setCreateMenuError] = useState("");
   const [editMenuError, setEditMenuError] = useState("");
   const [menuName, setmenuName] = useState("");

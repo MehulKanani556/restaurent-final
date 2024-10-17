@@ -5,7 +5,7 @@ const OrderRecipt = ({ paymentData, orderData }) => {
   console.log(paymentData);
   console.log(orderData);
 
-  const role = sessionStorage.getItem("role");
+  const role = localStorage.getItem("role");
 
   const currentDate = new Date();
   const currentHour = currentDate.getHours();

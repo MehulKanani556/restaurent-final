@@ -23,9 +23,9 @@ import useAudioManager from "./audioManager";
 export default function SingleArticleProduct() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role ]= useState(sessionStorage.getItem("role"));
-  const [admin_id] = useState(sessionStorage.getItem("admin_id"));
+  const [token] = useState(localStorage.getItem("token"));
+  const [role ]= useState(localStorage.getItem("role"));
+  const [admin_id] = useState(localStorage.getItem("admin_id"));
 
   const { id } = useParams();
   const navigate = useNavigate();

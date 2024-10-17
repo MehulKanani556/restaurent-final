@@ -7,8 +7,8 @@ import Home_Messages from "./Home_Messages";
 
 const Home_contMes = ({ setSelectedContact,className = "" }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem('token'));
-const [userId] = useState(sessionStorage.getItem('userId'));
+  const [token] = useState(localStorage.getItem('token'));
+const [userId] = useState(localStorage.getItem('userId'));
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");

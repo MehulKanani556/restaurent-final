@@ -83,12 +83,12 @@ const Login = () => {
       });
       if (response.data.access_token) {
         const { email, name, access_token, role, id, admin_id } = response.data;
-        sessionStorage.setItem("email", email);
-        sessionStorage.setItem("name", name);
-        sessionStorage.setItem("token", access_token);
-        sessionStorage.setItem("role", role);
-        sessionStorage.setItem("userId", id);
-        sessionStorage.setItem("admin_id", admin_id || id);
+        localStorage.setItem("email", email);
+        localStorage.setItem("name", name);
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("role", role);
+        localStorage.setItem("userId", id);
+        localStorage.setItem("admin_id", admin_id || id);
         setSuccessMessage("iniciar sesión exitosamente");
         setShowSuccessModal(true);
         updateActiveStatus(id,name,email,access_token);

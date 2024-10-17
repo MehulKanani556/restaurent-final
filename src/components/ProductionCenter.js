@@ -19,10 +19,10 @@ import Loader from "./Loader";
 export default function ProductionCenter() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
+  const [token] = useState(localStorage.getItem("token"));
   // const [isLoading, setIsLoading] = useState(true);
-const admin_id = sessionStorage.getItem("admin_id");
-const role = sessionStorage.getItem("role");
+const admin_id = localStorage.getItem("admin_id");
+const role = localStorage.getItem("role");
   const [productionCenters, setProductionCenters] = useState([]);
   const [prodName, setProdName] = useState("");
   const [printerCode, setPrinterCode] = useState("");

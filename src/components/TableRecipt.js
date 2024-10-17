@@ -4,8 +4,8 @@ const TableRecipt = ({payment,tableData,productData}) => {
     const [currentTime, setCurrentTime] = useState(new Date());
 
   
-  const role = sessionStorage.getItem("role");
-  const wName = sessionStorage.getItem("name");
+  const role = localStorage.getItem("role");
+  const wName = localStorage.getItem("name");
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
   const currentMinute = currentDate.getMinutes();

@@ -17,8 +17,8 @@ import CajaOrderRecipe from "./CajaOrderRecipe";
 
 const Informacira = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [token] = useState(sessionStorage.getItem("token"));
-  const [role] = useState(sessionStorage.getItem("role"));
+  const [token] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
   console.log(role)
   const location = useLocation();
   const queryString = location.search;
@@ -28,7 +28,7 @@ const Informacira = () => {
     : queryString;
 
   const [bId, setBId] = useState(queryValue);
-  const admin_id = sessionStorage.getItem("admin_id");
+  const admin_id = localStorage.getItem("admin_id");
   const [activeTab, setActiveTab] = useState("home");
   const [pricesecond, setpricesecond] = useState("");
   const [error, setError] = useState("");

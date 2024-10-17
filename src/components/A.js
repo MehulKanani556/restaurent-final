@@ -16,7 +16,7 @@ import Loader from "./Loader";
 export default function A() {
   const API = process.env.REACT_APP_IMAGE_URL; // Laravel Image URL
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [ token ] = useState(sessionStorage.getItem("token"));
+  const [ token ] = useState(localStorage.getItem("token"));
   const [ isLoading, setIsLoading ] = useState(true);
   const [ createMenuError, setCreateMenuError ] = useState("");
   const [ editMenuError, setEditMenuError ] = useState("");

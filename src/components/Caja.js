@@ -11,11 +11,11 @@ import useAudioManager from "./audioManager";
 
 const Caja = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     // const [token, setToken] = useState('');
     // const token = "3833|eXTXOfKbnxghwkcze0t6mtymYD4Z22IfHexv94yIa42cdbce"
     const [isLoading, setIsLoading] = useState(true);
-    const [role] = useState(sessionStorage.getItem("role"));
+    const [role] = useState(localStorage.getItem("role"));
 
     const [selectedTitle, setSelectedTitle] = useState('');
     const [boxName, setBoxName] = useState("");
@@ -29,8 +29,8 @@ const Caja = () => {
     const [validationErrors, setValidationErrors] = useState({});
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
-    const userId = sessionStorage.getItem('userId');
-    const admin_id = sessionStorage.getItem('admin_id');
+    const userId = localStorage.getItem('userId');
+    const admin_id = localStorage.getItem('admin_id');
     const { playNotificationSound } = useAudioManager();
 
     // useEffect(() => {
@@ -104,8 +104,8 @@ const Caja = () => {
                     Authorization: `Bearer ${token}`
                 }
             });
-            const userId = sessionStorage.getItem('userId'); // Get the userId from sessionStorage
-            const userRole = sessionStorage.getItem('role'); // Get the role from sessionStorage
+            const userId = localStorage.getItem('userId'); // Get the userId from localStorage
+            const userRole = localStorage.getItem('role'); // Get the role from localStorage
 
             if (userRole == 'cashier') { // Assuming role_id 2 is for cashier+
 
@@ -151,7 +151,7 @@ const Caja = () => {
            const response = await axios.post(`${apiUrl}/box/create`, {
                 name: boxName,
                 user_id: cashierAssigned,
-                admin_id: admin_id, // Get the admin_id from sessionStorage
+                admin_id: admin_id, // Get the admin_id from localStorage
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`

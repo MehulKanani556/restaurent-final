@@ -27,8 +27,8 @@ export default function Homeinformation() {
 
   const API_URL = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const token = sessionStorage.getItem("token");
-  const admin_id = sessionStorage.getItem("admin_id");
+  const token = localStorage.getItem("token");
+  const admin_id = localStorage.getItem("admin_id");
   const { id } = useParams();
   const navigate = useNavigate();
 

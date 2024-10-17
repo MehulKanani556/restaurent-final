@@ -23,8 +23,8 @@ import { startTransition } from "react";
 const ChatComponent = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const token = sessionStorage.getItem("token");
-  const admin_id = sessionStorage.getItem("admin_id");
+  const token = localStorage.getItem("token");
+  const admin_id = localStorage.getItem("admin_id");
   const [selectedRevMonth, setSelectedRevtaMonth] = useState(new Date().getMonth() + 1);
   const [data, setData] = useState([]);
   const [revData, setRevData] = useState('month');

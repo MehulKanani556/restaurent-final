@@ -28,7 +28,7 @@ const TablePago = () => {
   const [ payment, setPayment ] = useState(
     JSON.parse(localStorage.getItem("payment"))
   );
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);

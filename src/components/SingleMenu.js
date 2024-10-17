@@ -15,7 +15,7 @@ export default function SingleMenu({
 }) {
   const API = process.env.REACT_APP_IMAGE_URL; // Laravel Image URL
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [ token ] = useState(sessionStorage.getItem("token"));
+  const [ token ] = useState(localStorage.getItem("token"));
   const [ showConfirmation, setShowConfirmation ] = useState(false);
 
   const handleDeleteMenu = () => {
