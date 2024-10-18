@@ -177,6 +177,7 @@ const Kds = () => {
 
                                     {filterOrdersByCategory(allOrder, selectedCategory)
                                         .filter(section => section.status === orderTypeMapping[orderType])
+                                        .reverse() // Reversing the filtered array
                                         .map((section, sectionIndex) => (
                                             <>
                                             <KdsCard

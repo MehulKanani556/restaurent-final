@@ -633,10 +633,11 @@ const TableCounter1 = () => {
 
     //   add note
     const handleNoteChange = (index, newNote) => {
-      const updatedCartItems = cartItems.map(
-        (item, i) => (i === index ? { ...item, note: newNote } : item)
-      );
-      setCartItems(updatedCartItems);
+      setCartItems((prevItems) => {
+        const updatedItems = [...prevItems];
+        updatedItems[index] = { ...updatedItems[index], note: newNote }; // Update the note
+        return updatedItems;
+    });
     };
   const handleFinishEditing = (index) => {
     const updatedCartItems = cartItems.map(

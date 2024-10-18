@@ -131,8 +131,6 @@ const Counter = () => {
       setIsEditing(updatedIsEditing);
     }
   };
-console.log("object");
-
   const handleAddNoteClick = (index) => {
     const updatedCartItems = cartItems.map(
       (item, i) =>

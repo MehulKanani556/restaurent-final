@@ -315,6 +315,45 @@ const Informacira = () => {
     setIsProcessing(false);
   };
 
+
+
+
+  const [finalAmount, setFinalAmount] = useState()
+
+  useEffect(() => {
+
+    // filteredOrders.filter()
+
+ 
+    const opentime = data[data.length - 1]?.open_time
+    // const a = new Date(allpayments?.[0]?.created_at).toISOString().split('T')[0] + ' ' + new Date(allpayments?.[0]?.created_at).toISOString().split('T')[1].split('.')[0]
+    // console.log("sahsds", a)
+
+    // const finalpaymment = allpayments?.filter((v) => {
+    //   const createdAt = new Date(v.created_at);
+    //   return createdAt.toISOString().split('T')[0] + ' ' + createdAt.toISOString().split('T')[1].split('.')[0] > opentime;
+    // });
+    const finalpaymment = allpayments?.filter((v) => {
+      const createdAt = new Date(v.created_at);
+      console.log(createdAt.toISOString().split('T')[0] + ' ' + createdAt.toISOString().split('T')[1].split('.')[0]>opentime && createdAt.toISOString().split('T')[0] + ' ' + createdAt.toISOString().split('T')[1].split('.')[0],opentime)
+      return createdAt.toISOString().split('T')[0] + ' ' + createdAt.toISOString().split('T')[1].split('.')[0] > opentime;
+    });
+    console.log("finalpaymment",finalpaymment)
+    // Calculate the sum of amount minus return
+    const totalAmount = finalpaymment.reduce((sum, payment) => {
+      const amount = parseFloat(payment.amount) || 0;
+      const returnAmount = parseFloat(payment.return) || 0;
+      return sum + (amount - returnAmount);
+    }, 0);
+    
+    console.log("Total Amount:", totalAmount.toFixed(2)); // Display with 2 decimal places
+    const init = parseFloat(data[data.length-1]?.open_amount)
+
+    setFinalAmount((totalAmount + init).toFixed(2));
+
+
+  }, [allOrder, data])
+
   // const [orders, setOrders] = useState([]);
   const fetchAllOrder = async () => {
     setIsProcessing(true);
@@ -329,6 +368,8 @@ const Informacira = () => {
         }
       );
       const filteredOrders = response.data.filter(order => order.box_id == bId);
+      console.log(filteredOrders);
+
       setAllOrder(filteredOrders);
       // setOrders(response.data);
     } catch (error) {
@@ -385,6 +426,7 @@ const Informacira = () => {
           }
         }
       );
+      console.log(response.data);
 
       setData(
         response.data.map((box) => ({
@@ -542,6 +584,9 @@ const Informacira = () => {
         }
       );
 
+      console.log(response);
+
+
       if (response.status === 200) {
         handleShow18(); // Show success modal
         fetchAllBox(); // Refresh box data
@@ -577,7 +622,7 @@ const Informacira = () => {
         `${apiUrl}/box/statusChange`, // Replace with the correct endpoint
         {
           box_id: bId, // Pass the box ID
-          close_amount: closePrice, // Pass the close amount
+          close_amount: finalAmount, // Pass the close amount
           cash_amount: pricesecond,
           admin_id: admin_id
         },
@@ -587,7 +632,7 @@ const Informacira = () => {
           },
         }
       );
-
+      console.log(response);
       if (response.status === 200) {
         handleShow12(); // Show success modal
         handleClose11();
@@ -1551,8 +1596,9 @@ const Informacira = () => {
                               type="text"
                               id="final"
                               className="sj_modelinput j-tbl-information-input py-2 px-3 opacity-75"
-                              value={`$${closePrice}`}
+                              value={`$${finalAmount}`}
                               onChange={handleprice}
+                              disabled
                             />
                             {errorClosePrice && <div className="text-danger errormessage">{errorClosePrice}</div>}
                           </div>
@@ -1586,7 +1632,7 @@ const Informacira = () => {
                               // Check if closePrice is greater than openPrice
                               if (parseFloat(closePrice) < parseInt(data[data.length - 1]?.open_amount, 10)) {
                                 setErrorClosePrice("El monto final debe ser mayor que el monto inicial."); // New error message
-                              } else if (!closePrice || isNaN(closePrice) || parseFloat(closePrice) <= 0) {
+                              } else if (!finalAmount || isNaN(finalAmount) || parseFloat(finalAmount) <= 0) {
                                 setErrorClosePrice("Monto inicial debe ser un número positivo."); // Set error if validation fails
                               } else if (!pricesecond || isNaN(pricesecond) || parseFloat(pricesecond) <= 0) {
                                 setErrorCashPrice("Monto efectivo debe ser un número positivo."); // Set error if validation fails
@@ -1752,7 +1798,7 @@ const Informacira = () => {
                       <tbody>
                         {data.length > 0 ? (
                           data.map((box, index) => (
-                            console.log(box.close_time),
+                            // console.log(box.close_time),
                             <tr
                               key={box.id}
                               className="sjbordergray j-caja-text-2"
@@ -1855,7 +1901,7 @@ const Informacira = () => {
                           className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
                         >
                           <Modal.Title className="modal-title j-caja-pop-up-text-1 ">
-                          Detalles de caja 
+                            Detalles de caja
                           </Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
@@ -2215,7 +2261,7 @@ const Informacira = () => {
                                   id="efectivo"
                                   className="sj_modelinput mt-2 w-100"
                                   placeholder="$"
-                                  value={`$${(parseFloat(selectedBox?.close_amount || 0) + parseFloat(selectedBox?.open_amount || 0)).toFixed(2)}`}
+                                  value={`$${(parseFloat(selectedBox?.cash_amount || 0)).toFixed(2)}`}
                                 />
 
                               </div>
@@ -2227,8 +2273,9 @@ const Informacira = () => {
                                 </label>
                                 <input
                                   type="text"
-                                  className="sj_modelinput mt-2"
-                                  placeholder="$-50"
+                                  className="sj_modelinput mt-2 text-danger"
+                                  
+                                  value={`$${(parseFloat(selectedBox?.close_amount || 0) - parseFloat(selectedBox?.	cash_amount || 0)).toFixed(2)}`}
                                 />
                               </div>
                             </div>

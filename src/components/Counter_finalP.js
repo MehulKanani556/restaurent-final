@@ -938,6 +938,7 @@ console.log("payment",payment);
                       type="text"
                       placeholder={lastOrder ? lastOrder : "01234"}          //change
                       value={lastOrder ? lastOrder : orderType.orderId}
+                      disabled
                     />
                   </div>
                   <div className="j-orders-type me-2">
