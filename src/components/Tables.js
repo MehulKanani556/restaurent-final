@@ -1005,7 +1005,7 @@ const Tables = () => {
   // redirect to new page
   const handleLinkClick = (e) => {
     e.preventDefault(); // Prevent default link behavior
-    localStorage.clear(); // Clear local storage
+    localStorage.removeItem("cartItems"); // Clear only cart items from local storage
 
     navigate(`/table1?id=${selectedTable}&status=${tableStatus}`); // Navigate to the new page
   };

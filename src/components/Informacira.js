@@ -1654,7 +1654,7 @@ const Informacira = () => {
                   <div className="d-flex justify-content-between px-4  py-3 text-white sjd-flex">
                     <div>
                       <p className="mb-1 j-caja-text-1">
-                        Cantidad de pedidos
+                      Cantidad de turnos
                       </p>
                       <input
                         type="text"

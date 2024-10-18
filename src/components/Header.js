@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Button, Dropdown, Offcanvas, Toast } from "react-bootstrap";
 import { FaUserLarge } from "react-icons/fa6";
 import { IoCloudUpload, IoNotifications } from "react-icons/io5";
@@ -24,10 +24,12 @@ export default function Header() {
   const [notificationCount, setNotificationCount] = useState(0);
   const echo = useSocket();
   const { playNotificationSound } = useAudioManager();
-  const [prevNotificationCount, setPrevNotificationCount] = useState(0);
+  const [prevNotificationCount, setPrevNotificationCount] = useState(() => {
+    return parseInt(sessionStorage.getItem('prevNotificationCount') || '0');
+  });
   const [isFetching, setIsFetching] = useState(false); // Add a state to track fetching status
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (isFetching) return; // Prevent multiple fetches
     setIsFetching(true); // Set fetching status to true
     try {
@@ -39,9 +41,12 @@ export default function Header() {
 
       // Check if the notification count has increased
       if (newCount > prevNotificationCount) {
+        // console.log(newCount,prevNotificationCount);
         playNotificationSound(); // Play sound if count increased
+        setPrevNotificationCount(newCount);
+        sessionStorage.setItem('prevNotificationCount', newCount.toString());
       }
-      setPrevNotificationCount(newCount); // Update previous count
+       // Update previous count
       // console.log(newCount, prevNotificationCount);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -49,7 +54,7 @@ export default function Header() {
     } finally {
       setIsFetching(false); // Reset fetching status
     }
-  };
+  },[apiUrl, admin_id, user_id, token, prevNotificationCount]);
 
   const debounceFetchNotifications = useRef(null); // Create a ref for debounce
 
@@ -70,6 +75,8 @@ export default function Header() {
       navigate('/', { state: { from: location } });
     }
   }, [token, navigate, location]);
+
+  
   if (!token) {
     return null;
   }

@@ -602,8 +602,9 @@ const Counter = () => {
                   <input
                     className="j-input-name j_input_name2"
                     type="text"
-                    placeholder="01234"
+                    placeholder="-"
                     value={lastOrder}
+                    disabled
                   />
                 </div>
                 <div className="j-orders-type">
@@ -628,10 +629,12 @@ const Counter = () => {
               {cartItems.length === 0 ? (
                 <div>
                   <div className="b-product-order text-center">
-                    <MdRoomService className="i-product-order" />
-                    <h6 className="h6-product-order text-white j-tbl-pop-1">Mesa disponible</h6>
-                    <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar<br />
-                      con el pedido de la mesa</p>
+                  <svg class="w-6 h-6 text-gray-800 dark:text-white i-product-order" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clipRule="evenodd" />
+      </svg>
+                    {/* <MdRoomService className="i-product-order" /> */}
+                    <h6 className="h6-product-order text-white j-tbl-pop-1">Comenzar pedido</h6>
+                    <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar  pedido  </p>
                   </div>
                 </div>
               ) : (

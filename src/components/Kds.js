@@ -38,6 +38,7 @@ const Kds = () => {
             const ordersArray = Object.values(ordersObject); // Convert object to array
 
             setAllOrder(ordersArray); // Set the state with the array of orders
+            console.log(response)
             console.log("Fetched orders as array:", ordersArray); // Log the array
         } catch (error) {
             console.error("Error fetching orders:", error);
@@ -213,7 +214,11 @@ const Kds = () => {
                                                     : [selectedCategory]
                                                 }
                                                 />
-                                            {console.log(section)}
+                                             {section.order_id==132 && (
+                                             <>
+                                             {console.log("aa",section)}
+                                             </>
+                                             )}
 
                                                 </>
                                         ))}
