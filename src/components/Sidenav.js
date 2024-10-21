@@ -145,7 +145,7 @@ const Sidenav = ({ children, onNavigate }) => {
   const handleClose = () => setShow(false);
   const toggleShow = () => setShow((s) => !s);
   return (
-    <div className="m_borrig position-fixed j-this-for-message">
+    <div className="m_borrig position-fixed j-this-for-message mz999">
       <div className="">
         <div onClick={toggleShow} className=" j-toggle-btn">
           <FaBars className="sjborder" />

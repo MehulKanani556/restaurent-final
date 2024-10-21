@@ -30,6 +30,8 @@ const Home_pedidos_payment_edit = ({ item }) => {
     const { id } = useParams();
     const { state, replace } = useLocation();
     const navigate = useNavigate();
+    const location = useLocation();
+
     const admin_id = localStorage.getItem("admin_id");
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -1179,6 +1181,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                         >
                                                             <Link
                                                                 to={`/articles/singleatricleproduct/${ele.id}`}
+                                                                state={{ from: location.pathname }}
                                                                 className="text-white text-decoration-none"
                                                             >
                                                                 <p

@@ -1,6 +1,7 @@
 import React from "react";
 
 const TableLastRecipt = ({ data ,itemInfo , payment}) => {
+  console.log("recipe",data,itemInfo,payment);
   const role = localStorage.getItem("role");
 console.log(data,itemInfo,payment);
   const currentDate = new Date();
@@ -245,7 +246,7 @@ const translatedPayments = payment.type.length > 0 ? payment.type
           <br />
           <div className="mt-2 d-flex" style={{ display: 'flex' }}>
             <div className="me-3" style={{ marginRight: '16px' }}>Recibido: $ {payment.amount}</div>
-            <div>Cambio: $ {payment.return.toFixed(2)||payment.return || 0.00}</div>
+            <div>Cambio: $ {(typeof payment.return === 'number' ? payment.return : 0.00).toFixed(2)}</div>
           </div>
         </p>
         <div style={{ borderBottom: "1px dashed #000", marginTop: "5px" }} />

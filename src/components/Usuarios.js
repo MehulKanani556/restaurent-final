@@ -72,8 +72,10 @@ const Usuarios = () => {
       if (role !== "admin") {
         navigate("/dashboard");
       } else if (token) {
+        setIsProcessing(true);
         fetchUser();
         fetchRole();
+        setIsProcessing(false);
       }
     },
     [token]
@@ -124,8 +126,8 @@ const Usuarios = () => {
       name: user.name,
       role_id: user.role_id,
       email: user.email,
-      password: user.password,
-      confirm_password: user.confirm_password,
+      password: "", // Set password to empty string
+      confirm_password: "", // Set confirm_password to empty string
       invite: true
     });
     setShowEditProduction(true);
@@ -281,7 +283,7 @@ const Usuarios = () => {
       errors.email = "el correo electrónico es invalido";
     }
 
-    if (data.password.length == 0) {
+    if (!data.password) {
       errors.password = "Se requiere el contraseña";
     } else if (data.password.length < 8) {
       errors.password = "La contraseña debe tener al menos 8 caracteres";
@@ -294,7 +296,7 @@ const Usuarios = () => {
         "La contraseña debe contener al menos una letra minúscula, una mayúscula, un número y un carácter especial";
     }
 
-    if (data.confirm_password.length == 0) {
+    if (!data.confirm_password) {
       errors.confirm_password = "Se requiere el confirma la contraseña";
     }
     if (data.password !== data.confirm_password) {
@@ -304,7 +306,7 @@ const Usuarios = () => {
   };
 
   const fetchUser = async () => {
-    setIsProcessing(true);
+    // setIsProcessing(true);
 
     await axios
       .get(`${apiUrl}/get-users`, {
@@ -312,11 +314,12 @@ const Usuarios = () => {
       })
       .then((response) => {
         setUsers(response.data);
+        // setIsProcessing(false);
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
       });
-    setIsProcessing(false);
+    // setIsProcessing(false);
 
   };
   const fetchRole = () => {
@@ -381,6 +384,7 @@ const Usuarios = () => {
 
   const updateUser = async (dataToUpdate) => {
     handleCloseEditProduction();
+    setIsProcessing(true);
     try {
 
       const response = await axios.post(
@@ -393,6 +397,7 @@ const Usuarios = () => {
           }
         }
       );
+      setIsProcessing(false);
 
       await fetchUser();
       handleCloseEditProduction();
@@ -408,6 +413,8 @@ const Usuarios = () => {
       //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
       // playNotificationSound();;
     }
+    setIsProcessing(false);
+
   };
 
   const [showDuplicateEmailModal, setShowDuplicateEmailModal] = useState(
@@ -425,13 +432,12 @@ const Usuarios = () => {
   const handleSubmit = async () => {
     // Validation
     const errors = validateForm(formData);
-    // If there are errors, set them and return
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
       return;
     }
-
-
+    handleClose();
+    setIsProcessing(true);
     try {
       if (selectedUser) {
         const dataToUpdate = { ...formData };
@@ -442,6 +448,7 @@ const Usuarios = () => {
         await updateUser(dataToUpdate);
       } else {
         const emailExists = users.some((user) => user.email === formData.email);
+        setIsProcessing(false);
 
         if (emailExists) {
           handleClose();
@@ -468,6 +475,7 @@ const Usuarios = () => {
           handleShowCreSubSuc();
           handleClose();
           fetchUser();
+          setIsProcessing(false);
           //enqueueSnackbar (response.data.notification, { variant: 'success' })
           // playNotificationSound();;
 
@@ -485,25 +493,29 @@ const Usuarios = () => {
         setErrors({ general: "An error occurred. Please try again." });
       }
     }
+    setIsProcessing(false);
   };
 
   const handleDelete = async (userId) => {
+    setIsProcessing(true);
+
     try {
       const response = await axios.post(`${apiUrl}/user/update-status/${userId}`, {
         status: 'Suspender'
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      setIsProcessing(false);
       fetchUser();
     } catch (error) {
       console.error("Error deleting user:", error);
     }
-
+    setIsProcessing(false);
     handleShowEditProductionDel();
 
   };
   const handleActiveUser = async (userId) => {
-
+    setIsProcessing(true);
     try {
       const response = await axios.post(`${apiUrl}/user/update-status/${userId}`, {
         status: 'Activa'
@@ -511,9 +523,11 @@ const Usuarios = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUser();
+      setIsProcessing(false);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
+    setIsProcessing(false);
     handleShowEditProductionDel2();
   };
 
@@ -566,7 +580,7 @@ const Usuarios = () => {
   return (
     <div>
       <Header />
-      <div className="d-flex">
+      <div className="d-flex overflow-scroll">
         <div>
           <Sidenav />
         </div>
@@ -1107,10 +1121,7 @@ const Usuarios = () => {
               keyboard={false}
               className="m_modal m_user"
             >
-              <Modal.Header
-                closeButton
-                className="m_borbot  b_border_bb mx-3 ps-0"
-              >
+              <Modal.Header closeButton className="m_borbot b_border_bb mx-3 ps-0">
                 <Modal.Title>Editar usuario</Modal.Title>
               </Modal.Header>
               <Modal.Body className="border-0 pb-0">
@@ -1214,81 +1225,56 @@ const Usuarios = () => {
                   </div>
                   <div className="d-flex justify-content-between mt-3 row">
                     <div className="col-6">
-                      <label
-                        htmlFor="password"
-                        className="form-label text-white"
-                      >
-                        Contraseña
+                      <label htmlFor="password" className="form-label text-white">
+                        Nueva Contraseña (opcional)
                       </label>
                       <div className="icon-input">
                         <IoMdLock className="i" />
                         <input
                           type={editshowPassword ? "text" : "password"}
                           className="form-control j-user-password"
-                          placeholder="Escribir . . ."
+                          placeholder="-"
                           name="password"
                           value={formData.password}
                           onChange={handleChange}
-                          autoComplete="off"
+                          autoComplete="new-password"
                         />
                         <button
                           className="border-0 j-user-hide bg-transparent"
-                          onClick={() =>
-                            seteditShowPassword((prevState) => !prevState)}
+                          onClick={() => seteditShowPassword((prevState) => !prevState)}
                         >
-                          {editshowPassword ? (
-                            <FaEye className="i" />
-                          ) : (
-                            <FaEyeSlash className="i" />
-                          )}
+                          {editshowPassword ? <FaEye className="i" /> : <FaEyeSlash className="i" />}
                         </button>
                       </div>
                       {errors.password && (
-                        <div className="text-danger errormessage">
-                          {errors.password}
-                        </div>
+                        <div className="text-danger errormessage">{errors.password}</div>
                       )}
                     </div>
-                    <div class="col-6">
+                    <div className="col-6">
                       <div className="mb-2 me-2">
-                        <label
-                          htmlFor="password"
-                          className="form-label text-white"
-                        >
-                          confirmar Contraseña
+                        <label htmlFor="confirm_password" className="form-label text-white">
+                          Confirmar Nueva Contraseña
                         </label>
                         <div className="icon-input">
                           <IoMdLock className="i" />
                           <input
-                            type={
-                              editshowcomfirmPassword ? "text" : "password"
-                            }
+                            type={editshowcomfirmPassword ? "text" : "password"}
                             className="form-control j-user-password"
-                            id="password"
-                            placeholder="Escribir . . ."
+                            placeholder="-"
                             name="confirm_password"
                             value={formData.confirm_password}
                             onChange={handleChange}
-                            autoComplete="off"
+                            autoComplete="new-password"
                           />
                           <button
                             className="border-0 j-user-hide bg-transparent"
-                            onClick={() =>
-                              seteditShowcomfirmPassword(
-                                (prevState) => !prevState
-                              )}
+                            onClick={() => seteditShowcomfirmPassword((prevState) => !prevState)}
                           >
-                            {editshowcomfirmPassword ? (
-                              <FaEye className="i" />
-                            ) : (
-                              <FaEyeSlash className="i" />
-                            )}
+                            {editshowcomfirmPassword ? <FaEye className="i" /> : <FaEyeSlash className="i" />}
                           </button>
                         </div>
                         {errors.confirm_password && (
-                          <div className="text-danger errormessage">
-                            {errors.confirm_password}
-                          </div>
+                          <div className="text-danger errormessage">{errors.confirm_password}</div>
                         )}
                       </div>
                     </div>
@@ -1296,19 +1282,10 @@ const Usuarios = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer className="border-0">
-                {/* <Button
-                  variant="danger"
-                  className="b_btn_close"
-                  onClick={handleCloseEditProduction}
-                >
-                  Eliminar
-                </Button> */}
                 <Button
                   variant="primary"
                   className="b_btn_pop"
-                  onClick={() => {
-                    handleSubmit();
-                  }}
+                  onClick={handleSubmit}
                 >
                   Guardar cambios
                 </Button>

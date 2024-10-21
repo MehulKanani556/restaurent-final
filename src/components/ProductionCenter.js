@@ -7,7 +7,7 @@ import Sidenav from "./Sidenav";
 import { BsThreeDots } from "react-icons/bs";
 import SingProd from "./SingProd";
 import img1 from "../Image/Image (3).jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Badge, DropdownButton, Spinner } from "react-bootstrap";
 import { FaCartPlus, FaFilter } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
@@ -21,8 +21,8 @@ export default function ProductionCenter() {
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token] = useState(localStorage.getItem("token"));
   // const [isLoading, setIsLoading] = useState(true);
-const admin_id = localStorage.getItem("admin_id");
-const role = localStorage.getItem("role");
+  const admin_id = localStorage.getItem("admin_id");
+  const role = localStorage.getItem("role");
   const [productionCenters, setProductionCenters] = useState([]);
   const [prodName, setProdName] = useState("");
   const [printerCode, setPrinterCode] = useState("");
@@ -47,6 +47,7 @@ const role = localStorage.getItem("role");
   );
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const location = useLocation();
 
   const [menu, setMenu] = useState([]);
   const [itemstoUpdate, setItemstoUpdate] = useState([])
@@ -142,6 +143,7 @@ const role = localStorage.getItem("role");
   // create production center
   const [showCreate, setShowCreate] = useState(false);
   const handleCloseCreate = () => {
+    setShowCreate(false);
     setShowCreate(false);
     setProdName("");
     setPrinterCode("");
@@ -333,7 +335,7 @@ const role = localStorage.getItem("role");
   // get menu
   const fetchMenuData = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/item/getProducationdata`, {admin_id},
+      const response = await axios.post(`${apiUrl}/item/getProducationdata`, { admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -350,7 +352,7 @@ const role = localStorage.getItem("role");
   // get menu item
   const fetchMenuItemData = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/item/getProducationdata`, {admin_id},
+      const response = await axios.post(`${apiUrl}/item/getProducationdata`, { admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -371,10 +373,13 @@ const role = localStorage.getItem("role");
   const fetchFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`,{  headers: {
-        Authorization: `Bearer ${token}`,
-      }});
+      const response = await axios.get(`${apiUrl}/family/getFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       setParentCheck(response.data);
+      setIsProcessing(false);
     } catch (error) {
       console.error(
         "Error fetching roles:",
@@ -388,10 +393,13 @@ const role = localStorage.getItem("role");
   const fetchSubFamilyData = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{  headers: {
-        Authorization: `Bearer ${token}`,
-      }});
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       setChildCheck(response.data);
+      setIsProcessing(false);
     } catch (error) {
       console.error(
         "Error fetching roles:",
@@ -405,7 +413,7 @@ const role = localStorage.getItem("role");
   const getProductionCenters = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/production-centers`,{admin_id}, {
+      const response = await axios.post(`${apiUrl}/production-centers`, { admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -421,10 +429,13 @@ const role = localStorage.getItem("role");
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{  headers: {
-        Authorization: `Bearer ${token}`,
-      }});
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       setObj1(response.data.items);
+      setIsProcessing(false);
       setFilteredItemsMenu(response.data.items);
       setItems(response.data.items);
     } catch (error) {
@@ -562,7 +573,7 @@ const role = localStorage.getItem("role");
 
       const response = await axios.post(
         `${apiUrl}/update/production-centers/${currentProdCenter.id}`,
-        {...updatedData,admin_id},
+        { ...updatedData, admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -571,6 +582,7 @@ const role = localStorage.getItem("role");
       );
       console.log("Production center updated:", response.data);
       fetchMenuData()
+      setIsProcessing(false);
       fetchMenuItemData();
       getProductionCenters();
       handleShowEditProductionSuc();
@@ -627,7 +639,7 @@ const role = localStorage.getItem("role");
         }
       });
       console.log("Production center deleted");
-
+      setIsProcessing(false); // Then show the loader
       // Remove the deleted center from selectedProductionCenters
       setSelectedProductionCenters(prev => prev.filter(center => center.id !== id));
 
@@ -706,10 +718,11 @@ const role = localStorage.getItem("role");
   };
 
   console.log(itemstoUpdate[0]);
-  
+
   // ...
 
   const handleAddMenu = async () => {
+    handleClose1Prod();
     setIsProcessing(true);
     try {
       const response = await axios.post(
@@ -729,6 +742,7 @@ const role = localStorage.getItem("role");
         // Handle UI updates
         setIsProcessing(false);
         handleClose1Prod();
+
         handleShow1AddSuc();
         getProductionCenters();
         fetchMenuItemData();
@@ -817,7 +831,7 @@ const role = localStorage.getItem("role");
 
   const filterItems = (searchTerm, checkedParents, childCheck) => {
     return obj1.filter((item) => {
-      const matchesSearch = 
+      const matchesSearch =
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.code.toLowerCase().includes(searchTerm.toLowerCase()); // Added search by code
 
@@ -864,10 +878,10 @@ const role = localStorage.getItem("role");
 
     localStorage.setItem("cartItems", JSON.stringify([{ image, price, name, code, id, count: 1, isEditing: false, note: "" }]));
     try {
-     
-  const response = await axios.post(`${apiUrl}/orders/last`,{admin_id}, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+
+      const response = await axios.post(`${apiUrl}/orders/last`, { admin_id }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       // console.log(response.data);
       if (response.status == 200) {
@@ -914,7 +928,7 @@ const role = localStorage.getItem("role");
                         Centros de Producción
                       </p>
                       <div>
-                      {(role == "admin") &&
+                        {(role == "admin") &&
                           <div>
                             <Button
                               variant="primary"
@@ -1314,8 +1328,8 @@ const role = localStorage.getItem("role");
                         </Dropdown.Menu>
                       </Dropdown>
                     </div>
-                      {/* add product */}
-                      {(selectedMenus.length == 1 && role == "admin")  &&
+                    {/* add product */}
+                    {(selectedMenus.length == 1 && role == "admin") &&
                       <div>
                         <Button
                           variant="primary text-nowrap"
@@ -1530,6 +1544,7 @@ const role = localStorage.getItem("role");
                                         >
                                           <Link
                                             to={`/articles/singleatricleproduct/${ele.id}`}
+                                            state={{ from: location.pathname }}
                                             className="text-white text-decoration-none"
                                           >
                                             <p

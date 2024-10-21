@@ -6,7 +6,7 @@ import Sidenav from "./Sidenav";
 import { BsThreeDots } from "react-icons/bs";
 
 import img2 from "../Image/addmenu.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SingleMenu from "./SingleMenu";
 import { Badge, Spinner } from "react-bootstrap";
 import { IoMdInformationCircle } from "react-icons/io";
@@ -41,6 +41,7 @@ export default function Articles() {
   const [selectedItemsMenu, setSelectedItemsMenu] = useState(new Set());
   const [previousFilteredItems, setPreviousFilteredItems] = useState([]);
   const { playNotificationSound } = useAudioManager();
+  const location = useLocation();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate()
@@ -1429,6 +1430,7 @@ export default function Articles() {
                                             >
                                               <Link
                                                 to={`/articles/singleatricleproduct/${ele.id}`}
+                                                state={{ from: location.pathname }}
                                                 className="text-white text-decoration-none"
                                               >
                                                 <p

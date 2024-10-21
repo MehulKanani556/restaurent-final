@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Container, Row, Col, Image, Spinner, Modal } from "react-bootstrap";
 import axios from "axios";
 import Echo from "laravel-echo";
@@ -107,8 +107,7 @@ const Chat = () => {
     const [userId, setUserId] = useState(localStorage.getItem('userId'));
     const admin_id = localStorage.getItem('admin_id');
     const [token, setToken] = useState(localStorage.getItem('token'));
-    const [messages, setMessages] = useState([]);
-    const [inputText, setInputText] = useState('');
+    const [messages, setMessages] = useState([]); // Ensure messages state is defined
     const [searchTerm, setSearchTerm] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
     const [allUser, setAllUser] = useState([]);
@@ -120,6 +119,9 @@ const Chat = () => {
     const [connection, setConnection] = useState(0)
     const [length, setLength] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState();
+    const [isLoading, setIsLoading] = useState(false);
+    const inputTextRef = useRef(''); // Create a ref for the input text
+    const inputFieldRef = useRef(null); // Create a ref for the input field
 
     useEffect(() => {
         if (token) {
@@ -141,6 +143,22 @@ const Chat = () => {
         }
         // setIsProcessing(false);
     }
+
+    // Add a separate useEffect for fetching online users periodically
+    useEffect(() => {
+        if (token) {
+            // Initial fetch
+            fetchOnlineUsers();
+
+            // Set up interval for periodic updates
+            // const intervalId = setInterval(() => {
+            //     fetchOnlineUsers();
+            // }, 10000); // Fetch every 10 seconds
+
+            // Cleanup interval on unmount
+            // return () => clearInterval(intervalId);
+        }
+    }, [token]);
 
     useEffect(() => {
         setupEchoListeners();
@@ -197,6 +215,7 @@ const Chat = () => {
     };
 
     const fetchMessages = async () => {
+        setIsLoading(true); // Set loading state
         if (!selectedContact) return;
 
         try {
@@ -212,22 +231,30 @@ const Chat = () => {
             return response.data;
         } catch (error) {
             console.error("Error fetching messages:", error);
+        } finally {
+            setIsLoading(false); // Reset loading state
         }
     };
     const sendMessage = async () => {
-        if (!selectedContact || !inputText.trim()) return;
+        if (!selectedContact || !inputTextRef.current.trim()) return;
 
         try {
             await axios.post(`${apiUrl}/chat/broadcast`, {
                 username: selectedContact.name,
                 receiver_id: selectedContact.id || null,
-                msg: inputText,
+                msg: inputTextRef.current,
                 group_id: selectedContact?.pivot?.group_id || null,
                 admin_id: admin_id
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setInputText('');
+            
+            // Clear both the ref value and the input field
+            inputTextRef.current = '';
+            if (inputFieldRef.current) {
+                inputFieldRef.current.value = '';
+            }
+            
             fetchMessages();
             fetchAllUsers();
         } catch (error) {
@@ -266,13 +293,12 @@ const Chat = () => {
     };
 
     const handleContactClick = (contact) => {
+        console.log("Selected contact:", contact); // Debugging line
         setSelectedContact(contact);
-        // fetchMessages();
-
     };
 
     const handleInputChange = (event) => {
-        setInputText(event.target.value);
+        inputTextRef.current = event.target.value; // Update the ref value
     };
 
     const handleKeyPress = (event) => {
@@ -351,13 +377,15 @@ const Chat = () => {
                         {selectedContact ? (
                             <ChatWindow
                                 selectedContact={selectedContact}
-                                messages={messages}
-                                inputText={inputText}
+                                inputTextRef={inputTextRef}
+                                inputFieldRef={inputFieldRef}
                                 handleInputChange={handleInputChange}
                                 handleKeyPress={handleKeyPress}
                                 sendMessage={sendMessage}
                                 renderMessageGroups={renderMessageGroups}
                                 onlineUsers={onlineUsers}
+                                isLoading={isLoading}
+                                messages={messages} // Pass messages to ChatWindow
                             />
                         ) : (
                             <EmptyChatWindow />
@@ -452,7 +480,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                 ))} */}
                 {groups.map((group) => (
                     <div className="sjcontacts-list" onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
-                        <div className="sjcontact-item justify-content-between ">
+                        <div className={`sjcontact-item justify-content-between ${selectedContact.id === group ? 'mhighlighted' : ''}`}>
                             <div className='d-flex align-items-center'>
                                 <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                                     {/* <div className="sjonline-status"></div> */}
@@ -475,13 +503,14 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                 ))}
 
                 <div className="j-chats-meaasges" style={{ borderTop: "1px solid #374151" }}>
+
                     {sortedContacts.map((ele) => {
                         const messagesWithReadByNo = ele.messages.filter(message => message.receiver_id == userId && message.read_by === "no");
                         const numberOfMessagesWithReadByNo = messagesWithReadByNo.length;
-
+                        // console.log("aa",selectedContact.email , ele.email)
                         return (
-                            <div key={ele.id} className={`sjcontacts-list  ${selectedContact === ele ? 'jchat-active' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleContactClick(ele)} >
-                                <div className="sjcontact-item" >
+                            <div key={ele.id} className={`sjcontacts-list ${selectedContact?.email === ele.email ? 'jchat-active' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleContactClick(ele)} >
+                                <div className={`sjcontact-item `}>
                                     <div className="sjavatar me-2" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                                         {onlineUsers?.map((v) => v.id == ele.id && <div className="sjonline-status"></div>)}
                                         {ele.name.split(' ')
@@ -514,9 +543,20 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
     );
 };
 
-const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, handleKeyPress, sendMessage, renderMessageGroups, onlineUsers }) => {
+const ChatWindow = ({ 
+    selectedContact, 
+    inputTextRef,
+    inputFieldRef,
+    handleInputChange, 
+    handleKeyPress, 
+    sendMessage, 
+    renderMessageGroups, 
+    onlineUsers, 
+    isLoading,
+    messages // Receive messages as a prop
+}) => {
     const messagesEndRef = useRef(null);
-
+// console.log("aisss",messages)
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
     };
@@ -553,6 +593,7 @@ const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, h
             </div>
 
             <div className="w-100" style={{ overflowY: 'auto' }}>
+                {isLoading && <p>Loading messages...</p>}
                 {renderMessageGroups()}
                 <div ref={messagesEndRef} />
             </div>
@@ -568,16 +609,33 @@ const ChatWindow = ({ selectedContact, messages, inputText, handleInputChange, h
                         gap: "12px",
                         marginBottom: "12px",
                     }}>
-                        <button onClick={() => handleInputChange({ target: { value: 'Hola ¿Cómo estas?' } })} className="j_chat_default_button" style={styles.button}>
+                        <button 
+                            onClick={() => {
+                                inputTextRef.current = 'Hola ¿Cómo estas?';
+                                if (inputFieldRef.current) {
+                                    inputFieldRef.current.value = 'Hola ¿Cómo estas?';
+                                }
+                            }} 
+                            className="j_chat_default_button" 
+                            style={styles.button}
+                        >
                             Hola ¿Cómo estas?
                         </button>
-                        <button onClick={() => handleInputChange({ target: { value: 'Corregir pedido' } })} style={styles.button}>
+                        <button 
+                            onClick={() => {
+                                inputTextRef.current = 'Corregir pedido';
+                                if (inputFieldRef.current) {
+                                    inputFieldRef.current.value = 'Corregir pedido';
+                                }
+                            }} 
+                            style={styles.button}
+                        >
                             Corregir pedido
                         </button>
                     </div>
                     <input
                         type="text"
-                        value={inputText}
+                        ref={inputFieldRef}
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
                         placeholder="Escribir ..."

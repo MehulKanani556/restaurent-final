@@ -8661,3 +8661,12 @@ input[type="search"]::-webkit-search-cancel-button {
 .bg-alert .j-time{
   color:white !important;
 }
+
+
+.mz999{
+  z-index:999 !important; 
+}
+.mhighlighted {
+  background-color: #2c3e50; /* Change to your desired highlight color */
+  color: #fff; /* Change text color if needed */
+}

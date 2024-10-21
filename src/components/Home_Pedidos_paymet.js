@@ -13,7 +13,7 @@ import pic3 from "../img/Image (2).png"
 import { Tabs, Tab } from 'react-bootstrap';
 import { IoMdCloseCircle, IoMdInformationCircle } from 'react-icons/io';
 import img2 from "../Image/addmenu.jpg";
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { BsCalculatorFill } from 'react-icons/bs';
@@ -29,6 +29,7 @@ export default function Home_Pedidos_paymet() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // create family
   const [show, setShow] = useState(false);
@@ -605,7 +606,7 @@ console.log(orderData)
     if (orderData?.status == 'delivered' || orderData?.status == "cancelled") {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
-      alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
+      alert('No puedes generar una nota de crédito si el pedido actual no ha sido entregado')
     }
   }
 
@@ -948,9 +949,10 @@ console.log(orderData)
                         </div>
                         {!orderData?.reason &&
                           <div className='mx-auto text-center mt-3'>
-                            {!pamentDone ?
+                            {console.log(!pamentDone, orderData?.status.toLowerCase() !== 'delivered')}
+                            {!pamentDone || (orderData?.status.toLowerCase() !== 'finalized' &&  orderData?.status.toLowerCase() !== 'delivered') ?
                               <div className='btn text-white j-btn-primary w-100' style={{ padding: "8px 12px", borderRadius: "8px" }} onClick={handlePayment}>Pagar ahora</div> :
-                              <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147bdea8", borderRadius: "8px", padding: "10px 20px", cursor: "not-allowed" }}>Pago completado</div>
+                              ""
                             }
                           </div>
                         }
@@ -1204,6 +1206,7 @@ console.log(orderData)
                             >
                               <Link
                                 to={`/articles/singleatricleproduct/${ele.id}`}
+                                state={{ from: location.pathname }}
                                 className="text-white text-decoration-none"
                               >
                                 <p

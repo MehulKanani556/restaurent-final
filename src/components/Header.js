@@ -42,7 +42,7 @@ export default function Header() {
       // Check if the notification count has increased
       if (newCount > prevNotificationCount) {
         // console.log(newCount,prevNotificationCount);
-        playNotificationSound(); // Play sound if count increased
+        // playNotificationSound(); // Play sound if count increased
         setPrevNotificationCount(newCount);
         sessionStorage.setItem('prevNotificationCount', newCount.toString());
       }

@@ -3,7 +3,7 @@ import Header from "./Header";
 import Sidenav from "./Sidenav";
 import { Button, Tabs, Tab, Modal, Spinner } from "react-bootstrap";
 import { FaArrowLeft } from "react-icons/fa";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { HiClipboardList } from "react-icons/hi";
 import {
   RiCloseLargeFill,
@@ -52,6 +52,9 @@ export default function SingleArticleProduct() {
   const [errorMessages, setErrorMessages] = useState({});
   const { playNotificationSound } = useAudioManager();
 
+  const location = useLocation(); // Get the current location
+  const previousPath = location.state?.from || "/articles"; // Default to /articles if no previous path
+console.log("previous Path: " , location);
 
 
   const handleClose = () => {
@@ -769,7 +772,7 @@ export default function SingleArticleProduct() {
           <div className="flex-grow-1 sidebar">
             <div>
               <div className="pb-3  m_bgblack text-white m_borbot m_padding  ">
-                <Link to="/articles">
+                <Link to={previousPath}>
                   <div className="btn bj-btn-outline-primary m14">
                     <FaArrowLeft className="" /> Regresar
                   </div>

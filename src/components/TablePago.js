@@ -175,7 +175,7 @@ const TablePago = () => {
   };
 
   const getTotalCost = () => {
-    console.log(cartItems);
+    // console.log(cartItems);
 
     return cartItems.reduce(
       (total, item, index) => total + parseInt(item.price) * parseInt(item.quantity),
@@ -215,7 +215,7 @@ const TablePago = () => {
   };
 
   const totalCost = getTotalCost();
-  console.log(totalCost);
+  // console.log(totalCost);
 
   const discount = 1.0;
   const propina = 5.0;
@@ -285,14 +285,14 @@ const TablePago = () => {
         [name]: value, // Update the specific payment type amount
       };
       // New calculation for turn
-      console.log(tableData);
+      // console.log(tableData);
       const taxAmount = parseFloat(((tableData[0].order_total - parseFloat(tableData[0].discount)) * 0.19).toFixed(2))
       const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
-      console.log(totalAmount, finalTotal, tipAmount, taxAmount);
+      // console.log(totalAmount, finalTotal, tipAmount, taxAmount);
       updatedState.turn = totalAmount - (tableData[0].order_total + taxAmount + tipAmount); // Update turn based on total amounts
       return updatedState;
     });
-    console.log("Payment", customerData);
+    // console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
       [name]: undefined
@@ -424,7 +424,7 @@ const TablePago = () => {
 
     const totalWithTax = tableData[0].order_total + (tableData[0].order_total * 0.19) + tipAmount - tableData[0].discount;
     const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
-    console.log(totalPaymentAmount < totalWithTax, totalPaymentAmount <= 0)
+    // console.log(totalPaymentAmount < totalWithTax, totalPaymentAmount <= 0)
     // Validate payment amount
     if (!totalPaymentAmount || totalPaymentAmount <= 0) {
       errors.amount = "Por favor, introduzca un importe de pago válido";
@@ -460,8 +460,8 @@ const TablePago = () => {
 
   useEffect(() => {
     fetchBoxData();
-    console.log(tableData[0]?.id);
-    console.log(selectedCheckboxes[0]);
+    // console.log(tableData[0]?.id);
+    // console.log(selectedCheckboxes[0]);
 
   }, [userId]);
 
@@ -493,11 +493,11 @@ const TablePago = () => {
       tax: taxAmount,
     };
 
-    console.log(paymentData)
+    // console.log(paymentData)
     setPaymentInfo(paymentData);
     setIsProcessing(true);
-    console.log(boxId?.id);
-    console.log(tableData[0].id);
+    // console.log(boxId?.id);
+    // console.log(tableData[0].id);
 
     try {
       const response = await axios.post(`${apiUrl}/order/orderUpdateItem/${tableData[0].id}`, {
@@ -512,7 +512,7 @@ const TablePago = () => {
           }
         })
 
-      console.log(response.status);
+      // console.log(response.status);
       if (response.status == 200) {
         try {
           const responsePayment = await axios.post(
@@ -525,8 +525,8 @@ const TablePago = () => {
             }
           )
 
-          console.log(responsePayment.status == 200);
-          console.log(responsePayment);
+          // console.log(responsePayment.status == 200);
+          // console.log(responsePayment);
           if (responsePayment.status == 200) {
             try {
               const resStatus = await axios.post(`${apiUrl}/table/updateStatus`, {
@@ -539,7 +539,7 @@ const TablePago = () => {
                 }
               })
               setIsProcessing(false);
-              console.log(resStatus);
+              // console.log(resStatus);
               setTipAmount('');
               setFormErrors({});
               setPrice('');
@@ -1271,7 +1271,7 @@ const TablePago = () => {
                               paymentType={selectedCheckboxes}
                             /> */}
                     <TableLastRecipt  data={tableData} itemInfo={itemInfo} payment={paymentInfo} paymentAmt={customerData} />
-                    {console.log("cust", customerData)}
+                    {/* {console.log("cust", customerData)} */}
                   </Modal.Body>
                   <Modal.Footer className="sjmodenone">
                     <Button

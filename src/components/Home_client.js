@@ -399,6 +399,7 @@ function Home_client() {
                   </tr>
                 </thead>
                 <tbody className="text-white b_btnn ">
+                  {/* {console.log(currentFilteredItems)} */}
 
                   {currentFilteredItems.length > 0 ?
                     currentFilteredItems.map((user) => (

@@ -23,7 +23,6 @@ const Counter = () => {
   const [role] = useState(localStorage.getItem("role"));
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
-
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
   const [obj1, setObj1] = useState([]);
@@ -637,7 +636,7 @@ console.log("object");
         <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clipRule="evenodd" />
       </svg>
                     {/* <MdRoomService className="i-product-order" /> */}
-                    <h6 className="h6-product-order text-white j-tbl-pop-1">Comenzar pedido</h6>
+                    <h6 className="h6-product-order text-white j-tbl-pop-1">Empezar pedido</h6>
                     <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar  pedido  </p>
                   </div>
                 </div>

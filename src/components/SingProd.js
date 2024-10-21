@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaCartPlus } from "react-icons/fa6";
 import img1 from "../Image/Image.jpg";
 import { IoMdInformationCircle } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
@@ -12,6 +12,7 @@ export default function SingProd({ image, price, name, code, id }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const navigate = useNavigate();
   const [admin_id, setAdmin_id] = useState(localStorage.getItem("admin_id"));
+  const location = useLocation();
 
 
   const handleClick = async () => {
@@ -59,7 +60,7 @@ export default function SingProd({ image, price, name, code, id }) {
         </div>
 
         <div className="position-absolute " style={{ cursor: 'pointer' }}>
-          <Link to={`/articles/singleatricleproduct/${id}`} className="text-white text-decoration-none" >
+          <Link to={`/articles/singleatricleproduct/${id}`} state={{ from: location.pathname }} className="text-white text-decoration-none" >
             <p className=" px-1  rounded m-2" style={{ backgroundColor: '#374151' }}>
               <IoMdInformationCircle />{" "}
               <span style={{ fontSize: "12px" }}>Ver información</span>

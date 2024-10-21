@@ -12,7 +12,7 @@ import pic2 from "../img/Image(1).jpg"
 import pic3 from "../img/Image (2).png"
 import { Tabs, Tab } from 'react-bootstrap';
 import { IoMdCloseCircle, IoMdInformationCircle } from 'react-icons/io';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { RiDeleteBin5Fill } from 'react-icons/ri';
 import { BsCalculatorFill } from 'react-icons/bs';
@@ -31,6 +31,7 @@ export default function Homeinformation() {
   const admin_id = localStorage.getItem("admin_id");
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // create family
   const [show, setShow] = useState(false);
@@ -1212,6 +1213,7 @@ export default function Homeinformation() {
                             >
                               <Link
                                 to={`/articles/singleatricleproduct/${ele.id}`}
+                                state={{ from: location.pathname }}
                                 className="text-white text-decoration-none"
                               >
                                 <p

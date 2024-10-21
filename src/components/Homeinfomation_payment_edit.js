@@ -30,6 +30,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
     const { id } = useParams();
     const { state, replace } = useLocation();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -1162,6 +1163,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                                             <Link
                                                                 to={`/articles/singleatricleproduct/${ele.id}`}
                                                                 className="text-white text-decoration-none"
+                                                                state={{ from: location.pathname }}
                                                             >
                                                                 <p
                                                                     className=" px-1  rounded m-2"
