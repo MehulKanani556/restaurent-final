@@ -572,8 +572,8 @@ const ChatWindow = ({
     };
 
     return (
-        <div style={styles.container} className="j-chat-margin">
-            <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "0" }}>
+        <div style={styles.container} className="j-chat-margin ">
+            <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "10" }}>
                 <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                     {selectedContact.name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
                 </div>
@@ -681,7 +681,7 @@ const EmptyChatWindow = () => {
             gap: "16px",
             left: "621px",
             width: "67%",
-            height: "612px",
+            height: "100%",
             overflowY: "auto",
             textAlign: "left",
             fontSize: "14px",

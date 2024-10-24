@@ -317,7 +317,7 @@ export default function Home_crear({ item }) {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`, {
+            const response = await axios.get(`${apiUrl}/item/getAllDeletedAt`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -333,6 +333,7 @@ export default function Home_crear({ item }) {
         }
         setIsProcessing(false);
     };
+
 
 
     // console.log(user,orderAlldata);
@@ -636,7 +637,7 @@ export default function Home_crear({ item }) {
                     setShowcreditfinal(true);
                     setTimeout(() => {
                         setShowcreditfinal(false);
-                        let use = {user : {...orderUser}  }; // if you need to modify user later
+                        let use = { user: { ...orderUser } }; // if you need to modify user later
                         navigate("/home/client/detail", {
                             state: state ? state : use
                         });
@@ -712,13 +713,13 @@ export default function Home_crear({ item }) {
                             {showCancelOrderButton ? (
                                 <div className="d-flex justify-content-between align-items-center flex-wrap ms-3">
                                     <div className="text-white  my-2">
-                                        DNI :- {order2}
+                                        DNI :- {userPayment?.rut}
                                     </div>
                                 </div>
                             ) : (
                                 <div className="d-flex justify-content-between align-items-center flex-wrap ms-3">
                                     <div className="text-white  my-2">
-                                        DNI :- {order1}
+                                        DNI :- {userPayment?.rut}
                                     </div>
                                 </div>
                             )}
@@ -780,11 +781,11 @@ export default function Home_crear({ item }) {
                                                                                 <div className="col-sm-3 a_text_price">
                                                                                     <button className="b_count11 btn btn-secondary" onClick={() => decrement(item.id, item.item_id, item.quantity)}>-</button>
                                                                                     <span className="pe-3 ms-2">{counts[item.id]}</span>
-                                                                                    <button 
-                                                                                    className="b_count btn btn-secondary" 
-                                                                                    onClick={() => increment(item.id, item.item_id, item.quantity)}
-                                                                                    disabled={!originalCounts || originalCounts[item.id] === undefined || originalCounts[item.id] === item.quantity}
-                                                                                        >+</button>
+                                                                                    <button
+                                                                                        className="b_count btn btn-secondary"
+                                                                                        onClick={() => increment(item.id, item.item_id, item.quantity)}
+                                                                                        disabled={!originalCounts || originalCounts[item.id] === undefined || originalCounts[item.id] === item.quantity}
+                                                                                    >+</button>
                                                                                 </div>
                                                                                 <div className="col-sm-2 a_text_price">
                                                                                     <div className="pe-5 fw-bold">${item.amount}</div>
@@ -964,9 +965,10 @@ export default function Home_crear({ item }) {
                                                                     <div className="w-100 a_bg_order mt-2 border-0" style={{ borderRadius: "10px" }}><span className="">{userPayment?.firstname ? userPayment.firstname : userPayment?.business_name} {userPayment?.lastname}</span></div>
                                                                 </div>
                                                                 <div className="d-flex justify-content-end align-items-center mt-4">
+
                                                                     <div className="w-50">
                                                                         <div>DNI</div>
-                                                                        <div className="w-75 a_bg_order border-0 mt-2" style={{ borderRadius: "10px" }}><span className="">{order1}</span></div>
+                                                                        <div className="w-75 a_bg_order border-0 mt-2" style={{ borderRadius: "10px" }}><span className="">{userPayment?.rut}</span></div>
                                                                     </div>
                                                                     <div className="w-50">
                                                                         <div>Correo electrónico</div>
@@ -1041,7 +1043,7 @@ export default function Home_crear({ item }) {
                                                                 <div className="d-flex justify-content-end align-items-center mt-4">
                                                                     <div className="w-50">
                                                                         <div className='mb-2'>DNI</div>
-                                                                        <div className="w-75 a_bg_order  border-0 " style={{ borderRadius: "10px" }}><span className="">{order2}</span></div>
+                                                                        <div className="w-75 a_bg_order  border-0 " style={{ borderRadius: "10px" }}><span className="">{userPayment?.rut}</span></div>
                                                                     </div>
                                                                     <div className="w-50">
                                                                         <div className='mb-2'>Correo electrónico</div>

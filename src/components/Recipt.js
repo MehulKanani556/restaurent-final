@@ -1,6 +1,6 @@
 import React from "react";
 
-const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
+const Recipt = ({ payment, item, discount, paymentAmt, paymentType, creditTotal }) => {
   const role = localStorage.getItem("role");
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
@@ -56,7 +56,7 @@ const Recipt = ({ payment, item, discount, paymentAmt, paymentType }) => {
     (sum, item) => sum + item.total,
     0
   );
-  const price = itemsTotal - discount;
+  const price = itemsTotal - discount - (creditTotal ? creditTotal : 0);
   const iva = price * 0.19; // 12% tax
   const total = price + iva;
 
@@ -227,6 +227,13 @@ receiptData.cashier = roleTranslations[role] || role; // Translate role to Spani
                 <br />
               </div>
             </div>
+            {creditTotal && <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>credito</div>
+              <div>
+                {creditTotal.toFixed(2)}
+                <br />
+              </div>
+            </div>}
             <div className="d-flex justify-content-between mx-1" style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div>Dcto:</div>
               <div>

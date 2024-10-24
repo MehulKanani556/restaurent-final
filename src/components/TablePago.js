@@ -16,6 +16,7 @@ import pic2 from "../img/Image(1).jpg";
 import axios from "axios";
 import Recipt from "./Recipt";
 import TableLastRecipt from "./TableLastRecipt";
+import ElapsedTimeDisplay from "./ElapsedTimeDisplay";
 
 const TablePago = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -37,6 +38,7 @@ const TablePago = () => {
   const navigate = useNavigate();
   const [tId, setTId] = useState(id);
   const [tableData, setTableData] = useState([]);
+  const [users, setUsers] = useState([]);
   const [obj1, setObj1] = useState([]);
   const [price, setPrice] = useState("");
   const [tipAmount, setTipAmount] = useState(0);
@@ -52,12 +54,31 @@ const TablePago = () => {
           getTableData(id);
           fetchAllItems();
           setIsProcessing(false);
+          fetchAllUser();
         }
       }
     },
     [id, role]
   );
+  console.log("object")
+  const fetchAllUser = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.get(`${apiUrl}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
+      setUsers(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching users:",
+        error.response ? error.response.data : error.message
+      );
+    }
+    setIsProcessing(false);
+  }
   const getTableData = async (id) => {
     setIsProcessing(true);
     try {
@@ -268,7 +289,12 @@ const TablePago = () => {
       }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
-      setCustomerData({ ...customerData, [value + "Amount"]: customerData?.turn ? (Math.abs(customerData?.turn.toFixed(2))).toString() : '', turn: '' });
+      setCustomerData({
+        ...customerData,
+        [value + "Amount"]: customerData?.turn && customerData.turn < 0 ?
+          (Math.abs(customerData.turn.toFixed(2))).toString() : '',
+        turn: customerData?.turn && customerData.turn > 0 ? customerData.turn : 0
+      });
     }
     // Clear the payment type error when a type is selected
     setFormErrors((prevErrors) => ({
@@ -276,53 +302,74 @@ const TablePago = () => {
       paymentType: undefined
     }));
   };
+
+
+
   const handleChange = (event) => {
     let { name, value } = event.target;
     value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
+
+    console.log(name);
+    const otherbox = selectedCheckboxes.filter(item => !name.includes(item))
+
     setCustomerData((prevState) => {
       const updatedState = {
         ...prevState,
         [name]: value, // Update the specific payment type amount
       };
-      // New calculation for turn
-      // console.log(tableData);
+
       const taxAmount = parseFloat(((tableData[0].order_total - parseFloat(tableData[0].discount)) * 0.19).toFixed(2))
+      const currentValue = parseFloat(value) || 0;
+      const finalTotal = tableData[0].order_total
+      const totalDue = finalTotal + taxAmount + tipAmount;
+      const otherAmount = Math.max(totalDue - currentValue, 0);
+
+
+      if (otherbox.length > 0) {
+        const otherPaymentType = otherbox[0] + 'Amount';
+        updatedState[otherPaymentType] = otherAmount.toFixed(2);
+      }
+      console.log(updatedState);
+
+      // New calculation for turn
+      console.log(tableData);
+      
       const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
-      // console.log(totalAmount, finalTotal, tipAmount, taxAmount);
+
       updatedState.turn = totalAmount - (tableData[0].order_total + taxAmount + tipAmount); // Update turn based on total amounts
       return updatedState;
     });
-    // console.log("Payment", customerData);
+    console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
       [name]: undefined
     }));
   };
 
-  // timer
-  const [elapsedTime, setElapsedTime] = useState("");
-  const calculateElapsedTime = (createdAt) => {
-    const now = new Date();
-    const created = new Date(createdAt);
-    const diff = now - created;
+  // // timer
+  // const [elapsedTime, setElapsedTime] = useState("");
+  // const calculateElapsedTime = (createdAt) => {
+  //   const now = new Date();
+  //   const created = new Date(createdAt);
+  //   const diff = now - created;
 
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
+  //   const minutes = Math.floor(diff / 60000);
+  //   const seconds = Math.floor((diff % 60000) / 1000);
 
-    return `${minutes} min ${seconds} seg`;
-  };
-  useEffect(
-    () => {
-      if (tableData.length > 0 && tableData[0].created_at) {
-        const timer = setInterval(() => {
-          setElapsedTime(calculateElapsedTime(tableData[0].created_at));
-        }, 1000);
+  //   return `${minutes} min ${seconds} seg`;
+  // };
+  // useEffect(
+  //   () => {
+  //     if (tableData.length > 0 && tableData[0].created_at) {
+  //       const timer = setInterval(() => {
+  //         setElapsedTime(calculateElapsedTime(tableData[0].created_at));
+  //       }, 1000);
 
-        return () => clearInterval(timer);
-      }
-    },
-    [tableData]
-  );
+  //       return () => clearInterval(timer);
+  //     }
+  //   },
+  //   [tableData]
+  // );
 
 
   //   add note
@@ -504,7 +551,7 @@ const TablePago = () => {
         tip: tipAmount ? tipAmount : 0,
         payment_type: selectedCheckboxes[0],
         box_id: boxId?.id,
-        transaction_code: true
+        transaction_code: true,customer_name:payment.firstname || payment.business_name
       },
         {
           headers: {
@@ -550,6 +597,8 @@ const TablePago = () => {
               localStorage.removeItem("cartItems");
               localStorage.removeItem("currentOrder");
               localStorage.removeItem("payment");
+              localStorage.removeItem("tablePayment");
+
             } catch (error) {
               console.log("Table Status not Upadte ," + error.message);
             }
@@ -616,6 +665,16 @@ const TablePago = () => {
     }
   };
   const itemInfo = tableData[0]?.items.map(item => getItemInfo(item.item_id));
+  const getUserName =   (id) => {
+    const user = users.find(user => user.id === id);
+   
+    if (user) {
+      return user.name;
+    } else {
+      console.error(`User with id ${id} not found`);
+      return 'Unknown User';
+    }
+  };
   return (
     <div className="s_bg_dark">
       <Header />
@@ -1019,17 +1078,17 @@ const TablePago = () => {
           className="j-counter-price position-sticky"
           style={{ top: "77px" }}
         >
-          <div className="j_position_fixed j_b_hd_width">
+          <div className="j_position_fixed j_b_hd_width ak-position">
             <h2 className="text-white j-tbl-text-13">Resumen</h2>
             <div className="j-counter-price-data">
               <h3 className="text-white mt-3 j-tbl-text-13">Datos</h3>
-              <div className="j_td_center my-3">
-                <div className="j-busy-table j_busy_table_last d-flex align-items-center">
+              <div className="j_td_center my-3 ak-w-100">
+                <div className="j-busy-table j_busy_table_last d-flex align-items-center ak-w-50">
                   <div className="j-b-table" />
-                  <p className="j-table-color j-tbl-font-6">Ocupado</p>
+                  <p className="j-table-color j-tbl-font-6 ak-input">Ocupado</p>
                 </div>
 
-                <div className="b-date-time b_date_time2  d-flex align-items-center">
+                <div className="b-date-time b_date_time2  d-flex align-items-center ak-w-50">
                   <svg
                     class="j-canvas-svg-i"
                     aria-hidden="true"
@@ -1046,35 +1105,40 @@ const TablePago = () => {
                     />
                   </svg>
 
-                  <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
-                    {elapsedTime}
-                  </p>
+                  {tableData && tableData.length > 0 ? (
+                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+
+                        ) : (
+                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1 ak-input">
+                            00 min 00 sg
+                          </p>
+                        )}
                 </div>
               </div>
 
               <div className="j-counter-price-data">
-                <div className="j-orders-inputs j_td_inputs">
-                  <div className="j-orders-code">
+                <div className="j-orders-inputs j_td_inputs ak-w-100">
+                  <div className="j-orders-code ak-w-50">
                     <label className="j-label-name text-white mb-2 j-tbl-btn-font-1">
                       Quién registra
                     </label>
                     <div>
                       <input
-                        className="j-input-name j_input_name520"
+                        className="j-input-name j_input_name520 ak-input"
                         type="text"
                         placeholder="Lucia Lopez"
-                        value={tableData[0]?.customer_name}
+                        value={getUserName(tableData[0]?.user_id)}
                         readOnly
                       />
                     </div>
                   </div>
-                  <div className="j-orders-code">
+                  <div className="j-orders-code ak-w-50">
                     <label className="j-label-name j-tbl-btn-font-1 text-white mb-2">
                       Personas
                     </label>
                     <div>
                       <input
-                        className="j-input-name630"
+                        className="j-input-name630 ak-input"
                         type="text"
                         placeholder="5"
                         value={tableData[0]?.person}
@@ -1176,7 +1240,7 @@ const TablePago = () => {
                       </Link>
                     )}
                   </div>
-                  <div className="j-counter-total">
+                  <div className="j-counter-total ak-counter-total">
                     <h5 className="text-white j-tbl-text-15">Costo total</h5>
                     <div className="j-total-discount d-flex justify-content-between">
                       <p className="j-counter-text-2">Artículos</p>

@@ -1050,10 +1050,11 @@ export default function ProductionCenter() {
                   </Modal>
 
                   <div className="py-3 m_borbot mx-3 j-table-position-sticky-sector">
+                    
                     {productionCenters.map((item, index) => (
                       <div key={item.id}>
                         <div className="d-flex justify-content-between m14 align-items-center flex-wrap mb-2">
-                          <div className="text-nowrap ">
+                          <div className="text-nowrap  ">
                             <label className="d-flex align-items-center">
                               <input
                                 type="checkbox"
@@ -1063,7 +1064,7 @@ export default function ProductionCenter() {
                                   setMenuId(item.id);
                                 }}
                               />
-                              <p className="text-white mb-0">{item.name}</p>
+                              <p className="text-white mb-0 ">{item.name}</p>
                             </label>
                           </div>
                           {(role == "admin") &&
@@ -1381,7 +1382,7 @@ export default function ProductionCenter() {
                                   parentCheck.map((parentItem) => (
                                     <div key={parentItem.id}>
                                       <div className="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                                        <div className="text-nowrap">
+                                        <div className="">
                                           <label>
                                             <input
                                               type="checkbox"
@@ -1710,7 +1711,7 @@ export default function ProductionCenter() {
                             </div>
                           ) : (
                             <div className="col-12 text-center text-white mt-3">
-                              <p className="opacity-75">No hay productos disponibles en este menú</p>
+                              <p className="opacity-75">No hay artículo asignado a este centro de producción</p>
                             </div>
                           )}
                         </div>

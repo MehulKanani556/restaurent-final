@@ -19,6 +19,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 const DeliveryPago = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("token");
+  const userName = localStorage.getItem("name");
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = localStorage.getItem("userId");
   const admin_id = localStorage.getItem("admin_id");
@@ -32,6 +33,9 @@ const DeliveryPago = () => {
   );
   const [orderType, setOrderType] = useState(
     JSON.parse(localStorage.getItem("currentOrder")) || []
+  );
+  const [tableId] = useState(
+    JSON.parse(localStorage.getItem("tableId")) || null
   );
 
   const [tipAmount, setTipAmount] = useState(0);
@@ -163,31 +167,48 @@ const DeliveryPago = () => {
     turn: ""
   };
 
+  const getTotalCost = () => {
+    return (
+      cartItems.reduce(
+        (total, item, index) => total + parseInt(item.price) * item.count,
+        0
+      )
+    );
+  };
+  const totalCost = getTotalCost();
+  const discount = 1.0;
+  const finalTotal = totalCost - discount;
+  const taxAmount = finalTotal * 0.19;
+
+
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
   const [customerData, setCustomerData] = useState(initialCustomerData);
-
+  console.log(selectedCheckboxes);
 
   const handleCheckboxChange = (value) => {
     // console.log(value);
-
     if (selectedCheckboxes.includes(value)) {
 
-      if (customerData?.[value + "Amount"] ) {
+      if (customerData?.[value + "Amount"]) {
         setCustomerData((prevData) => ({
           ...prevData,
-          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : ""
+          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : 0
         }));
       }
-
       setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
-      // setCustomerData(initialCustomerData);
+
       setCustomerData((prevData) => ({
         ...prevData,
-        [value + "Amount"]: "" // Reset only the deselected payment type amount
+        [value + "Amount"]: ""
       }));
     } else {
       setSelectedCheckboxes((prev) => [...prev, value]);
-      setCustomerData({ ...customerData, [value + "Amount"]: customerData?.turn ? (Math.abs(customerData?.turn.toFixed(2))).toString() : '', turn: '' });
+      setCustomerData({
+        ...customerData,
+        [value + "Amount"]: customerData?.turn && customerData.turn < 0 ?
+          (Math.abs(customerData.turn.toFixed(2))).toString() : '',
+        turn: customerData?.turn && customerData.turn > 0 ? customerData.turn : 0
+      });
     }
     // Clear the payment type error when a type is selected
     setFormErrors((prevErrors) => ({
@@ -196,18 +217,40 @@ const DeliveryPago = () => {
     }));
   };
 
+
+
   const handleChange = (event) => {
     let { name, value } = event.target;
     value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
+    console.log(name);
+    const otherbox = selectedCheckboxes.filter(item => !name.includes(item))
+    console.log(otherbox);
     setCustomerData((prevState) => {
+      const currentValue = parseFloat(value) || 0;
+      const totalDue = finalTotal + taxAmount + tipAmount;
+      const otherAmount = Math.max(totalDue - currentValue, 0);
+
+      console.log(otherAmount);
+
       const updatedState = {
         ...prevState,
-        [name]: value, // Update the specific payment type amount
+        [name]: value,
       };
+
+      console.log(updatedState);
+
+
+      if (otherbox.length > 0) {
+        const otherPaymentType = otherbox[0] + 'Amount';
+        updatedState[otherPaymentType] = otherAmount.toFixed(2);
+      }
+      console.log(updatedState);
+
       // New calculation for turn
       const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
       updatedState.turn = totalAmount - (finalTotal + taxAmount + tipAmount); // Update turn based on total amounts
       return updatedState;
+
     });
     console.log("Payment", customerData);
     setFormErrors((prevState) => ({
@@ -215,6 +258,8 @@ const DeliveryPago = () => {
       [name]: undefined
     }));
   };
+
+
   useEffect(
     () => {
       if (showCreSuc) {
@@ -270,18 +315,7 @@ const DeliveryPago = () => {
     setCartItems(updatedCartItems);
   };
 
-  const getTotalCost = () => {
-    return (
-      cartItems.reduce(
-        (total, item, index) => total + parseInt(item.price) * item.count,
-        0
-      )
-    );
-  };
-  const totalCost = getTotalCost();
-  const discount = 1.0;
-  const finalTotal = totalCost - discount;
-  const taxAmount = finalTotal * 0.19;
+
 
 
   // ==== Get BOX Data =====
@@ -437,36 +471,54 @@ const DeliveryPago = () => {
         headers: { Authorization: `Bearer ${token}` }
       })
       // console.log(response.data)
-      // if (response.data.success) {
+      if (response.data.success) {
 
-      try {
-        const responsePayment = await axios.post(
-          `${apiUrl}/payment/insert`,
-          paymentData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+        try {
+          const responsePayment = await axios.post(
+            `${apiUrl}/payment/insert`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
+          )
+          setIsProcessing(false)
+          console.log(responsePayment);
+
+          if (responsePayment.data.success) {
+
+            if (tableId) {
+              try {
+                const resStatus = await axios.post(`${apiUrl}/table/updateStatus`, {
+                  table_id: tableId,
+                  status: "available",
+                  admin_id: admin_id
+                }, {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                })
+              } catch (error) {
+                console.log("Table Status not Upadte ," + error.message);
+              }
+            }
+            localStorage.removeItem("cartItems");
+            localStorage.removeItem("currentOrder");
+            localStorage.removeItem("payment");
+            handleShow11();
+
           }
-        )
-        setIsProcessing(false)
-        // console.log("sbhs",responsePayment);
-        if (responsePayment.status) {
-          localStorage.removeItem("cartItems");
-          localStorage.removeItem("currentOrder");
-          localStorage.removeItem("payment");
-          handleShow11();
+        } catch (error) {
+          setIsProcessing(false)
+          console.log("Payment not done." + error.message);
         }
-        // console.log("payemnt suc", responsePayment.data);
-      } catch (error) {
-        setIsProcessing(false)
-        console.log("Payment not done." + error.message);
+      } else {
+        alert(response.data.message)
       }
-      // }
     } catch (error) {
       setIsProcessing(false)
       console.error("Error creating order : ", error);
-      //enqueueSnackbar (error?.response?.data?.message, { variant: 'error' })
     }
     setIsProcessing(false)
     // localStorage.removeItem("cartItems");
@@ -900,8 +952,9 @@ const DeliveryPago = () => {
                       <input
                         className="j-input-name j_input_name520"
                         type="text"
-                        placeholder={orderType?.name}
-
+                        // placeholder={orderType?.name}
+                        disabled
+                        value={userName}
                       />
                     </div>
                   </div>

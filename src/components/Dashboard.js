@@ -1894,20 +1894,20 @@ const Dashboard = () => {
                     {/* <Aa /> */}
                   </div>
                   <div className="j-summary-data2 mb-3">
-                    <div className="d-flex align-items-center j-margin">
-                      <img src={chart4} className="jj_img me-2" />
+                    <div className="d-flex align-items-center j-margin ak-Dstate">
+                      <img src={chart4} className="jj_img me-2 ak-me1" />
                       <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Recibido</p>
                     </div>
-                    <div className="d-flex align-items-center j-margin">
-                      <img src={chart2} className="jj_img me-2" />
+                    <div className="d-flex align-items-center j-margin ak-Dstate">
+                      <img src={chart2} className="jj_img me-2 ak-me1" />
                       <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Preparado</p>
                     </div>
-                    <div className="d-flex align-items-center j-margin">
-                      <img src={chart1} className="jj_img me-2" />
+                    <div className="d-flex align-items-center j-margin ak-Dstate">
+                      <img src={chart1} className="jj_img me-2 ak-me1" />
                       <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Finalizado</p>
                     </div>
                     <div className="d-flex align-items-center">
-                      <img src={chart3} className="jj_img me-2" />
+                      <img src={chart3} className="jj_img me-2 ak-me1" />
                       <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Entregado</p>
                     </div>
                   </div>

@@ -49,84 +49,6 @@ function Home_detail() {
         });
     });
 
-    // const [data, setData] = useState([
-    //     {
-    //         id: '01234',
-    //         state1: 'Entregado',
-    //         credit_note: 'Crear nota de credito',
-    //         action1: 'Anular venta',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Entregado',
-    //         credit_note: 'Crear nota de credito',
-    //         action1: 'Anular venta',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Entregado',
-    //         credit_note: 'Crear nota de credito',
-    //         action1: 'Anular venta',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Entregado',
-    //         credit_note: 'Crear nota de credito',
-    //         action1: 'Anular venta',
-    //     },
-
-    // ]);
-    // const [data1, setData1] = useState([
-    //     {
-    //         id: '01234',
-    //         state1: 'Devolucion pendiente',
-    //         credit_note: 'Ver detalles',
-    //         action1: 'Anular credito',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Devolucion completada',
-    //         credit_note: 'Ver detalles',
-    //         action1: 'Anular credito',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Devolucion completada',
-    //         credit_note: 'Ver detalles',
-    //         action1: 'Anular credito',
-    //     },
-    //     {
-    //         id: '01234',
-    //         state1: 'Devolucion completada',
-    //         credit_note: 'Ver detalles',
-    //         action1: 'Anular credito',
-    //     },
-
-    // ]);
-
-    // const handleEditClick = (id) => {
-    //     // Implement edit functionality here
-    //     console.log('Edit button clicked for order:', id);
-    // };
-
-    // const handleDeleteClick = (id) => {
-    //     // Implement delete functionality here
-    //     const newData = data.filter((order) => order.id !== id);
-    //     setData(newData);
-    //     console.log('Delete button clicked for order:', id);
-    // };
-
-    // const handleStatusChange = (id, newStatus) => {
-    //     // Update order status
-    //     const newData = data.map((order) => {
-    //         if (order.id === id) {
-    //             return { ...order, status: newStatus };
-    //         }
-    //         return order;
-    //     });
-    //     setData(newData);
-    // };
-
 
     // =========================API====================
 
@@ -270,6 +192,7 @@ function Home_detail() {
                 }
             );
             console.log("Note added successfully:", response.data);
+            setIsProcessing(false);
 
         } catch (error) {
             console.error(
@@ -293,6 +216,7 @@ function Home_detail() {
             );
             //   getOrderStatus();
             console.log("Order Cancle successfully:", response.data);
+            setIsProcessing(false);
 
         } catch (error) {
             console.error(
@@ -357,6 +281,7 @@ function Home_detail() {
                 setPrintOrderData(order);
                 handleShow11();
             }
+            setIsProcessing(false);
 
 
         } catch (error) {
@@ -382,6 +307,8 @@ function Home_detail() {
                 setPaymentData(response.data.data);
                 setPrintOrderData(credit);
                 handleShow11();
+            setIsProcessing(false);
+
             }
         } catch (error) {
             console.error(
@@ -506,6 +433,7 @@ function Home_detail() {
 
     const handleCreditDelete = async () => {
         try {
+            setShowDeleteConfirmation(false);
             setIsProcessing(true);
             const response = await axios.delete(`${apiUrl}/order/creditnotes/${deleteProductId}`, {
                 headers: {
@@ -543,7 +471,7 @@ function Home_detail() {
                 <div>
                     <Sidenav />
                 </div>
-                <div className='flex-grow-1 sidebar overflow-y-scroll ' style={{ backgroundColor: "#1F2A37" }}>
+                <div className='flex-grow-1 sidebar w-50 ' style={{ backgroundColor: "#1F2A37" }}>
                     <Link to={"/home/client"} className='d-flex text-decoration-none bj-delivery-text-3 ' style={{ backgroundColor: "#1F2A37" }} >
                         <div className='btn bj-btn-outline-primary text-nowrap py-2 d-flex mt-4 ms-4' style={{ borderRadius: "10px", }}> <FaArrowLeft className='me-2 mt-1' />Regresar</div>
                     </Link>
@@ -562,7 +490,7 @@ function Home_detail() {
                             title="Historial"
                             className=" text-white m_bgblack rounded"
                         >
-                            <div className='b_table1'>
+                            <div className='b_table1 w-100'>
                                 <table className='b_table '>
                                     <thead>
                                         <tr className='b_thcolor'>
@@ -641,7 +569,7 @@ function Home_detail() {
                                         </div>
                                         <div className=' b_search text-white a_input_size'>
                                             <label htmlFor="inputPassword2" className="">DNI</label>
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 bj-slimilar-class-why " id="inputPassword2" placeholder="-" style={{ backgroundColor: '#374151', borderRadius: "10px" }} value={"-"} disabled/>
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 bj-slimilar-class-why " id="inputPassword2" placeholder="-" value={user?.rut} style={{ backgroundColor: '#374151', borderRadius: "10px" }} />
                                         </div>
 
                                     </div>
@@ -696,7 +624,7 @@ function Home_detail() {
                             title="Nota de credito"
                             className=" text-white m_bgblack rounded"
                         >
-                            <div className='b_table1'>
+                            <div className='b_table1 w-100'>
                                 <table className='b_table '>
                                     <thead>
                                         <tr className='b_thcolor'>

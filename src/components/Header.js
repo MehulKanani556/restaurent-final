@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Button, Dropdown, Offcanvas, Toast } from "react-bootstrap";
 import { FaUserLarge } from "react-icons/fa6";
 import { IoCloudUpload, IoNotifications } from "react-icons/io5";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useSocket from "../hooks/useSocket";
 import useAudioManager from "./audioManager";
 
@@ -46,7 +46,7 @@ export default function Header() {
         setPrevNotificationCount(newCount);
         sessionStorage.setItem('prevNotificationCount', newCount.toString());
       }
-       // Update previous count
+      // Update previous count
       // console.log(newCount, prevNotificationCount);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -54,7 +54,7 @@ export default function Header() {
     } finally {
       setIsFetching(false); // Reset fetching status
     }
-  },[apiUrl, admin_id, user_id, token, prevNotificationCount]);
+  }, [apiUrl, admin_id, user_id, token, prevNotificationCount]);
 
   const debounceFetchNotifications = useRef(null); // Create a ref for debounce
 
@@ -76,11 +76,11 @@ export default function Header() {
     }
   }, [token, navigate, location]);
 
-  
+
   if (!token) {
     return null;
   }
-  if(role =="superadmin"){
+  if (role == "superadmin") {
     navigate('/enlaceAdmin');
   }
 
@@ -164,7 +164,7 @@ export default function Header() {
     });
     return Object.entries(grouped).sort(([a], [b]) => b - a); // Sort by date, most recent first
   };
-
+// console.log(location.pathname+location.search,location.state,location)
   return (
     <section className="m_bgblack m_borbot position-sticky top-0 z-3">
       <div className=" p-3 d-flex align-items-center justify-content-between ">
@@ -218,35 +218,16 @@ export default function Header() {
                 <React.Fragment key={dateKey}>
                   <p className="j-canvas-text mb-3">{dateString}</p>
                   {notifications.map(notification => (
-                    <div 
-                      className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`} 
-                      style={{ height: "auto" }} 
+                    <div
+                      className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
+                      style={{ height: "auto" }}
                       key={notification.id}
                     >
-                      <div className="j-canvas-icon-data mb-2">
-                        <svg
-                          className="j-canvas-icon-small me-1"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <h5 className="j-canvas-data-h2 mb-0">{notification.notification_type == "notification" ? "Notificación" : "Alerta"}</h5>
+                      <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none">
 
-                      </div>
-                      <p className="j-canvas-data-p ms-1">{notification.notification}</p>
-                      <div className="j-canvas-date-time">
-                        <div className="j-time me-4">
+                        <div className="j-canvas-icon-data mb-2">
                           <svg
-                            className="j-date-icon me-1"
+                            className="j-canvas-icon-small me-1"
                             aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -256,13 +237,36 @@ export default function Header() {
                           >
                             <path
                               fillRule="evenodd"
-                              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
+                              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm13.707-1.293a1 1 0 0 0-1.414-1.414L11 12.586l-1.793-1.793a1 1 0 0 0-1.414 1.414l2.5 2.5a1 1 0 0 0 1.414 0l4-4Z"
                               clipRule="evenodd"
                             />
                           </svg>
-                          {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          <h5 className="j-canvas-data-h2 mb-0">{notification.notification_type == "notification" ? "Notificación" : "Alerta"}</h5>
+
                         </div>
-                      </div>
+                        <p className="j-canvas-data-p ms-1">{notification.notification}</p>
+                        <div className="j-canvas-date-time">
+                          <div className="j-time me-4">
+                            <svg
+                              className="j-date-icon me-1"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </Link>
+
                     </div>
                   ))}
                 </React.Fragment>

@@ -18,6 +18,7 @@ function Home_detail_no2() {
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate()
     const { state } = useLocation();
+
     console.log(state);
 
     console.log(id);
@@ -26,7 +27,36 @@ function Home_detail_no2() {
     const [items, setItems] = useState([]);
     const [returnDetails, setReturnDetail] = useState();
     const [orderAlldata, setOrderAlldata] = useState([]);
+    const [paymentData, setPaymentData] = useState();
 
+    useEffect(() => {
+        if (creditNote)
+            fetchpayment();
+    }, [creditNote])
+
+    const fetchpayment = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.get(`${apiUrl}/getsinglepayments/${creditNote?.order_id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.data.success) {
+                setPaymentData(response.data.data);
+            }
+
+
+        } catch (error) {
+            console.error(
+                "Error fetching allOrders:",
+                error.response ? error.response.data : error.message
+            );
+        } finally {
+            setIsProcessing(false);
+        }
+    }
 
     useEffect(() => {
         fetchCredit();
@@ -82,7 +112,7 @@ function Home_detail_no2() {
     const getItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(`${apiUrl}/item/getAll`, {
+            const response = await axios.get(`${apiUrl}/item/getAllDeletedAt`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -174,7 +204,7 @@ function Home_detail_no2() {
                             <h5 className='text-white' style={{ fontSize: "18px" }}>Detalles nota de credito</h5>
                         </div>
                         <div className='ms-4 mt-4'>
-                            <h5 className='text-white' style={{ fontSize: "18px" }}>DNI: 0123456789</h5>
+                            <h5 className='text-white' style={{ fontSize: "18px" }}>DNI: {paymentData?.rut}</h5>
                         </div>
                     </div>
 
@@ -204,9 +234,10 @@ function Home_detail_no2() {
                                 </div>
                             </div>
                             <div className='d-flex gap-5 mx-4 b_inputt b_id_input b_home_field'>
-                                <div className='w-100 b_search text-white mb-3'>
-                                    <label htmlFor="dni">DNI</label>
-                                    <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={obj1.id} id="dni" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} readOnly />
+
+                                <div className='w-100 b_search  text-white mb-3'>
+                                    <label htmlFor="inputPassword2" className="">DNI</label>
+                                    <input type="text" className="form-control bg-gray  border-0 mt-2 py-3 " value={paymentData?.rut} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                 </div>
                                 <div className='w-100 b_search text-white mb-3'>
                                     <label htmlFor="email">Correo electrónico</label>

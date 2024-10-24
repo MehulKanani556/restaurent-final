@@ -22,7 +22,7 @@ const BHomeDelivery = () => {
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
   const admin_id = localStorage.getItem("admin_id");
-
+const userName = localStorage.getItem("name");
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
   const [obj1, setObj1] = useState([]);
@@ -41,7 +41,7 @@ const BHomeDelivery = () => {
   const [orType, setOrType] = useState([]);
   const [cname, setCName] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
+  const [users, setUsers] = useState([]);
   const [orderTypeA, setOrderTypeA] = useState()
   useEffect(() => {
 
@@ -52,6 +52,7 @@ const BHomeDelivery = () => {
         await fetchAllItems();
         await fetchSubFamilyData();
         await fetchLastOrder();
+        await fetchAllUser();
 
         if (parentCheck.length > 0) {
           const todoCategory = { id: "todo", name: "Todo" };
@@ -70,6 +71,25 @@ const BHomeDelivery = () => {
 
     fetchData();
   }, []);
+
+  const fetchAllUser = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.get(`${apiUrl}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setUsers(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching users:",
+        error.response ? error.response.data : error.message
+      );
+    }
+    setIsProcessing(false);
+  }
 
   const [userId, setUserId] = useState('')
 
@@ -434,7 +454,7 @@ const BHomeDelivery = () => {
   const placeNewOrder = async () => {
     console.log(orderType, cname);
 
-    if (!orderType || !cname) {
+    if (!orderType || !userName) {
       console.log("Dgd");
 
       setOrderTypeError("Por favor ingrese su nombre");
@@ -485,31 +505,7 @@ const BHomeDelivery = () => {
 
 
 
-  const [categories, setCategories] = useState([
-    "Todo",
-    "Bebidas",
-    "Snacks",
-    "Postres",
-    "Almuerzos",
-    "Desayunos",
-    "Cenas",
-    "Gelatinas",
-    "Pasteles",
-    "Frutas con crema",
-  ]);
-
-  const [subcategories, setSubCategories] = useState({
-    "Bebidas": ["Soda", "Juice", "Water"],
-    "Snacks": ["Chips", "Nuts", "Popcorn"],
-    "Postres": ["Soda", "Juice", "Water"],
-    "Almuerzos": ["Chips", "Nuts", "Popcorn"],
-    "Desayunos": ["Soda", "Juice", "Water"],
-    "Cenas": ["Chips", "Nuts", "Popcorn"],
-    "Gelatinas": ["Soda", "Juice", "Water"],
-    "Pasteles": ["Chips", "Nuts", "Popcorn"],
-    "Frutas con crema": ["Soda", "Juice", "Water"],
-
-  });
+  
 
   // const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   // const [selectedSubCategory, setSelectedSubCategory] = useState(null);
@@ -560,107 +556,7 @@ const BHomeDelivery = () => {
 
 
 
-  const item1 = [
-    {
-      image: img1,
-      name: "Sopa de queso",
-      price: "2.00",
-      code: "01234",
-      note: 'Nota: Al clima',
-      subcategory: "Soda"
-    },
-    {
-      image: img1,
-      name: "Sopa de queso",
-      price: "2.00",
-      code: "01234",
-      note: 'Nota: Al clima',
-      subcategory: "Juice"
-    },
-    {
-      image: img1,
-      name: "Sopa de queso",
-      price: "2.00",
-      code: "01234",
-      note: 'Nota: Al clima',
-      subcategory: "Water"
-    }
-  ];
-
-  const item2 = [
-    {
-      image: img2,
-      name: "Pollo frito crujiente",
-      price: "2.00",
-      code: "01234",
-      note: '+ Agregar nota',
-      subcategory: "Chips"
-    },
-    {
-      image: img2,
-      name: "Pollo frito crujiente",
-      price: "2.00",
-      code: "01234",
-      note: '+ Agregar nota',
-      subcategory: "Chips"
-    },
-    {
-      image: img2,
-      name: "Pollo frito crujiente",
-      price: "2.00",
-      code: "01234",
-      note: '+ Agregar nota',
-      subcategory: "Nuts"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "Nuts"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "Popcorn"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "Popcorn"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "chip"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "Nuts"
-    },
-    {
-      image: img3,
-      name: "Gelatina fresa",
-      price: "2.00",
-      code: "01234",
-      note: 'Con fresas',
-      subcategory: "Popcorn"
-    },
-  ];
+ 
 
   const handlename = (e) => {
     const value = e.target.value
@@ -669,6 +565,16 @@ const BHomeDelivery = () => {
       setOrderTypeError("")
     }
   }
+  const getUserName =   (id) => {
+    const user = users.find(user => user.id === id);
+   
+    if (user) {
+      return user.name;
+    } else {
+      console.error(`User with id ${id} not found`);
+      return 'Unknown User';
+    }
+  };
 
   // console.log(cname);
 
@@ -822,8 +728,9 @@ const BHomeDelivery = () => {
                   className="form-control b-form-control"
                   id="exampleFormControlInput1"
                   placeholder=""
-                  onChange={handlename}
-                  value={cname}
+                  // onChange={handlename}
+                  value={userName}
+                  disabled
                 />
                 {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>}
 

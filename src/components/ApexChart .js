@@ -114,7 +114,7 @@ const ApexChart = ({mapVal,cat}) => {
 
 
   return (
-    <div style={{ position: 'relative' }} className='py-3 j-table-chart'>
+    <div style={{ position: 'relative' }} className='py-3 j-table-chart me-0'>
       <div id="chart" className='m_chart'>
         <ReactApexChart options={chartState.options} series={chartState.series} type="area" height={350} />
       </div>

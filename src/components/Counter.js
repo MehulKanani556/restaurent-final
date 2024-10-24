@@ -23,6 +23,7 @@ const Counter = () => {
   const [role] = useState(localStorage.getItem("role"));
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
+
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
   const [obj1, setObj1] = useState([]);
@@ -593,29 +594,29 @@ console.log("object");
           className="j-counter-price position-sticky"
           style={{ top: "77px" }}
         >
-          <div className="j_position_fixed j_b_hd_width">
+          <div className="j_position_fixed j_b_hd_width ak-position">
             <h2 className="text-white j-kds-body-text-1000">Resumen</h2>
             <div className="j-counter-price-data">
               <h3 className="text-white j-kds-body-text-1000">Datos</h3>
-              <div className="j-orders-inputs j_inputs_block">
-                <div className="j-orders-code">
+              <div className="j-orders-inputs j_inputs_block ak-w-100">
+                <div className="j-orders-code ak-w-50">
                   <label className="j-label-name text-white mb-2 j-tbl-font-6 ">
                     Código pedido
                   </label>
                   <input
-                    className="j-input-name j_input_name2"
+                    className="j-input-name j_input_name2 ak-input"
                     type="text"
                     placeholder="-"
                     value={lastOrder}
                     disabled
                   />
                 </div>
-                <div className="j-orders-type">
+                <div className="j-orders-type ak-w-50">
                   <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                     Tipo pedido
                   </label>
                   <select
-                    className="form-select j-input-name-2 j-input-name-23"
+                    className="form-select j-input-name-2 j-input-name-23 ak-input"
                     onChange={(e) => { setOrderType(e.target.value); setOrderTypeError('') }}
                   // value={orType.orderType}
                   >
@@ -636,7 +637,7 @@ console.log("object");
         <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clipRule="evenodd" />
       </svg>
                     {/* <MdRoomService className="i-product-order" /> */}
-                    <h6 className="h6-product-order text-white j-tbl-pop-1">Empezar pedido</h6>
+                    <h6 className="h6-product-order text-white j-tbl-pop-1">Comenzar pedido</h6>
                     <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar  pedido  </p>
                   </div>
                 </div>
@@ -726,7 +727,7 @@ console.log("object");
                       </Link>
                     )}
                   </div>
-                  <div className="j-counter-total">
+                  <div className="j-counter-total ak-counter-total">
                     <h5 className="text-white j-tbl-text-15">Costo total</h5>
                     <div className="j-total-discount d-flex justify-content-between">
                       <p className="j-counter-text-2">Artículos</p>

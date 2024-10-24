@@ -19,6 +19,7 @@ import echo from "../echo";
 import Echo from "laravel-echo";
 import { io } from 'socket.io-client';
 import useAudioManager from "./audioManager";
+import ElapsedTimeDisplay from "./ElapsedTimeDisplay";
 //import { enqueueSnackbar  } from "notistack";
 
 const Tables = () => {
@@ -814,29 +815,29 @@ const Tables = () => {
     navigate("/table/information", { state: { selectedTable } });
   };
   // timer
-  const [elapsedTime, setElapsedTime] = useState("");
-  const calculateElapsedTime = (createdAt) => {
-    const now = new Date();
-    const created = new Date(createdAt);
-    const diff = now - created;
+  // const [elapsedTime, setElapsedTime] = useState("");
+  // const calculateElapsedTime = (createdAt) => {
+  //   const now = new Date();
+  //   const created = new Date(createdAt);
+  //   const diff = now - created;
 
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
+  //   const minutes = Math.floor(diff / 60000);
+  //   const seconds = Math.floor((diff % 60000) / 1000);
 
-    return `${minutes} min ${seconds} seg`;
-  };
-  useEffect(
-    () => {
-      if (tableData.length > 0 && tableData[0].created_at) {
-        const timer = setInterval(() => {
-          setElapsedTime(calculateElapsedTime(tableData[0].created_at));
-        }, 1000);
+  //   return `${minutes} min ${seconds} seg`;
+  // };
+  // useEffect(
+  //   () => {
+  //     if (tableData.length > 0 && tableData[0].created_at) {
+  //       const timer = setInterval(() => {
+  //         setElapsedTime(calculateElapsedTime(tableData[0].created_at));
+  //       }, 1000);
 
-        return () => clearInterval(timer);
-      }
-    },
-    [tableData]
-  );
+  //       return () => clearInterval(timer);
+  //     }
+  //   },
+  //   [tableData]
+  // );
   //pass data to Datos
   const handleCobrarClcik = () => {
     navigate(`/table/datos?id=${selectedTable}`, { state: { tableData } });
@@ -1886,9 +1887,13 @@ const Tables = () => {
                         clipRule="evenodd"
                       />
                     </svg>
-                    <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
-                      {elapsedTime}
-                    </p>
+                    {tableData && tableData.length > 0 ? (
+                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+                        ) : (
+                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
+                            00 min 00 sg
+                          </p>
+                        )}
                   </div>
                 </div>
                 <div className="j-counter-price-data">
@@ -2137,9 +2142,16 @@ const Tables = () => {
                         clipRule="evenodd"
                       />
                     </svg>
-                    <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
+                    {tableData && tableData.length > 0 ? (
+                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+                        ) : (
+                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
+                            00 min 00 sg
+                          </p>
+                        )}
+                    {/* <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
                       {elapsedTime}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
                 <div className="j-counter-price-data">

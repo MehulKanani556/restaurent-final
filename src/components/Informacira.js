@@ -1697,8 +1697,8 @@ const Informacira = () => {
                   title="Historial"
                   className=" text-white m_bgblack  rounded"
                 >
-                  <div className="d-flex justify-content-between px-4  py-3 text-white sjd-flex">
-                    <div>
+                  <div className="row d-flex justify-content-between px-4  py-3 text-white sjd-flex">
+                    <div className="col-md-6">
                       <p className="mb-1 j-caja-text-1">
                       Cantidad de turnos
                       </p>
@@ -1709,7 +1709,7 @@ const Informacira = () => {
                         disabled
                       />
                     </div>
-                    <div className="d-flex justify-content-end gap-4">
+                    <div className="d-flex col-md-6 justify-content-end gap-4">
                       <div>
                         <label className="mb-1 j-caja-text-1">Desde</label>
 
@@ -1782,8 +1782,8 @@ const Informacira = () => {
                       </div>
                     )}
                   </div>
-                  <div className="text-white py-3" style={{ height: data.length === 0 ? "calc(-370px + 100vh)" : "auto" }}>
-                    <table className="sj_table b_table1">
+                  <div className="text-white py-3 b_table1 w-100" style={{ height: data.length === 0 ? "calc(-370px + 100vh)" : "auto" }}>
+                    <table className="sj_table ">
                       <thead>
                         <tr className="sjtable_dark flex-nowrap">
                           <th className="p-3">Horario de apertura</th>
@@ -2464,8 +2464,8 @@ const Informacira = () => {
                   title="Movimientos"
                   className=" text-white m_bgblack rounded mx-3"
                 >
-                  <div className="text-white sj_overflow mt-4 py-3">
-                    <table className="sj_table b_table1">
+                  <div className="text-white sj_overflow mt-4 py-3 b_table1 w-100">
+                    <table className="sj_table ">
                       <thead>
                         <tr className="sjtable_dark">
                           <th className="p-3">Pedido</th>

@@ -108,9 +108,9 @@ function Home_Usuarios() {
                     Cliente: order.customer_name, // Changed to Spanish
                     Pago: "$" + order.total, // Changed to Spanish
                     Metodo: order.payment_type == 'cash' ? 'Efectivo' :
-                            order.payment_type == 'debit' ? 'Débito' :
+                        order.payment_type == 'debit' ? 'Débito' :
                             order.payment_type == 'credit' ? 'Crédito' :
-                            order.payment_type == 'transfer' ? 'Transferir' : " ",
+                                order.payment_type == 'transfer' ? 'Transferir' : " ",
                     Vuelto: "$" + order.total, // Changed to Spanish
                     Tipo: order.order_type.toLowerCase() === 'local' ? 'Local' :
                         order.order_type.toLowerCase().includes("with") ? 'Retiro ' :
@@ -184,7 +184,7 @@ function Home_Usuarios() {
     const getAllorder = async () => {
         setIsProcessing(true)
         try {
-            const response = await axios.post(`${API_URL}/order/getAll`, {admin_id: admin_id}, {
+            const response = await axios.post(`${API_URL}/order/getAll`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -338,7 +338,7 @@ function Home_Usuarios() {
 
 
 
-   
+
 
 
     return (
@@ -386,26 +386,28 @@ function Home_Usuarios() {
                         </div>
                     </div>
                     <div className='justify-content-between  b_btn_main'>
-                        <div className=''>
-                            <div className='d-flex justify-content-between align-items-center flex-wrap'>
-                                <ul className="nav nav-pills  b_nav ms-4 mb-3 gap-3 " id="pills-tab" role="tablist" >
-                                    <li className="nav-item" role="presentation">
-                                        <button className="nav-link active rounded-pill bj-delivery-text-2 " id="pills-home-tab1" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true" onClick={() => handleType("Todo")} >Todo</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-profile-tab2" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" onClick={() => handleType("delivery")}>Delivery</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-contact-tab3" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" onClick={() => handleType("with")} >Retiro</button>
-                                    </li>
-                                    <li className="nav-item" role="presentation">
-                                        <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-local-tab4" data-bs-toggle="pill" data-bs-target="#pills-local" type="button" role="tab" aria-controls="pills-local" aria-selected="false" onClick={() => handleType("local")} >Local</button>
-                                    </li>
-                                    {/* <li className="nav-item" role="presentation">
+
+                        <div>
+                            <div className='row d-flex justify-content-between'>
+                                <div className='col-md-6 d-flex justify-content-between align-items-center flex-wrap'>
+                                    <ul className="nav nav-pills  b_nav ms-4 mb-3 gap-3 " id="pills-tab" role="tablist" >
+                                        <li className="nav-item" role="presentation">
+                                            <button className="nav-link active rounded-pill bj-delivery-text-2 " id="pills-home-tab1" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true" onClick={() => handleType("Todo")} >Todo</button>
+                                        </li>
+                                        <li className="nav-item" role="presentation">
+                                            <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-profile-tab2" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false" onClick={() => handleType("delivery")}>Delivery</button>
+                                        </li>
+                                        <li className="nav-item" role="presentation">
+                                            <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-contact-tab3" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false" onClick={() => handleType("with")} >Retiro</button>
+                                        </li>
+                                        <li className="nav-item" role="presentation">
+                                            <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-local-tab4" data-bs-toggle="pill" data-bs-target="#pills-local" type="button" role="tab" aria-controls="pills-local" aria-selected="false" onClick={() => handleType("local")} >Local</button>
+                                        </li>
+                                        {/* <li className="nav-item" role="presentation">
                                         <button className="nav-link rounded-pill bj-delivery-text-2 " id="pills-paltform-tab5" data-bs-toggle="pill" data-bs-target="#pills-paltform" type="button" role="tab" aria-controls="pills-paltform" aria-selected="false" onClick={() => handleType("Plat")} >Plataforma</button>
                                     </li> */}
-                                </ul>
-                                {/* <div className='text-white fs-5 fw- d-flex b_arrow align-item-center justify-content-center'>
+                                    </ul>
+                                    {/* <div className='text-white fs-5 fw- d-flex b_arrow align-item-center justify-content-center'>
                                     <div className='text-white  d-flex  b_arrow' style={{ alignItems: "baseline" }}>
                                         <div className='pe-3 mt-2 b_svg ' style={{ color: "#9CA3AF" }}>
                                             <FaAngleLeft
@@ -429,33 +431,35 @@ function Home_Usuarios() {
                                     </div>
                                 </div> */}
 
+                                </div>
+                                <div className='col-md-6 text-white  d-flex  b_arrow justify-content-end' style={{ alignItems: "baseline", cursor: "pointer", top: "200px", right: "0" }}>
+                                    <div className='j-right-left-arrow'>
+                                        <div className='pe-3 mt-2 b_svg ' style={{ color: "#9CA3AF" }}>
+                                            <FaAngleLeft
+                                                className='bj-right-icon-size-2'
+                                                onClick={() => handlePrevPage()}
+                                                disabled={currentPage === 1}
+                                            />
+                                        </div>
+                                        <span className='mt-2' style={{ color: "#9CA3AF" }}>
+                                            <FaAngleRight
+                                                className='bj-right-icon-size-2'
+                                                onClick={() => handleNextPage()}
+                                                disabled={currentPage === Math.ceil(filterData.length / itemsPerPage)}
+                                            />
+                                        </span>
+                                    </div>
+                                    <div className='text-white bj-delivery-text-3  d-flex  pt-1 ms-5'>
+                                        <p className='b_page_text me-4' style={{ color: "#9CA3AF" }}>
+                                            vista <span className='text-white'>{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filterData.length)}</span> de <span className='text-white'>{filterData.length}</span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="tab-content text-white" id="pills-tabContent">
                                 <div className="tab-pane fade show active text-white" id="" role="tabpanel" aria-labelledby="">
-                                    <div className='text-white j-delivery-position-final d-flex  b_arrow' style={{ alignItems: "baseline", cursor: "pointer", position: "absolute", top: "200px", right: "0" }}>
-                                        <div className='j-right-left-arrow'>
-                                            <div className='pe-3 mt-2 b_svg ' style={{ color: "#9CA3AF" }}>
-                                                <FaAngleLeft
-                                                    className='bj-right-icon-size-2'
-                                                    onClick={() => handlePrevPage()}
-                                                    disabled={currentPage === 1}
-                                                />
-                                            </div>
-                                            <span className='mt-2' style={{ color: "#9CA3AF" }}>
-                                                <FaAngleRight
-                                                    className='bj-right-icon-size-2'
-                                                    onClick={() => handleNextPage()}
-                                                    disabled={currentPage === Math.ceil(filterData.length / itemsPerPage)}
-                                                />
-                                            </span>
-                                        </div>
-                                        <div className='text-white bj-delivery-text-3  d-flex  pt-1 ms-5'>
-                                            <p className='b_page_text me-4' style={{ color: "#9CA3AF" }}>
-                                                vista <span className='text-white'>{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filterData.length)}</span> de <span className='text-white'>{filterData.length}</span>
-                                            </p>
-                                        </div>
-                                    </div>
+
                                     <div className='b_table1'>
                                         <table className='b_table bj-table mb-4'>
                                             <thead>
@@ -483,17 +487,17 @@ function Home_Usuarios() {
                                                             <td className='b_text_w'>{new Date(order?.created_at).toLocaleDateString('en-GB')}</td>
                                                             <td className='b_text_w'>{new Date(order?.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                                                             <td className='b_text_w'>{order.customer_name}</td>
-                                                            <td className='b_text_w'>${order.order_details.reduce((acc,v)=>acc+parseInt(v.amount)*parseInt(v.quantity),0)-parseFloat(order.discount).toFixed(2)}</td>
+                                                            <td className='b_text_w'>${order.order_details.reduce((acc, v) => acc + parseInt(v.amount) * parseInt(v.quantity), 0) - parseFloat(order.discount).toFixed(2)}</td>
                                                             {/* <td className='b_text_w'>{order.payment_type}</td> */}
                                                             <td className='b_text_w'>
                                                                 {
-                                                                order.payment_type == 'cash' ? 'Efectivo' :
-                                                                order.payment_type == 'debit' ? 'Débito' :
-                                                                order.payment_type == 'credit' ? 'Crédito' :
-                                                                order.payment_type == 'transfer' ? 'Transferir' : " "
+                                                                    order.payment_type == 'cash' ? 'Efectivo' :
+                                                                        order.payment_type == 'debit' ? 'Débito' :
+                                                                            order.payment_type == 'credit' ? 'Crédito' :
+                                                                                order.payment_type == 'transfer' ? 'Transferir' : " "
                                                                 }
                                                             </td>
-                                                            <td className='b_text_w'>${order.order_details.reduce((acc,v)=>acc+parseInt(v.amount)*parseInt(v.quantity),0)-parseFloat(order.discount).toFixed(2)}</td>
+                                                            <td className='b_text_w'>${order.order_details.reduce((acc, v) => acc + parseInt(v.amount) * parseInt(v.quantity), 0) - parseFloat(order.discount).toFixed(2)}</td>
                                                             {/* <td className='b_btn1 bj-delivery-text-2 mb-3 ms-3 d-flex align-items-center justify-content-center'>{order.order_type}</td> */}
                                                             <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
                                                             ${order.order_type.toLowerCase() === 'local' ? 'b_indigo' : order.order_type.toLowerCase() === 'order now' ? 'b_ora ' : order.order_type.toLowerCase() === 'delivery' ? 'b_blue' : order.order_type.toLowerCase() === 'uber' ? 'b_ora text-danger' : order.order_type.toLowerCase().includes("with") ? 'b_purple' : 'b_ora text-danger'}`}>

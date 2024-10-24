@@ -220,24 +220,22 @@ export default function Homeinformation() {
   };
 
   const getItems = async () => {
-    setIsProcessing(true);
+    // setIsProcessing(true);
     try {
-      const response = await axios.get(`${API_URL}/item/getAll`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.get(`${API_URL}/item/getAllDeletedAt`,{headers: {
+        Authorization: `Bearer ${token}`
+      }});
       setItems(response.data.items);
-      setObj1(response.data.items);
+      setObj1(response.data.items.filter(v=> v.deleted_at == null));
       // setFilteredMenuItems(response.data.items);
-      setFilteredItemsMenu(response.data.items);
+      setFilteredItemsMenu(response.data.items.filter(v=> v.deleted_at == null));
     } catch (error) {
       console.error(
         "Error fetching Items:",
         error.response ? error.response.data : error.message
       );
     }
-    setIsProcessing(false);
+    // setIsProcessing(false);
   };
 
   const getSector = async () => {
@@ -655,11 +653,43 @@ export default function Homeinformation() {
       }
       cartItems.push(obj)
     })
-
+    localStorage.setItem("tableId", JSON.stringify(orderData[0]?.table_id));
     localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
 
     navigate("/home/usa/bhomedelivery/datos");
+  }
+  useEffect(() => {
+    if (id)
+      fetchCredit();
+  }, [id]);
+
+  const [creditNote, setCreditNote] = useState(false);
+
+  const fetchCredit = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.post(`${API_URL}/order/getCredit`, { admin_id: admin_id }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(response.data.data);
+
+
+      const credit = response.data.data?.some((v) => v.order_id == id);
+
+      setCreditNote(credit);
+      // console.log(credit);
+
+    } catch (error) {
+      console.error(
+        "Error fetching allOrder:",
+        error.response ? error.response.data : error.message
+      );
+    }
+    setIsProcessing(false);
   }
 
   return (
@@ -691,8 +721,10 @@ export default function Homeinformation() {
                     </>
                   )}
                   {/* <div className='btn btn-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}> <MdEditSquare className='me-2' />Editar Pedido</div> */}
-                  {showCancelOrderButton &&
-                    <div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
+                 
+ {showCancelOrderButton &&
+                  creditNote &&
+                    (<div onClick={handleCredit} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>)
                   }
                 </div>
 
@@ -816,9 +848,9 @@ export default function Homeinformation() {
                 eventKey="home"
                 title="Pedidos"
                 className="m_in text-white m-3 aaaaa rounded">
-                <div className='row'>
+                <div className='row' >
                   <div className='col-xl-7 ps-0 col-12 overflow-hidden '>
-                    <div className='p-4 m_bgblack text-white'>
+                    <div className='p-4 m_bgblack text-white mb-3'>
                       <p className='bj-delivery-text-65' style={{ marginBottom: "36px" }}>Listado</p>
                       <div className='a_deli_infolist p-4'>
                         {console.log(orderDetails)}
@@ -906,7 +938,7 @@ export default function Homeinformation() {
                       </div>
                     </div>
                   </div>
-                  <div className='col-xl-5 col-12 overflow-hidden pe-0 '>
+                  <div className='col-xl-5 col-12 overflow-hidden px-0 '>
                     <div className='p-3 m_bgblack text-white '>
                       <h5 className='mt-3 ms-2 bj-delivery-text-15'>Resumen</h5>
                       <div className='deli_infolist p-2'>
@@ -963,9 +995,10 @@ export default function Homeinformation() {
                         <div className='mx-auto text-center mt-3'>
                           {!(orderData?.[0].status == "cancelled") &&
                             < div className='d-flex text-decoration-none'>
-                              {!pamentDone ?
+                              {console.log("payment",pamentDone)}
+                              {!pamentDone  || (orderData?.[0].status.toLowerCase() !== 'finalized' && orderData?.[0].status.toLowerCase() !== 'delivered') ?
                                 <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147BDE", borderRadius: "8px", padding: "10px 20px" }} onClick={handlePayment} >Cobrar ahora</div> :
-                                <div className='btn btn-primary w-100 my-4 bj-delivery-text-3' style={{ backgroundColor: "#147bdea8", borderRadius: "8px", padding: "10px 20px", cursor: "not-allowed" }}>Pago completado</div>
+                                ""
                               }
                             </div>
                           }
@@ -1001,7 +1034,7 @@ export default function Homeinformation() {
                     </div>
                   </div>
 
-                  <div className='b_table1 mx-4 mt-2' >
+                  <div className='b_table1 mx-4 mt-2 w-100' >
                     <div className='text-white mt-4'>
                       <h5 style={{ fontSize: "16px" }}>Historia del Estado</h5>
                     </div>

@@ -69,8 +69,8 @@ function Home_client() {
         fullName.includes(searchLower) ||
         displayName?.toLowerCase().includes(searchLower) ||
         (user?.lastname?.toLowerCase().includes(searchLower) || '') ||
-        user?.email?.toLowerCase().includes(searchLower) &&
-        user.email !== "superadmin@gmail.com"
+        user?.email?.toLowerCase().includes(searchLower)  ||
+        user.rut?.toLowerCase().includes(searchLower)
       );
     });
   const indexOfLastFilteredItem = currentPage * itemsPerPage;
@@ -190,7 +190,9 @@ function Home_client() {
     const groupedUsers = {};
 
     users.forEach(user => {
-      const key = `${user.firstname}|${user.business_name}|${user.email}`;
+      const displayName = user.firstname || user.business_name;
+    const fullName = `${displayName} ${user.lastname || ''}`.trim();
+    const key = `${fullName}|${user.rut}`;
 
       if (!groupedUsers[key]) {
         groupedUsers[key] = {
@@ -232,11 +234,13 @@ function Home_client() {
           <Sidenav />
         </div>
         <div
-          className="flex-grow-1 sidebar overflow-y-scroll"
+          className="flex-grow-1 sidebar w-50"
           style={{ backgroundColor: "#1F2A37" }}
         >
 
           <div>
+            <div className="overflow-hidden">
+
             <div className="ms-4 mt-4">
               <h4 className="text-white bj-delivery-text-65">Clientes</h4>
             </div>
@@ -388,7 +392,8 @@ function Home_client() {
                 </div>
               </div>
             </div>
-            <div className="b_table1">
+            </div>
+            <div className="b_table1 w-100" >
               <table className="b_table ">
                 <thead>
                   <tr className="b_thcolor">
@@ -399,14 +404,14 @@ function Home_client() {
                   </tr>
                 </thead>
                 <tbody className="text-white b_btnn ">
-                  {/* {console.log(currentFilteredItems)} */}
+                  {console.log(currentFilteredItems)}
 
                   {currentFilteredItems.length > 0 ?
                     currentFilteredItems.map((user) => (
                       // console.log(user),  
 
                       <tr key={user.id} className="b_row">
-                        <td className="bj-table-client-text">{user.id}</td>
+                        <td className="bj-table-client-text">{user.rut}</td>
                         <td className="bj-table-client-text">{user.firstname ? user.firstname : user.business_name} {user.lastname}</td>
                         <td className="b_text_w bj-table-client-text">
                           {user.email}

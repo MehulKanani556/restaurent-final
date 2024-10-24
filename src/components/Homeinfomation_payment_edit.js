@@ -147,22 +147,23 @@ const Homeinfomation_payment_edit = ({ item }) => {
     };
 
     const getItems = async () => {
+        // setIsProcessing(true);
         try {
-            const response = await axios.get(`${API_URL}/item/getAll`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setItems(response.data.items);
-            setObj1(response.data.items);
-            setFilteredItemsMenu(response.data.items);
+          const response = await axios.get(`${API_URL}/item/getAllDeletedAt`,{headers: {
+            Authorization: `Bearer ${token}`
+          }});
+          setItems(response.data.items);
+          setObj1(response.data.items.filter(v=> v.deleted_at == null));
+          // setFilteredMenuItems(response.data.items);
+          setFilteredItemsMenu(response.data.items.filter(v=> v.deleted_at == null));
         } catch (error) {
-            console.error(
-                "Error fetching Items:",
-                error.response ? error.response.data : error.message
-            );
+          console.error(
+            "Error fetching Items:",
+            error.response ? error.response.data : error.message
+          );
         }
-    };
+        // setIsProcessing(false);
+      };
 
     const getSector = async () => {
         try {
@@ -631,7 +632,38 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
 
     console.log(orderData);
-
+    useEffect(() => {
+        if (id)
+          fetchCredit();
+      }, [id]);
+    
+      const [creditNote, setCreditNote] = useState(false);
+    
+      const fetchCredit = async () => {
+        // setIsProcessing(true);
+        try {
+          const response = await axios.post(`${API_URL}/order/getCredit`, { admin_id: admin_id }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+    
+          console.log(response.data.data);
+    
+    
+          const credit = response.data.data?.some((v) => v.order_id == id);
+    
+          setCreditNote(credit);
+          // console.log(credit);
+    
+        } catch (error) {
+          console.error(
+            "Error fetching allOrder:",
+            error.response ? error.response.data : error.message
+          );
+        }
+        // setIsProcessing(false);
+      }
     return (
         <div>
             <div className="m_bg_black">
@@ -651,7 +683,8 @@ const Homeinfomation_payment_edit = ({ item }) => {
 
                                 <div className='d-flex flex-wrap me-4'>
                                     {showCancelOrderButton ? (
-                                        <div className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>
+                                        creditNote &&
+                                        (<div className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <BsCalculatorFill className='me-2' />Generar nota de crédito</div>)
                                     ) : (
                                         <div onClick={handleShow1Prod} className='btn bj-btn-outline-primary me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ borderRadius: '10px' }}> <FaPlus className='me-2' />Agregar artículo</div>
                                     )}
@@ -738,7 +771,7 @@ const Homeinfomation_payment_edit = ({ item }) => {
                             >
                                 <div className='row'>
                                     <div className='col-xl-7 ps-0 col-12 overflow-hidden '>
-                                        <div className='p-4 m_bgblack text-white '>
+                                        <div className='p-4 m_bgblack text-white mb-3 '>
                                             <p className='' style={{ fontSize: "18px", marginBottom: "36px" }}>Listado</p>
                                             <div className='a_deli_infolist p-4'>
                                                 {
@@ -849,8 +882,8 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='col-xl-5 pe-0 col-12 overflow-hidden '>
-                                        <div className='p-3 m_bgblack text-white'>
+                                    <div className='col-xl-5 px-0 col-12 overflow-hidden '>
+                                        <div className='p-3 m_bgblack text-white '>
                                             <h5 className='mt-3 ms-2'>Resumen</h5>
                                             <div className='deli_infolist p-2'>
                                                 <div className='d-flex justify-content-end align-items-center ' >
@@ -951,11 +984,11 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                         </div>
                                     </div>
 
-                                    <div className='b_table1 mx-4 mt-2' >
+                                    <div className='b_table1 w-100 mx-4 mt-2' >
                                         <div className='text-white mt-4'>
                                             <h5 style={{ fontSize: "16px" }}>Historial estados</h5>
                                         </div>
-                                        <table className='b_table '>
+                                        <table className='b_table overflow-auto'>
                                             <thead>
                                                 <tr className='b_thcolor'>
                                                     <th>Fecha</th>

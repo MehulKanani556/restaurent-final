@@ -12,6 +12,7 @@ const Counter_finalP = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [token] = useState(localStorage.getItem("token"));
   const [role] = useState(localStorage.getItem("role"));
+  const [creditId] = useState(localStorage.getItem("credit"));
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = localStorage.getItem("userId");
   const admin_id = localStorage.getItem("admin_id");
@@ -30,9 +31,14 @@ const Counter_finalP = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState(0);
   const [show11, setShow11] = useState(false);
+  const [creditData, setCreditData] = useState({})
   const handleClose11 = () => {
     setShow11(false)
-    navigate('/counter')
+    if(creditId){
+      localStorage.removeItem("credit");
+      navigate(`/home/client/detail_no2/${creditData?.order_id}`);
+    }
+    navigate('/counter');
     // setTimeout(() => {
     //   setShow11(false)
     //   navigate('/counter')
@@ -75,6 +81,7 @@ const Counter_finalP = () => {
   const [formErrors, setFormErrors] = useState({});
   const [show, setShow] = useState(false);
   const [tipError, setTipError] = useState("");
+ 
 
   const handleClose = () => {
     setShow(false);
@@ -163,38 +170,6 @@ const Counter_finalP = () => {
     turn: ""
   };
 
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
-  const [customerData, setCustomerData] = useState(initialCustomerData);
-
-  const handleCheckboxChange = (value) => {
-    // console.log(value);
-
-    if (selectedCheckboxes.includes(value)) {
-
-      if (customerData?.[value + "Amount"] ) {
-        setCustomerData((prevData) => ({
-          ...prevData,
-          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : ""
-        }));
-      }
-
-      setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
-      // setCustomerData(initialCustomerData);
-      setCustomerData((prevData) => ({
-        ...prevData,
-        [value + "Amount"]: "" // Reset only the deselected payment type amount
-      }));
-    } else {
-      setSelectedCheckboxes((prev) => [...prev, value]);
-      setCustomerData({ ...customerData, [value + "Amount"]: customerData?.turn ? (Math.abs(customerData?.turn.toFixed(2))).toString() : '', turn: '' });
-    }
-    // Clear the payment type error when a type is selected
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      paymentType: undefined
-    }));
-  };
-
   const getTotalCost = () => {
     return (
       cartItems.reduce(
@@ -203,24 +178,79 @@ const Counter_finalP = () => {
       )
     );
   };
+
   const totalCost = getTotalCost();
   const discount = 1.0;
-  const finalTotal = totalCost - discount;
+  const finalTotal = totalCost - discount - (creditId ? creditData?.creditTotal : 0);
   const taxAmount = finalTotal * 0.19;
 
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+  const [customerData, setCustomerData] = useState(initialCustomerData);
+  console.log(selectedCheckboxes);
+
+  const handleCheckboxChange = (value) => {
+    // console.log(value);
+    if (selectedCheckboxes.includes(value)) {
+
+      if (customerData?.[value + "Amount"]) {
+        setCustomerData((prevData) => ({
+          ...prevData,
+          turn: customerData?.[value + "Amount"] ? parseFloat(customerData?.turn || 0) + parseFloat(-customerData?.[value + "Amount"]) : 0
+        }));
+      }
+      setSelectedCheckboxes((prev) => prev.filter((item) => item !== value));
+
+      setCustomerData((prevData) => ({
+        ...prevData,
+        [value + "Amount"]: ""
+      }));
+    } else {
+      setSelectedCheckboxes((prev) => [...prev, value]);
+      setCustomerData({
+        ...customerData,
+        [value + "Amount"]: customerData?.turn && customerData.turn < 0 ?
+          (Math.abs(customerData.turn.toFixed(2))).toString() : '',
+        turn: customerData?.turn && customerData.turn > 0 ? customerData.turn : 0
+      });
+    }
+    // Clear the payment type error when a type is selected
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      paymentType: undefined
+    }));
+  };
 
   const handleChange = (event) => {
     let { name, value } = event.target;
     value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal points
+    console.log(name);
+    const otherbox = selectedCheckboxes.filter(item => !name.includes(item))
+    console.log(otherbox);
     setCustomerData((prevState) => {
+
+      const currentValue = parseFloat(value) || 0;
+      const totalDue = finalTotal + taxAmount + tipAmount;
+      const otherAmount = Math.max(totalDue - currentValue, 0);
+
+      console.log(otherAmount);
+
       const updatedState = {
         ...prevState,
-        [name]: value, // Update the specific payment type amount
+        [name]: value,
       };
+
+      console.log(updatedState);
+      if (otherbox.length > 0) {
+        const otherPaymentType = otherbox[0] + 'Amount';
+        updatedState[otherPaymentType] = otherAmount.toFixed(2);
+      }
+      console.log(updatedState);
+
       // New calculation for turn
       const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
       updatedState.turn = totalAmount - (finalTotal + taxAmount + tipAmount); // Update turn based on total amounts
       return updatedState;
+
     });
     console.log("Payment", customerData);
     setFormErrors((prevState) => ({
@@ -284,7 +314,46 @@ const Counter_finalP = () => {
     setCartItems(updatedCartItems);
   };
 
+  //===Get CreditData======-
 
+  useEffect(() => {
+    if (creditId) {
+      fetchCredit()
+    }
+  }, [creditId])
+
+  const fetchCredit = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.post(`${apiUrl}/order/getCredit`, { admin_id: admin_id }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(response.data.data);
+
+      const credit = response.data.data?.find((v) => v.id == creditId);
+      console.log(credit);
+      
+      const Total = credit.return_items?.reduce((acc, v) => acc + v.amount * v.quantity, 0);
+      const creditTotal = parseFloat((Total + Total * 0.19).toFixed(2))
+
+      console.log(Total,creditTotal);
+
+      setCreditData({ ...credit, creditTotal: creditTotal });
+      // console.log(credit);
+
+    } catch (error) {
+      console.error(
+        "Error fetching allOrder:",
+        error.response ? error.response.data : error.message
+      );
+    }
+    setIsProcessing(false);
+  }
+
+  console.log(creditData);
 
 
   // ==== Get BOX Data =====
@@ -408,7 +477,7 @@ const Counter_finalP = () => {
     }));
 
     const totalPaymentAmount = parseFloat(customerData.cashAmount || 0) + parseFloat(customerData.debitAmount || 0) + parseFloat(customerData.creditAmount || 0) + parseFloat(customerData.transferAmount || 0);
-console.log("payment",payment);
+    console.log("payment", payment);
     const orderData = {
       order_details: orderDetails,
       admin_id: admin_id,
@@ -447,29 +516,70 @@ console.log("payment",payment);
           ...payment,
           amount: totalPaymentAmount,
           type: selectedCheckboxes,
-          order_master_id: orderType.orderId,
+          order_master_id: order_master_id,
           return: customerData.turn,
           admin_id: admin_id,
         };
-
-        const responsePayment = await axios.post(
-          `${apiUrl}/payment/insert`,
-          paymentData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+        try {
+          const responsePayment = await axios.post(
+            `${apiUrl}/payment/insert`,
+            paymentData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
-          }
-        )
-        console.log("payemnt suc", responsePayment.data);
-        localStorage.removeItem("cartItems");
-        localStorage.removeItem("currentOrder");
-        localStorage.removeItem("payment");
-        setIsSubmitted(true);
-        handleShow11();
-        // handleClose11();
+          )
 
-        setIsProcessing(false);
+
+          console.log("payemnt suc", responsePayment.data);
+
+          if (creditId) {
+            setIsProcessing(true);
+            axios
+              .post(
+                `${apiUrl}/order/getCreditUpdate/${creditId}`,
+                {
+                  status: "Completed",
+                  destination: orderType.orderId
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              )
+              .then((response) => {
+                console.log(response.data);
+                setIsProcessing(false);
+                // setShowcreditfinal(true);
+                // setTimeout(() => {
+                //   setShowcreditfinal(false);
+                //   navigate('/home/client/detail', {
+                //     replace: true,
+                //     state,
+                //   });
+                // }, 2000);
+              })
+              .catch((error) => {
+                console.error(error);
+                setIsProcessing(false);
+                // setError('Hubo un error al intentar realizar el retorno');
+              });
+          }
+          localStorage.removeItem("cartItems");
+          localStorage.removeItem("currentOrder");
+          localStorage.removeItem("payment");
+          setIsSubmitted(true);
+          handleShow11();
+          // handleClose11();
+
+          setIsProcessing(false);
+
+        } catch (error) {
+          console.log(error, "payment Not Done");
+
+        }
         // handlePrint();
       }
     } catch (error) {
@@ -924,29 +1034,29 @@ console.log("payment",payment);
             className="j-counter-price bg_gay bg_margin position-sticky"
             style={{ top: "77px" }}
           >
-            <div className="j_position_fixed j_b_hd_width">
+            <div className="j_position_fixed j_b_hd_width ak-position">
               <h2 className="text-white j-kds-body-text-1000">Resumen</h2>
               <div className="j-counter-price-data">
                 <h3 className="text-white j-kds-body-text-1000">Datos</h3>
-                <div className="j-orders-inputs j_inputs_block">
-                  <div className="j-orders-code">
+                <div className="j-orders-inputs j_inputs_block ak-w-100">
+                  <div className="j-orders-code ak-w-50">
                     <label className="j-label-name text-white mb-2 j-tbl-font-6 ">
                       Código pedido
                     </label>
                     <input
-                      className="j-input-name j_input_name2"
+                      className="j-input-name j_input_name2 ak-input"
                       type="text"
                       placeholder={lastOrder ? lastOrder : "01234"}          //change
                       value={lastOrder ? lastOrder : orderType.orderId}
                       disabled
                     />
                   </div>
-                  <div className="j-orders-type me-2">
+                  <div className="j-orders-type  ak-w-50">
                     <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                       Tipo pedido
                     </label>
                     <select
-                      className="form-select j-input-name-2 j-input-name-23"
+                      className="form-select j-input-name-2 j-input-name-23 ak-input"
                       onChange={handleOrderTypeChange}
                       value={orderType.orderType}
                     >
@@ -1054,7 +1164,7 @@ console.log("payment",payment);
                           </Link>
                         )}
                       </div>
-                      <div className="j-counter-total">
+                      <div className="j-counter-total ak-counter-total">
                         <h5 className="text-white j-tbl-text-15">
                           Costo total
                         </h5>
@@ -1072,6 +1182,14 @@ console.log("payment",payment);
                             </span>
                           </div>
                         )}
+                        {creditId &&
+                          <div className="j-total-discount d-flex justify-content-between">
+                            <p className="j-counter-text-2">credito</p>
+                            <span className="text-white">
+                              ${creditData.creditTotal}
+                            </span>
+                          </div>
+                        }
 
                         <div className="j-total-discount d-flex justify-content-between">
                           <p className="j-counter-text-2">Descuentos</p>
@@ -1127,6 +1245,7 @@ console.log("payment",payment);
                               discount={discount}
                               paymentAmt={customerData}
                               paymentType={selectedCheckboxes}
+                              creditTotal ={creditId && creditData.creditTotal}
                             />
                           </Modal.Body>
                           <Modal.Footer className="sjmodenone">

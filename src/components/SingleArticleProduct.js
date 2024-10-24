@@ -769,7 +769,7 @@ console.log("previous Path: " , location);
         <Header />
         <div className="d-flex">
           <Sidenav />
-          <div className="flex-grow-1 sidebar">
+          <div className="flex-grow-1 sidebar" style={{ width: "50%" }}>
             <div>
               <div className="pb-3  m_bgblack text-white m_borbot m_padding  ">
                 <Link to={previousPath}>
@@ -1548,10 +1548,12 @@ console.log("previous Path: " , location);
                       </div>
                     </div>
                   </Tab>
-                  <Tab eventKey="profile" title="Historial" className="m14">
-                    <div className="m-3 text-white m_bgblack p-4 rounded">
-                      <div className="d-flex  justify-content-between">
-                        <div className="mb-3">
+                  <Tab eventKey="profile" title="Historial" >
+                    
+
+                    <div className="m-3 text-white m_bgblack p-4 rounded ">
+                      <div className="d-flex  justify-content-between row">
+                        <div className="mb-3 col-sm-6">
                           <label
                             htmlFor="exampleFormControlInput1"
                             className="form-label"
@@ -1567,8 +1569,8 @@ console.log("previous Path: " , location);
                             readOnly
                           />
                         </div>
-                        <div className="d-flex gap-3">
-                          <div className="mb-3">
+                        <div className="d-flex col-sm-6 gap-3">
+                          <div className="mb-3 flex-grow-1">
                             <label
                               htmlFor="exampleFormControlInput6"
                               className="form-label"
@@ -1598,7 +1600,7 @@ console.log("previous Path: " , location);
                               <option value="12">Diciembre</option>
                             </select>
                           </div>
-                          <div className="mb-3">
+                          <div className="mb-3 flex-grow-1">
                             <label
                               htmlFor="exampleFormControlInput6"
                               className="form-label"
@@ -1740,13 +1742,14 @@ console.log("previous Path: " , location);
                         </div>
                       </div>
                     </div>
+                    
                   </Tab>
                   <Tab eventKey="longer-tab" title="Estadísticas">
                     <div className="m-3 text-white m_bgblack p-4 rounded m14">
                       <div className="row mt-5">
-                        <div className=" gap-3 col-md-6 flex-grow-1">
-                          <div className="d-flex gap-3">
-                            <div className="mb-3 j-input-width2">
+                        <div className=" gap-3 col-xl-6 ">
+                          <div className="d-flex gap-3 row">
+                            <div className="mb-3 col-xs-6 j-input-width2 flex-grow-1">
                               <label
                                 htmlFor="desdeSelect"
                                 className="form-label text-white j-tbl-font-11"
@@ -1754,7 +1757,7 @@ console.log("previous Path: " , location);
                                 Desde
                               </label>
                               <select
-                                className="form-select j-input-width2 j-tbl-information-input  b_select border-0 py-2  "
+                                className="form-select j-input-width2 j-tbl-information-input w-100  b_select border-0 py-2  "
                                 style={{ borderRadius: "6px" }}
                                 aria-label="Default select example"
                                 onChange={(e) =>
@@ -1777,7 +1780,7 @@ console.log("previous Path: " , location);
                                 <option value="12">Diciembre</option>
                               </select>
                             </div>
-                            <div className="mb-3  j-input-width2">
+                            <div className="mb-3 col-xs-6   j-input-width2 flex-grow-1">
                               <label
                                 htmlFor="hastaSelect"
                                 className="form-label text-white j-tbl-font-11"
@@ -1785,7 +1788,7 @@ console.log("previous Path: " , location);
                                 Hasta
                               </label>
                               <select
-                                className="form-select j-input-width2 j-tbl-information-input  b_select border-0 py-2  "
+                                className="form-select w-100 j-input-width2 j-tbl-information-input  b_select border-0 py-2  "
                                 style={{ borderRadius: "6px" }}
                                 aria-label="Default select example"
                                 onChange={(e) =>
@@ -1826,7 +1829,7 @@ console.log("previous Path: " , location);
                           )}
                         </div>
                         {mapVal.length > 0 ? (
-                          <div className="col-md-6">
+                          <div className="col-xl-6">
                             {/* <ApexChart mapVal={mapVal} cat={categories} /> */}
                             <ApexChart
                               mapVal={chartData.series[0].data}
