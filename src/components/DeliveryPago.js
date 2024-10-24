@@ -414,10 +414,14 @@ const DeliveryPago = () => {
       }));
 
       orderData = {
+        tip: tipAmount ? tipAmount : 0,
+        payment_type: selectedCheckboxes[0],
         order_id: orderType.orderId,
         admin_id: 154,
         transaction_code: 1,
         order_details: orderDetails,
+        box_id: boxId?.id != 'undefined' ? boxId?.id : '',
+        customer_name:payment.firstname || payment.business_name
       }
 
     } else {

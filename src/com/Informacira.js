@@ -19,7 +19,7 @@ const Informacira = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [token] = useState(localStorage.getItem("token"));
   const [role] = useState(localStorage.getItem("role"));
-  console.log(role)
+  // console.log(role)
   const location = useLocation();
   const queryString = location.search;
   // Remove the leading "?" from the query string and get the value
@@ -156,7 +156,7 @@ const Informacira = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = (box) => {
-    console.log(box)
+    // console.log(box)
     if (box.close_amount === null) {
       setSelectedBox(box);
       setShow19(true);
@@ -382,7 +382,7 @@ const Informacira = () => {
       // setNotificationMessage(response.data.notification || response.data.alert);
       // //enqueueSnackbar (response.data.notification, { variant: 'success' });
       // // playNotificationSound();;
-      console.log("sdjjisdbdb", response.data)
+      // console.log("sdjjisdbdb", response.data)
 
     } catch (error) {
       console.error("Error fetching boxes:", error);
@@ -391,7 +391,7 @@ const Informacira = () => {
     setIsProcessing(false);
   };
 
-  console.log(data);
+  // console.log(data);
 
   const fetchAllBoxReport = async () => {
     setIsProcessing(true);
@@ -554,8 +554,8 @@ const Informacira = () => {
 
   const handleCloseBox = async () => {
     if (!bId) return; // Ensure a box is selected
-    console.log("close Price", closePrice)
-    console.log("cashier Price", pricesecond)
+    // console.log("close Price", closePrice)
+    // console.log("cashier Price", pricesecond)
     handleClose11();
     setIsProcessing(true);
     try {
@@ -646,7 +646,7 @@ const Informacira = () => {
         }
       );
 
-      console.log(responseB.data);
+      // console.log(responseB.data);
 
       const boxData = responseB.data.map((box) => {
         return {
@@ -942,7 +942,7 @@ const Informacira = () => {
               // Store type and amount from the response
               const paymentType = response.data.data.type; // Store the payment type
               const paymentAmount = parseFloat(response.data.data.amount); // Store the payment amount as a number
-              console.log(paymentType, paymentAmount);
+              // console.log(paymentType, paymentAmount);
 
               // Create or update the total for the payment type
               if (!totalPaymentByType[paymentType]) {
@@ -997,7 +997,7 @@ const Informacira = () => {
   const handleorderRecipt = (data) => {
 
     const payament = allpayments.some((v)=>v.order_master_id == data.id)
-    console.log(payament);
+    // console.log(payament);
     if(payament){
       setShowModalOrder(true)
     }else{

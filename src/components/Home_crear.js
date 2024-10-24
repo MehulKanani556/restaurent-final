@@ -676,25 +676,31 @@ export default function Home_crear({ item }) {
 
 
     const groupUsersByDetails = (users) => {
+        
         setIsProcessing(true);
         const groupedUsers = {};
-
+    
         users.forEach(user => {
-            const key = `${user.firstname}|${user.business_name}|${user.email}`;
-
-            if (!groupedUsers[key]) {
-                groupedUsers[key] = {
-                    ...user,
-                    orderIds: [user.order_master_id]
-                };
-            } else {
-                groupedUsers[key].orderIds.push(user.order_master_id);
-            }
+          const displayName = user.firstname || user.business_name;
+        const fullName = `${displayName} ${user.lastname || ''}`.trim();
+        const key = `${fullName}|${user.rut}`;
+    
+          if (!groupedUsers[key]) {
+            groupedUsers[key] = {
+              ...user,
+              orderIds: [user.order_master_id]
+            };
+          } else {
+            groupedUsers[key].orderIds.push(user.order_master_id);
+          }
+        //   console.log(groupedUsers);
+          
         });
         setIsProcessing(false);
-
+        // console.log(Object.values(groupedUsers));
+    
         return Object.values(groupedUsers);
-    }
+      } 
 
     return (
         <div className="m_bg_black">

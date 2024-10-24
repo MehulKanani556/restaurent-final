@@ -164,7 +164,8 @@ export default function Header() {
     });
     return Object.entries(grouped).sort(([a], [b]) => b - a); // Sort by date, most recent first
   };
-// console.log(location.pathname+location.search,location.state,location)
+  // console.log(location.pathname+location.search,location.state,location)
+
   return (
     <section className="m_bgblack m_borbot position-sticky top-0 z-3">
       <div className=" p-3 d-flex align-items-center justify-content-between ">
@@ -172,12 +173,8 @@ export default function Header() {
           <img src={require("../Image/logo.png")} alt="" />
         </div>
         <div className="m_header d-flex align-items-center ">
-          <div className="m_bell position-relative">
-            <span
-              className="m_grey"
-              onClick={handleShow}
-              style={{ cursor: "pointer" }}
-            >
+          <div className="m_bell position-relative" style={{ cursor: "pointer" }} onClick={() => setShow(true)}>
+            <span className="m_grey" >
               <IoNotifications />
               {notificationCount > 0 && (
                 <span
@@ -218,12 +215,12 @@ export default function Header() {
                 <React.Fragment key={dateKey}>
                   <p className="j-canvas-text mb-3">{dateString}</p>
                   {notifications.map(notification => (
-                    <div
-                      className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
-                      style={{ height: "auto" }}
-                      key={notification.id}
-                    >
-                      <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none">
+                    <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none">
+                      <div
+                        className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
+                        style={{ height: "auto" }}
+                        key={notification.id}
+                      >
 
                         <div className="j-canvas-icon-data mb-2">
                           <svg
@@ -265,9 +262,9 @@ export default function Header() {
                             {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
-                      </Link>
 
-                    </div>
+                      </div>
+                    </Link>
                   ))}
                 </React.Fragment>
               ))}

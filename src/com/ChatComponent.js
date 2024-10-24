@@ -124,7 +124,7 @@ const ChatComponent = () => {
         const cn = startDate.getMonth()+1; // Get the current month number
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in the current month
         let endDay = selectedRevMonth === cn ? today : daysInMonth; // Determine the end day based on the condition
-        console.log(endDay,selectedRevMonth,cn,selectedRevMonth === cn)
+        // console.log(endDay,selectedRevMonth,cn,selectedRevMonth === cn)
         for (let day = 1; day <= endDay; day++) {
           const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString('en-US'); // Specify locale
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the month
@@ -305,7 +305,7 @@ const ChatComponent = () => {
       </div>
     </div>
     <div className="j-payment-body">
-      {console.log(chartData)}
+      {/* {console.log(chartData)} */}
     <ResponsiveContainer width="100%" height={450}>
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>  
             <defs>

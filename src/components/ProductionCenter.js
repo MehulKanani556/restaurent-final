@@ -706,11 +706,15 @@ export default function ProductionCenter() {
         // Remove productionCenterId if it exists
         return prev.filter(v => v.production_id != productionCenterId);
       } else {
+        console.log(obj1);
+        
         const add = {
-          item_ids: menu.find(v => v.id === productionCenterId)?.items.map(item => item.id) || [],
+          item_ids: menu.find(v => v.id === productionCenterId)?.items
+          .map(item => (obj1.some(obj => obj.id === item.id) ? item.id : null))
+          .filter(id => id !== null) || [],
           production_id: productionCenterId
         };
-        // Add productionCenterId if it does not exist
+        
         return [...prev, add];
       }
     });

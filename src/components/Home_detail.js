@@ -641,7 +641,9 @@ function Home_detail() {
                                                 // console.log(order),
 
                                                 <tr key={order.id} className='b_row'>
-                                                    <td ><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.order_id}</div></td>
+                                                    {/* <td ><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.order_id}</div></td> */}
+                                                    <td><Link to={`/home_Pedidos/paymet/${order.order_id}`}><div className='b_idbtn bj-delivery-text-2' style={{ borderRadius: "10px" }}>{order.order_id}</div></Link></td>
+
                                                     <td ><div className={`b_idbtn bj-delivery-text-2 b_idbtn_s m-0 ${order.status === 'pending' ? 'b_ora' : order.status === "completed" ? 'b_greena' : 'text-danger'}`} style={{ borderRadius: "10px" }}>{order.status === "completed" ? "Devolucion completada " : "Devolucion pendiente"}</div></td>
 
                                                     <td onClick={() => handleCreditDetails(order.status, order.order_id)}>

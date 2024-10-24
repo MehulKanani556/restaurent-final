@@ -22,7 +22,7 @@ const BHomeDelivery = () => {
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
   const admin_id = localStorage.getItem("admin_id");
-const userName = localStorage.getItem("name");
+  const userName = localStorage.getItem("name");
   const [parentCheck, setParentCheck] = useState([]);
   const [childCheck, setChildCheck] = useState([]);
   const [obj1, setObj1] = useState([]);
@@ -46,7 +46,7 @@ const userName = localStorage.getItem("name");
   useEffect(() => {
 
     const fetchData = async () => {
-  
+
       try {
         await fetchFamilyData();
         await fetchAllItems();
@@ -119,7 +119,7 @@ const userName = localStorage.getItem("name");
   };
   const [showEditFamDel, setShowEditFamDel] = useState(false);
   const handleCloseEditFamDel = () => setShowEditFamDel(false);
-  
+
   const handleShowEditFamDel = () => {
     setShowEditFamDel(true);
     setTimeout(() => {
@@ -138,7 +138,7 @@ const userName = localStorage.getItem("name");
       const updatedItems = [...prevItems];
       updatedItems[index] = { ...updatedItems[index], note: newNote }; // Update the note
       return updatedItems;
-  });
+    });
   };
   const handleFinishEditing = (index) => {
     const updatedCartItems = cartItems.map(
@@ -388,9 +388,11 @@ const userName = localStorage.getItem("name");
   // get family
   const fetchFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/family/getFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const todoCategory = { id: "todo", name: "Todo" };
       setParentCheck([todoCategory, ...response.data]);
       setSelectedCategory(todoCategory); // Set "Todo" as initial category
@@ -405,9 +407,11 @@ const userName = localStorage.getItem("name");
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -421,9 +425,11 @@ const userName = localStorage.getItem("name");
   // get subfamily
   const fetchSubFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -437,7 +443,7 @@ const userName = localStorage.getItem("name");
 
   const fetchLastOrder = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/orders/last`,{admin_id: admin_id}, {
+      const response = await axios.post(`${apiUrl}/orders/last`, { admin_id: admin_id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setLastOrder(response.data.order.id + 1);
@@ -505,7 +511,7 @@ const userName = localStorage.getItem("name");
 
 
 
-  
+
 
   // const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   // const [selectedSubCategory, setSelectedSubCategory] = useState(null);
@@ -556,7 +562,7 @@ const userName = localStorage.getItem("name");
 
 
 
- 
+
 
   const handlename = (e) => {
     const value = e.target.value
@@ -565,9 +571,9 @@ const userName = localStorage.getItem("name");
       setOrderTypeError("")
     }
   }
-  const getUserName =   (id) => {
+  const getUserName = (id) => {
     const user = users.find(user => user.id === id);
-   
+
     if (user) {
       return user.name;
     } else {
@@ -698,188 +704,193 @@ const userName = localStorage.getItem("name");
           </div>
         </div>
         <div className="j-counter-price position-sticky" style={{ top: '77px' }}>
-          <div className="b-summary-center mb-4 align-items-center text-white d-flex justify-content-between">
-            {/* <div className="j_position_fixed j_b_hd_width"> */}
-            <h2 class="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
-            <FaXmark className="b-icon" />
-          </div>
-
-          <div className="b-date-time d-flex align-items-center justify-content-end text-white">
-            <FaCalendarAlt />
-            <p className="mb-0 ms-2 me-3">{new Date().toLocaleDateString('en-GB')}</p>
-            <MdOutlineAccessTimeFilled />
-            <p className="mb-0 ms-2">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-          </div>
-          <div className="b-delivery-button">
-            <button className="bj-delivery-text-2">Delivery</button>
-          </div>
-
-          <div className="j-counter-price-data mt-4">
-            <h3 className="text-white j-kds-body-text-1000">Datos</h3>
-            <form>
-              <div className="mb-3 b-input-registers">
-                <label
-                  htmlFor="exampleFormControlInput1"
-                  className="form-label text-white"
-                >Quién lo registra
-                </label>
-                <input
-                  type="text"
-                  className="form-control b-form-control"
-                  id="exampleFormControlInput1"
-                  placeholder=""
-                  // onChange={handlename}
-                  value={userName}
-                  disabled
-                />
-                {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>}
-
+          <div className="j_position_fixed j_b_hd_width ak-position pe-3 pe-lg-0">
+            <div className="b-summary-center mb-4 align-items-center text-white d-flex justify-content-between">
+              {/* <div className="j_position_fixed j_b_hd_width"> */}
+              <h2 class="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
+              <FaXmark className="b-icon" />
+            </div>
+            <div className="b-date-time d-flex flex-wrap column-gap-3 align-items-center justify-content-end text-white">
+              <div>
+              <FaCalendarAlt className="mb-1" />
+              <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
               </div>
-            </form>
-            {/* <div className="b-product-order text-center">
+              <div>
+              <MdOutlineAccessTimeFilled className="mb-1"/>
+              <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+            </div>
+            <div className="b-delivery-button mt-2">
+              <button className="bj-delivery-text-2">Delivery</button>
+            </div>
+
+            <div className="j-counter-price-data mt-4 ak-w-100">
+              <h3 className="text-white j-kds-body-text-1000">Datos</h3>
+              <form>
+                <div className="mb-3 b-input-registers">
+                  <label
+                    htmlFor="exampleFormControlInput1"
+                    className="form-label text-white"
+                  >Quién lo registra
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control b-form-control"
+                    id="exampleFormControlInput1"
+                    placeholder=""
+                    // onChange={handlename}
+                    value={userName}
+                    disabled
+                  />
+                  {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>}
+
+                </div>
+              </form>
+              {/* <div className="b-product-order text-center">
               <MdRoomService className="i-product-order" />
               <h6 className="h6-product-order text-white">Empezar pedido</h6>
               <p className="p-product-order">Agregar producto para empezar <br />
                 con el pedido</p>
             </div> */}
-            {cartItems.length === 0 ? (
-              <div>
-                <div className="b-product-order text-center">
-                <svg class="w-6 h-6 text-gray-800 dark:text-white i-product-order" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-        <path fillRule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clipRule="evenodd" />
-      </svg>
-                  {/* <MdRoomService className="i-product-order" /> */}
-                  <h6 className="h6-product-order text-white">Empezar pedido </h6>
-                  <p className="p-product-order">Agregar producto para empezar <br />
-                    con el pedido</p>
-                </div>
-              </div>
-            ) : (
-              <div className="j-counter-order j_counter_width">
-                <h3 className="text-white j-tbl-font-5">Pedido </h3>
-
-                <div className={`j-counter-order-data `}>
-                  {(showAllItems
-                    ? cartItems
-                    : cartItems.slice(0, 3)).map((item, index) => (
-                      <div className="j-counter-order-border-fast">
-                        <div className="j-counter-order-img" key={item.id}>
-                          <div className="d-flex align-items-center justify-content-between">
-                            <img src={`${API}/images/${item.image}`} alt="" />
-                            <h5 className="text-white j-tbl-pop-1">
-                              {item.name}
-                            </h5>
-                          </div>
-                          <div className="d-flex align-items-center">
-                            <div className="j-counter-mix">
-                              <button
-                                className="j-minus-count"
-                                onClick={() => decrementItem(item.id)}
-                              >
-                                <FaMinus />
-                              </button>
-                              <h3 className="j-tbl-btn-font-1">{item.count}</h3>
-                              <button
-                                className="j-plus-count"
-                                onClick={() => addItemToCart(item)}
-                              >
-                                <FaPlus />
-                              </button>
-                            </div>
-                            <h4 className="text-white fw-semibold j-tbl-text-14">
-                              ${parseInt(item.price)}
-                            </h4>
-                            <button
-                              className="j-delete-btn"
-                              onClick={() => {
-                                handleDeleteClick(item.id);
-                                // handleShowEditFam();
-                              }}
-                            >
-                              <RiDeleteBin6Fill />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="text-white j-order-count-why">
-                          {item.isEditing ? (
-                            <div>
-                              <input
-                                className="j-note-input"
-                                type="text"
-                                value={item.note}
-                                onChange={(e) =>
-                                  handleNoteChange(index, e.target.value)}
-                                onBlur={() => handleFinishEditing(index)}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter")
-                                    handleFinishEditing(index);
-                                }}
-                                autoFocus
-                              />
-                            </div>
-                          ) : (
-                            <div>
-                              {item.note ? (
-                                <p className="j-nota-blue" style={{cursor: "pointer"}} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
-                              ) : (
-                                <button
-                                  className="j-note-final-button"
-                                  onClick={() => handleAddNoteClick(index)}
-                                >
-                                  + Agregar nota
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  {cartItems.length > 3 && (
-                    <Link onClick={toggleShowAllItems} className="sjfs-14">
-                      {showAllItems ? "Ver menos" : "Ver más"}
-                    </Link>
-                  )}
-                </div>
-                <div className="j-counter-total">
-                  <h5 className="text-white j-tbl-text-15">Costo total</h5>
-                  <div className="j-total-discount d-flex justify-content-between">
-                    <p className="j-counter-text-2">Artículos</p>
-                    <span className="text-white">${totalCost.toFixed(2)}</span>
+              {cartItems.length === 0 ? (
+                <div>
+                  <div className="b-product-order text-center">
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white i-product-order" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clipRule="evenodd" />
+                    </svg>
+                    {/* <MdRoomService className="i-product-order" /> */}
+                    <h6 className="h6-product-order text-white">Empezar pedido </h6>
+                    <p className="p-product-order">Agregar producto para empezar <br />
+                      con el pedido</p>
                   </div>
-                  <div className="j-border-bottom-counter">
+                </div>
+              ) : (
+                <div className="j-counter-order j_counter_width ak-w-100">
+                  <h3 className="text-white j-tbl-font-5">Pedido </h3>
+
+                  <div className={`j-counter-order-data `}>
+                    {(showAllItems
+                      ? cartItems
+                      : cartItems.slice(0, 3)).map((item, index) => (
+                        <div className="j-counter-order-border-fast">
+                          <div className="j-counter-order-img" key={item.id}>
+                            <div className="d-flex align-items-center justify-content-between">
+                              <img src={`${API}/images/${item.image}`} alt="" />
+                              <h5 className="text-white j-tbl-pop-1">
+                                {item.name}
+                              </h5>
+                            </div>
+                            <div className="d-flex align-items-center">
+                              <div className="j-counter-mix">
+                                <button
+                                  className="j-minus-count"
+                                  onClick={() => decrementItem(item.id)}
+                                >
+                                  <FaMinus />
+                                </button>
+                                <h3 className="j-tbl-btn-font-1">{item.count}</h3>
+                                <button
+                                  className="j-plus-count"
+                                  onClick={() => addItemToCart(item)}
+                                >
+                                  <FaPlus />
+                                </button>
+                              </div>
+                              <h4 className="text-white fw-semibold j-tbl-text-14">
+                                ${parseInt(item.price)}
+                              </h4>
+                              <button
+                                className="j-delete-btn"
+                                onClick={() => {
+                                  handleDeleteClick(item.id);
+                                  // handleShowEditFam();
+                                }}
+                              >
+                                <RiDeleteBin6Fill />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="text-white j-order-count-why">
+                            {item.isEditing ? (
+                              <div>
+                                <input
+                                  className="j-note-input"
+                                  type="text"
+                                  value={item.note}
+                                  onChange={(e) =>
+                                    handleNoteChange(index, e.target.value)}
+                                  onBlur={() => handleFinishEditing(index)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                      handleFinishEditing(index);
+                                  }}
+                                  autoFocus
+                                />
+                              </div>
+                            ) : (
+                              <div>
+                                {item.note ? (
+                                  <p className="j-nota-blue" style={{ cursor: "pointer" }} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
+                                ) : (
+                                  <button
+                                    className="j-note-final-button"
+                                    onClick={() => handleAddNoteClick(index)}
+                                  >
+                                    + Agregar nota
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    {cartItems.length > 3 && (
+                      <Link onClick={toggleShowAllItems} className="sjfs-14">
+                        {showAllItems ? "Ver menos" : "Ver más"}
+                      </Link>
+                    )}
+                  </div>
+                  <div className="j-counter-total ak-counter-total">
+                    <h5 className="text-white j-tbl-text-15">Costo total</h5>
                     <div className="j-total-discount d-flex justify-content-between">
-                      <p className="j-counter-text-2">Descuentos</p>
-                      <span className="text-white">
+                      <p className="j-counter-text-2">Artículos</p>
+                      <span className="text-white">${totalCost.toFixed(2)}</span>
+                    </div>
+                    <div className="j-border-bottom-counter">
+                      <div className="j-total-discount d-flex justify-content-between">
+                        <p className="j-counter-text-2">Descuentos</p>
+                        <span className="text-white">
+                          {cartItems.length > 0 ? (
+                            `$${discount.toFixed(2)}`
+                          ) : (
+                            "$0.00"
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="j-total-discount my-2 d-flex justify-content-between">
+                      <p className="text-white bj-delivery-text-153 ">Total</p>
+                      <span className="text-white bj-delivery-text-153 ">
                         {cartItems.length > 0 ? (
-                          `$${discount.toFixed(2)}`
+                          `$${finalTotal.toFixed(2)}`
                         ) : (
                           "$0.00"
                         )}
                       </span>
                     </div>
-                  </div>
-                  <div className="j-total-discount my-2 d-flex justify-content-between">
-                    <p className="text-white bj-delivery-text-153 ">Total</p>
-                    <span className="text-white bj-delivery-text-153 ">
-                      {cartItems.length > 0 ? (
-                        `$${finalTotal.toFixed(2)}`
-                      ) : (
-                        "$0.00"
-                      )}
-                    </span>
-                  </div>
-                  <div
-                    className="btn w-100 j-btn-primary text-white m-articles-text-2"
-                    onClick={placeNewOrder}
-                  >
-                    Continuar
+                    <div
+                      className="btn w-100 j-btn-primary text-white m-articles-text-2"
+                      onClick={placeNewOrder}
+                    >
+                      Continuar
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
           </div>
         </div>
-
         {/* processing */}
         <Modal
           show={isProcessing}

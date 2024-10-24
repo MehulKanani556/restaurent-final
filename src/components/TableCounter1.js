@@ -566,40 +566,36 @@ const TableCounter1 = () => {
       console.log("Order created successfully:", response.data);
       // console.log(tId);
       // Call the table/updateStatus API
-      try {
-        const resTable = await axios.post(
-          `${apiUrl}/table/updateStatus`,
-          {
-            table_id: parseInt(tId),
-            status: "busy", // Set the status you need
-            admin_id: admin_id
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+      if (response.data.success) {
+        try {
+          const resTable = await axios.post(
+            `${apiUrl}/table/updateStatus`,
+            {
+              table_id: parseInt(tId),
+              status: "busy", // Set the status you need
+              admin_id: admin_id
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
-          }
-        );
-        console.log("Table status updated successfully", resTable.data);
-
-        // Clear cart items from local storage
-        localStorage.removeItem("cartItems");
-
-        // Clear cart items from state
-        setCartItems([]);
-        setCountsoup([]);
-        navigate("/table");
-
-        // Handle successful order creation (e.g., show success message, redirect, etc.)
-      } catch (error) {
-        setIsProcessing(false);
-        console.log("Table status  Not updated" + error.message);
+          );
+          console.log("Table status updated successfully", resTable.data);
+            localStorage.removeItem("cartItems");
+            setCartItems([]);
+            setCountsoup([]);
+            navigate("/table");
+        } catch (error) {
+          setIsProcessing(false);
+          console.log("Table status  Not updated" + error.message);
+        }
+      } else {
+        alert(response.data.message)
       }
 
     } catch (err) {
       console.error("Error creating order:", err);
-      //enqueueSnackbar (err?.response?.data?.message, { variant: 'error' })
-
     } finally {
       setIsProcessing(false);
     }
@@ -1097,8 +1093,8 @@ const TableCounter1 = () => {
                         </p> */}
                       </div>
                     </div>
-                    <div className="j-orders-inputs">
-                      <div>
+                    <div className="j-orders-inputs ak-w-100">
+                    <div className="w-100">
                         <div className="j-orders-inputs ak-w-100">
                           <div className="j-orders-code ak-w-50">
                             <label className="j-label-name text-white mb-2 j-tbl-btn-font-1">
@@ -1389,13 +1385,14 @@ const TableCounter1 = () => {
                         </div>
                       </div>
                       <div className="b-product-order text-center">
-                        <MdRoomService className="i-product-order" />
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white mb-2" style={{color:"white"}} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                          <path fillRule="evenodd" d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857Zm10 0A1.857 1.857 0 0 0 13 14.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 19.143v-4.286A1.857 1.857 0 0 0 19.143 13h-4.286Z" clipRule="evenodd" />
+                        </svg>
                         <h6 className="h6-product-order text-white j-tbl-pop-1">
-                          Mesa disponible
+                          Empezar Pedido
                         </h6>
                         <p className="p-product-order j-tbl-btn-font-1 ">
-                          Agregar producto para empezar<br />
-                          con el pedido de la mesa
+                          Agregar producto para comenzar el pedido
                         </p>
                       </div>
                     </div>

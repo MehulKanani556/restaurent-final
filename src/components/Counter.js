@@ -8,7 +8,7 @@ import img2 from "../Image/crispy-fry-chicken.png";
 import img3 from "../Image/Strawberry-gelatin.png";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import OrderCart from "./OrderCart";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaCircleCheck } from "react-icons/fa6";
 import Header from "./Header";
 import { MdRoomService } from "react-icons/md";
@@ -40,6 +40,9 @@ const Counter = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [orderType, setOrderType] = useState("");
   const [orType, setOrType] = useState([]);
+  const location = useLocation();
+  const redirect = location?.state?.from
+  console.log("redirect: " , redirect,location)
   const [admin_id, setAdminId] = useState(localStorage.getItem("admin_id"));
   useEffect(() => {
 
@@ -113,9 +116,9 @@ const Counter = () => {
   const handleNoteChange = (index, newNote) => {
     // Use functional updates to ensure you're working with the latest state
     setCartItems((prevItems) => {
-        const updatedItems = [...prevItems];
-        updatedItems[index] = { ...updatedItems[index], note: newNote }; // Update the note
-        return updatedItems;
+      const updatedItems = [...prevItems];
+      updatedItems[index] = { ...updatedItems[index], note: newNote }; // Update the note
+      return updatedItems;
     });
   };
   const handleFinishEditing = (index) => {
@@ -131,7 +134,7 @@ const Counter = () => {
       setIsEditing(updatedIsEditing);
     }
   };
-console.log("object");
+  console.log("object");
 
   const handleAddNoteClick = (index) => {
     const updatedCartItems = cartItems.map(
@@ -370,7 +373,7 @@ console.log("object");
   // get family
   const fetchFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/family/getFamily`,{headers:{Authorization:`Bearer ${token}`}});
+      const response = await axios.get(`${apiUrl}/family/getFamily`, { headers: { Authorization: `Bearer ${token}` } });
       const todoCategory = { id: "todo", name: "Todo" };
       setParentCheck([todoCategory, ...response.data]);
       setSelectedCategory(todoCategory); // Set "Todo" as initial category
@@ -384,7 +387,7 @@ console.log("object");
   // get product
   const fetchAllItems = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{headers:{Authorization:`Bearer ${token}`}});
+      const response = await axios.get(`${apiUrl}/item/getAll`, { headers: { Authorization: `Bearer ${token}` } });
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -397,7 +400,7 @@ console.log("object");
   // get subfamily
   const fetchSubFamilyData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`,{headers:{Authorization:`Bearer ${token}`}});
+      const response = await axios.get(`${apiUrl}/subfamily/getSubFamily`, { headers: { Authorization: `Bearer ${token}` } });
       setChildCheck(response.data);
     } catch (error) {
       console.error(
@@ -411,7 +414,7 @@ console.log("object");
 
   const fetchLastOrder = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/orders/last`,{admin_id:admin_id}, {
+      const response = await axios.post(`${apiUrl}/orders/last`, { admin_id: admin_id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setLastOrder(response.data.order.id + 1);
@@ -633,12 +636,12 @@ console.log("object");
               {cartItems.length === 0 ? (
                 <div>
                   <div className="b-product-order text-center">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white i-product-order" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-        <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clipRule="evenodd" />
-      </svg>
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white i-product-order" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4.243a1 1 0 1 0-2 0V11H7.757a1 1 0 1 0 0 2H11v3.243a1 1 0 1 0 2 0V13h3.243a1 1 0 1 0 0-2H13V7.757Z" clipRule="evenodd" />
+                    </svg>
                     {/* <MdRoomService className="i-product-order" /> */}
-                    <h6 className="h6-product-order text-white j-tbl-pop-1">Comenzar pedido</h6>
-                    <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar  pedido  </p>
+                    <h6 className="h6-product-order text-white j-tbl-pop-1">Empezar pedido</h6>
+                    <p className="p-product-order j-tbl-btn-font-1 ">Agregar producto para empezar con el pedido</p>
                   </div>
                 </div>
               ) : (
@@ -686,7 +689,7 @@ console.log("object");
                                 <RiDeleteBin6Fill />
                               </button>
                             </div>
-                          </div>                          
+                          </div>
                           <div className="text-white j-order-count-why">
                             {item.isEditing ? (
                               <div>
@@ -707,7 +710,7 @@ console.log("object");
                             ) : (
                               <div>
                                 {item.note ? (
-                                  <p className="j-nota-blue" style={{cursor: "pointer"}}  onClick={() => handleAddNoteClick(index)}>{item.note}</p>
+                                  <p className="j-nota-blue" style={{ cursor: "pointer" }} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
                                 ) : (
                                   <button
                                     className="j-note-final-button"
@@ -816,12 +819,12 @@ console.log("object");
                 className="m_modal jay-modal"
               >
                 <Modal.Header closeButton className="border-0" />
-               
+
                 <Modal.Body>
                   <div className="j-modal-trash text-center">
                     <img src={require("../Image/trash-outline.png")} alt="" />
                     <p className="mb-0 mt-3 h6 j-tbl-pop-1">
-                    Pedido eliminado
+                      Pedido eliminado
                     </p>
                     <p className="opacity-75 j-tbl-pop-2">
                       El Pedido ha sido eliminado correctamente

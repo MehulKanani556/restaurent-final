@@ -559,8 +559,8 @@ const TablePago = () => {
           }
         })
 
-      // console.log(response.status);
-      if (response.status == 200) {
+      // console.log(response.data[1] == 200);
+      if (response.data[1] == 200) {
         try {
           const responsePayment = await axios.post(
             `${apiUrl}/payment/insert`,
@@ -573,8 +573,8 @@ const TablePago = () => {
           )
 
           // console.log(responsePayment.status == 200);
-          // console.log(responsePayment);
-          if (responsePayment.status == 200) {
+          console.log(responsePayment);
+          if (responsePayment.data.success) {
             try {
               const resStatus = await axios.post(`${apiUrl}/table/updateStatus`, {
                 table_id: tableData[0].table_id,
@@ -593,7 +593,6 @@ const TablePago = () => {
               setCustomerData({});
               setSelectedCheckboxes([]);
               handleShow11();
-
               localStorage.removeItem("cartItems");
               localStorage.removeItem("currentOrder");
               localStorage.removeItem("payment");
@@ -603,18 +602,15 @@ const TablePago = () => {
               console.log("Table Status not Upadte ," + error.message);
             }
           }
-
         } catch (error) {
           setIsProcessing(false);
           console.log("Payment not Done" + error.message);
 
         }
       }
-
     } catch (error) {
       setIsProcessing(false);
       console.log("Error to update the Order", error.message);
-
     }
   };
   // print recipt

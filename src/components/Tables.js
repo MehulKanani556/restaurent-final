@@ -754,7 +754,7 @@ const Tables = () => {
   const handleSubmitNote = async (e, index, oId) => {
     e.preventDefault();
     console.log(e.target.value)
-    const finalNote = e.target.elements[0].value.trim() ||e.target.value;
+    const finalNote = e.target.elements[0].value.trim() || e.target.value;
     if (finalNote) {
       const flatIndex = tableData
         .flatMap((t) => t.items)
@@ -1466,8 +1466,9 @@ const Tables = () => {
                     </Button>
                   </Modal.Footer>
                 </Modal>
-                <div className="j-show-table pb-3">
-                  <div className="j_tables_center ">
+
+                <div className="j-show-table pb-3 ak-show-table">
+                  <div className="j_tables_center ak-show-table">
                     <div
                       onClick={() => handleFilterChange("available")}
                       className="j-available-table d-flex align-items-center"
@@ -1774,13 +1775,14 @@ const Tables = () => {
             </div>
 
             <div className="b-product-order text-center">
-              <MdRoomService className="i-product-order" />
+            <svg class="w-6 h-6 text-gray-800 dark:text-white mb-2" style={{color:"white"}} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                          <path fillRule="evenodd" d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857Zm10 0A1.857 1.857 0 0 0 13 14.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 19.143v-4.286A1.857 1.857 0 0 0 19.143 13h-4.286Z" clipRule="evenodd" />
+                        </svg>
               <h6 className="h6-product-order text-white j-tbl-pop-1">
-                Mesa disponible
+              Empezar Pedido
               </h6>
               <p className="p-product-order j-tbl-btn-font-1 ">
-                Agregar producto para empezar<br />
-                con el pedido de la mesa
+              Agregar producto para comenzar el pedido
               </p>
             </div>
           </Offcanvas.Body>
@@ -1888,12 +1890,12 @@ const Tables = () => {
                       />
                     </svg>
                     {tableData && tableData.length > 0 ? (
-                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
-                        ) : (
-                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
-                            00 min 00 sg
-                          </p>
-                        )}
+                      <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+                    ) : (
+                      <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
+                        00 min 00 sg
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="j-counter-price-data">
@@ -2044,7 +2046,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                     
+
                       {tableData[0]?.items.length >= 4 &&
                         <a
                           href="#"
@@ -2143,12 +2145,12 @@ const Tables = () => {
                       />
                     </svg>
                     {tableData && tableData.length > 0 ? (
-                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
-                        ) : (
-                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
-                            00 min 00 sg
-                          </p>
-                        )}
+                      <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+                    ) : (
+                      <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
+                        00 min 00 sg
+                      </p>
+                    )}
                     {/* <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
                       {elapsedTime}
                     </p> */}
@@ -2215,7 +2217,7 @@ const Tables = () => {
                                   </div>
                                 </div>
                                 <div className="text-white j-order-count-why">
-                                {item.notes ? (
+                                  {item.notes ? (
                                     addNotes[index] ? (
                                       <form
                                         onSubmit={(e) =>
@@ -2283,7 +2285,7 @@ const Tables = () => {
                             );
                           })
                       )}
-                     {tableData[0]?.items.length >= 4 &&
+                      {tableData[0]?.items.length >= 4 &&
                         <a
                           href="#"
                           onClick={handleShowMoreClick}
