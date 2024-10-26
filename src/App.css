@@ -10,7 +10,9 @@
   padding: 0;
   /* --bs-gutter-x:0.5px; */
 }
-
+img{
+  object-fit:cover !important;
+}
 
 /* ..........sandhya change  START
 ........... */

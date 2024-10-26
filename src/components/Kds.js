@@ -177,13 +177,13 @@ const Kds = () => {
 
                                     {filterOrdersByCategory(allOrder, selectedCategory)
                                         .filter(section => section.status === orderTypeMapping[orderType])
-                                        .reverse() // Reversing the filtered array
+                                        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
                                         .map((section, sectionIndex) => (
                                             <>
                                             <KdsCard
                                                 key={sectionIndex}
                                                 table={section.table_id}
-                                                time={section.created_at}
+                                                time={section.updated_at}
                                                 orderId={section.order_id}
                                                 startTime={section.created_at}
                                                 waiter={section.user_id}

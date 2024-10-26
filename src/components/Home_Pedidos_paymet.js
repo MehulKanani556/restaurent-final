@@ -39,7 +39,7 @@ export default function Home_Pedidos_paymet() {
   const [show12, setShow12] = useState(false);
   const handleClose12 = () => setShow12(false);
   const [errorReason, setReasonError] = useState(null);
-
+  const noteInputRefs = useRef({}); 
   const handleShow12 = async () => {
 
     // ----resons----
@@ -369,15 +369,20 @@ export default function Home_Pedidos_paymet() {
   };
 
   const handleOrderDetails = () => {
-    const details = orderData.order_details.map((orderItem) => {
-      const matchingItem = items.find((item) => item.id === orderItem.item_id);
-      return {
-        ...orderItem,
-        image: matchingItem ? matchingItem.image : orderItem.image,
-        description: matchingItem ? matchingItem.description : orderItem.description,
-      };
-    });
-    setOrderDetails(details);
+    // Check if orderData is not null before accessing its properties
+    if (orderData) {
+        const details = orderData.order_details.map((orderItem) => {
+            const matchingItem = items.find((item) => item.id === orderItem.item_id);
+            return {
+                ...orderItem,
+                image: matchingItem ? matchingItem.image : orderItem.image,
+                description: matchingItem ? matchingItem.description : orderItem.description,
+            };
+        });
+        setOrderDetails(details);
+    } else {
+        console.error("orderData is null, cannot handle order details.");
+    }
   };
 
   const getFamily = async () => {
@@ -566,16 +571,18 @@ export default function Home_Pedidos_paymet() {
     setVisibleInputId(prevId => prevId === id ? null : id);
   };
 
-  const handleNoteChange = (id, e) => {
-    setNoteValues(e.target.value);
+  const handleNoteChange = (id, value) => {
+    if (noteInputRefs.current[id]) {
+      noteInputRefs.current[id].value = value; // Update the input value directly
+    }
   };
 
   const handleNoteKeyDown = async (id) => {
-    console.log(id)
+    const finalNote = noteInputRefs.current[id]?.value || "";
     try {
       const response = await axios.post(
         `${apiUrl}/order/addNote/${id}`,
-        { notes: noteValues },
+        { notes: finalNote },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -595,7 +602,25 @@ export default function Home_Pedidos_paymet() {
     }
     getOrder();
     handleOrderDetails();
+    // Here you can handle saving the note to your state or backend
+    console.log("Final Note:", finalNote);
+    // Optionally reset the input visibility
+    setVisibleInputId(null);
   };
+
+  // New function to handle outside click
+  const handleClickOutside = (event) => {
+    if (noteInputRefs.current[id] && !noteInputRefs.current[id].contains(event.target)) {
+      handleNoteKeyDown(id); // Submit the response
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   // =============end note==========
 
@@ -628,7 +653,6 @@ export default function Home_Pedidos_paymet() {
       setShowCancelOrderButton(false);
     }
   };
-  console.log(orderData)
   const handleCredit = () => {
     if (orderData?.status == 'delivered' || orderData?.status == "cancelled") {
       navigate(`/home/client/crear/${id}`, { replace: true })
@@ -848,7 +872,7 @@ export default function Home_Pedidos_paymet() {
                                 </div> */}
                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
                                   {v.notes === null ? (
-                                    <div key={v.id}>
+                                    <div>
                                       {visibleInputId !== v.id ? (
                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
                                           <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
@@ -859,20 +883,22 @@ export default function Home_Pedidos_paymet() {
                                           <input
                                             type="text"
                                             className='j-note-input'
-                                            value={noteValues}
-                                            onChange={(e) => handleNoteChange(v.id, e)}
-                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            ref={el => noteInputRefs.current[v.id] = el} // Assign ref to the input
+                                            onChange={(e) => handleNoteChange(v.id, e.target.value)} // Handle change
+                                            onBlur={() => handleNoteKeyDown(v.id)} // Handle blur
                                             onKeyDown={(e) => {
-                                              if (e.key === "Enter")
-                                                handleNoteKeyDown(v.id)
+                                              if (e.key === "Enter") {
+                                                handleNoteKeyDown(v.id);
+                                              }
                                             }}
+                                            autoFocus
                                           />
                                         </div>
                                       )}
                                     </div>
                                   ) : (
-                                    < div key={v.id}>
-                                      {visibleInputId != v.id ? (
+                                    <div>
+                                      {visibleInputId !== v.id ? (
                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
                                           <span className='j-nota-blue ms-4'>Nota: {v.notes}</span>
                                         </div>
@@ -882,15 +908,15 @@ export default function Home_Pedidos_paymet() {
                                           <input
                                             type="text"
                                             className='j-note-input'
-                                            value={noteValues}
-                                            onChange={(e) => handleNoteChange(v.id, e)}
-                                            onBlur={() => handleNoteKeyDown(v.id)}
+                                            ref={el => noteInputRefs.current[v.id] = el} // Assign ref to the input
+                                            onChange={(e) => handleNoteChange(v.id, e.target.value)} // Handle change
+                                            onBlur={() => handleNoteKeyDown(v.id)} // Handle blur
                                             onKeyDown={(e) => {
-                                              console.log(e.key);
-                                              if (e.key == "Enter") {
-                                                handleNoteKeyDown(v.id)
+                                              if (e.key === "Enter") {
+                                                handleNoteKeyDown(v.id);
                                               }
                                             }}
+                                            autoFocus
                                           />
                                         </div>
                                       )}
@@ -979,7 +1005,6 @@ export default function Home_Pedidos_paymet() {
                         </div>
                         {!orderData?.reason &&
                           <div className='mx-auto text-center mt-3'>
-                            {console.log(!pamentDone, orderData?.status.toLowerCase() !== 'delivered')}
                             {!pamentDone || (orderData?.status.toLowerCase() !== 'finalized' && orderData?.status.toLowerCase() !== 'delivered') ?
                               <div className='btn text-white j-btn-primary w-100' style={{ padding: "8px 12px", borderRadius: "8px" }} onClick={handlePayment}>Pagar ahora</div> :
                               ""

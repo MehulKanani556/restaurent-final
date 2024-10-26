@@ -206,9 +206,9 @@ function Home_detail_no() {
     // }
     const handleReturn = () => {
 
-        localStorage.setItem('credit',JSON.stringify(creditNote.id))
+        localStorage.setItem('credit', JSON.stringify(creditNote.id))
         navigate("/counter");
-        
+
         // if (!destination) {
         //     setError('Ingrese la dirección de retorno');
         //     return;
@@ -281,12 +281,12 @@ function Home_detail_no() {
     }
 
 
-    useEffect(()=>{
-        if(creditNote)
-        fetchpayment();
-    },[creditNote])
+    useEffect(() => {
+        if (creditNote)
+            fetchpayment();
+    }, [creditNote])
 
-    const fetchpayment = async()=> {
+    const fetchpayment = async () => {
         setIsProcessing(true);
         try {
             const response = await axios.get(`${apiUrl}/getsinglepayments/${creditNote?.order_id}`, {
@@ -360,7 +360,7 @@ function Home_detail_no() {
                                     </div>
                                 </div>
                                 <div className='d-flex gap-5 mx-4 m b_inputt b_id_input b_home_field'>
-                                <div className='w-100 b_search  text-white mb-3'>
+                                    <div className='w-100 b_search  text-white mb-3'>
                                         <label htmlFor="inputPassword2" className="">DNI</label>
                                         <input type="text" className="form-control bg-gray  border-0 mt-2 py-3 " value={paymentData?.rut} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                     </div>
@@ -424,12 +424,17 @@ function Home_detail_no() {
                                             <div>Productos</div>
                                             <div className='me-5'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0)}</div>
                                         </div>
+                                        <div className='d-flex justify-content-between mt-2'>
+                                            <div>IVA 19.00%</div>
+                                            <div className='me-5'>${(returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) * 0.19).toFixed(2)}</div>
+                                        </div>
                                         <hr className='w-100' />
                                         <div className='d-flex justify-content-between'>
                                             <div>Total</div>
-                                            <div className='me-5 fw-bold'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0)}</div>
+                                            <div className='me-5 fw-bold'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) + parseFloat((returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) * 0.19).toFixed(2))}</div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                             <div className='text-white ms-4'>

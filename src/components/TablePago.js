@@ -593,10 +593,10 @@ const TablePago = () => {
               setCustomerData({});
               setSelectedCheckboxes([]);
               handleShow11();
-              localStorage.removeItem("cartItems");
-              localStorage.removeItem("currentOrder");
-              localStorage.removeItem("payment");
-              localStorage.removeItem("tablePayment");
+              // localStorage.removeItem("cartItems");
+              // localStorage.removeItem("currentOrder");
+              // localStorage.removeItem("payment");
+              // localStorage.removeItem("tablePayment");
 
             } catch (error) {
               console.log("Table Status not Upadte ," + error.message);
@@ -617,7 +617,7 @@ const TablePago = () => {
   const [show11, setShow11] = useState(false);
   const handleClose11 = () => {
     setShow11(false);
-    navigate("/table"); // Navigate to the desired page after closing the modal
+    // navigate("/table"); // Navigate to the desired page after closing the modal
   };
   const handleShow11 = () => setShow11(true);
   const handlePrint = () => {
@@ -1190,13 +1190,8 @@ const TablePago = () => {
                               </div>
                             </div>
                             <div className="text-white j-order-count-why">
-                              {item.notes ? (
-                                <span className="j-nota-blue">
-                                  Nota: {item.notes}
-                                </span>
-                              ) : (
-                                <div>
-                                  {addNotes[index] ? (
+                            {item.notes ? (
+                                  addNotes[index] ? (
                                     <form
                                       onSubmit={(e) =>
                                         handleSubmitNote(e, index, item.id)}
@@ -1209,20 +1204,60 @@ const TablePago = () => {
                                         type="text"
                                         defaultValue={item.notes || ""}
                                         autoFocus
+                                        onBlur={(e) => {
+                                          const syntheticEvent = {
+                                            preventDefault: () => {},
+                                            target: {
+                                              elements: [e.target]
+                                            }
+                                          };
+                                          handleSubmitNote(syntheticEvent, index, item.id);
+                                        }}
                                       />
                                     </form>
                                   ) : (
-                                    <button
-                                      type="button"
-                                      className="j-note-final-button"
-                                      onClick={() =>
-                                        handleAddNoteClick(index)}
-                                    >
-                                      + Agregar nota
-                                    </button>
-                                  )}
-                                </div>
-                              )}
+                                    <span className="j-nota-blue" style={{cursor:'pointer'}} onClick={() =>
+                                      handleAddNoteClick(index)}>
+                                      Nota: {item.notes}
+                                    </span>
+                                  )
+                                ) : (
+                                  <div>
+                                    {addNotes[index] ? (
+                                      <form
+                                        onSubmit={(e) =>
+                                          handleSubmitNote(e, index, item.id)}
+                                      >
+                                        <span className="j-nota-blue">
+                                          Nota:{" "}
+                                        </span>
+                                        <input
+                                          className="j-note-input"
+                                          type="text"
+                                          defaultValue={item.notes || ""}
+                                          autoFocus
+                                          onBlur={(e) => {const syntheticEvent = {
+                                              preventDefault: () => {},
+                                              target: {
+                                                elements: [e.target]
+                                              }
+                                            };
+                                            handleSubmitNote(syntheticEvent, index, item.id);
+                                          }}
+                                        />
+                                      </form>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        className="j-note-final-button"
+                                        onClick={() =>
+                                          handleAddNoteClick(index)}
+                                      >
+                                        + Agregar nota
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
                             </div>
                           </div>
                         );

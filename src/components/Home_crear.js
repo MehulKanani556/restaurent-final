@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from './Header';
 import Sidenav from './Sidenav';
 import { FaArrowLeft, FaCalendarAlt } from 'react-icons/fa';
@@ -36,6 +36,8 @@ export default function Home_crear({ item }) {
     const [visibleInputId, setVisibleInputId] = useState(null);
     const [noteValues, setNoteValues] = useState('');
 
+    const noteInputRefs = useRef({}); // Create a ref to store note input references
+    const inputRef = useRef(null); // Ref for the input element
 
     // const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
 
@@ -500,41 +502,55 @@ export default function Home_crear({ item }) {
 
 
     const toggleInput = (id) => {
-        setVisibleInputId(prevId => prevId === id ? null : id);
+        const item = orderDetails.find(item => item.id === id); // Find the item based on the id
+        if (item) {
+            setVisibleInputId(visibleInputId === id ? null : id);
+            if (visibleInputId !== id) {
+                noteInputRefs.current[id] = item.notes || ''; // Set the current note value when toggling
+            }
+        } else {
+            console.error(`Item with id ${id} not found`); // Log an error if the item is not found
+        }
     };
 
     const handleNoteChange = (id, e) => {
-        setNoteValues(e.target.value);
+        noteInputRefs.current[id] = e.target.value; // Store the value in the ref
+    };
+
+    const handleNoteSubmit = async (id) => {
+        try {
+            const response = await axios.post(
+                `${apiUrl}/order/addNote/${id}`,
+                { notes: noteInputRefs.current[id] }, // Use the value from the ref
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            console.log("Note added successfully:", response.data);
+
+            // Reset the input value in the ref
+            noteInputRefs.current[id] = '';
+            setVisibleInputId(null);
+            getAllorder();
+            handleOrderDetails();
+        } catch (error) {
+            console.error(
+                "Error adding note:",
+                error.response ? error.response.data : error.message
+            );
+        }
     };
 
     const handleNoteKeyDown = (id) => async (e) => {
-
         if (e.key === 'Enter') {
-            console.log(id);
-            try {
-                const response = await axios.post(
-                    `${apiUrl}/order/addNote/${id}`,
-                    { notes: noteValues },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                console.log("Note added successfully:", response.data);
-
-                // setSavedNote(noteValues);
-                setNoteValues('');
-                setVisibleInputId(null);
-                getAllorder();
-                handleOrderDetails();
-            } catch (error) {
-                console.error(
-                    "Error adding note:",
-                    error.response ? error.response.data : error.message
-                );
-            }
+            await handleNoteSubmit(id);
         }
+    };
+
+    const handleInputBlur = (id) => {
+        handleNoteSubmit(id); // Submit the note when input loses focus
     };
 
     // =============end note==========
@@ -700,7 +716,7 @@ export default function Home_crear({ item }) {
         // console.log(Object.values(groupedUsers));
     
         return Object.values(groupedUsers);
-      } 
+      }
 
     return (
         <div className="m_bg_black">
@@ -823,16 +839,19 @@ export default function Home_crear({ item }) {
                                                                                             <input
                                                                                                 type="text"
                                                                                                 className='j-note-input'
-                                                                                                value={noteValues}
+                                                                                                defaultValue={noteInputRefs.current[item.id] || item.notes || ''} // Show existing note value
                                                                                                 onChange={(e) => handleNoteChange(item.id, e)}
                                                                                                 onKeyDown={handleNoteKeyDown(item.id)}
+                                                                                                onBlur={() => handleInputBlur(item.id)} // Handle blur event
+                                                                                                ref={inputRef} // Attach ref to the input
+                                                                                                autoFocus
                                                                                             />
                                                                                         </div>
                                                                                     )}
                                                                                 </div>
                                                                             ) : (
                                                                                 < div key={item.id}>
-                                                                                    {visibleInputId != item.id ? (
+                                                                                    {visibleInputId !== item.id ? (
                                                                                         <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
                                                                                             <span className='j-nota-blue ms-4'>Nota : {item.notes}</span>
                                                                                         </div>
@@ -842,11 +861,12 @@ export default function Home_crear({ item }) {
                                                                                             <input
                                                                                                 type="text"
                                                                                                 className='j-note-input'
-                                                                                                // placeholder={v.notes}
-                                                                                                value={noteValues}
+                                                                                                defaultValue={noteInputRefs.current[item.id] || item.notes || ''} // Show existing note value
                                                                                                 onChange={(e) => handleNoteChange(item.id, e)}
                                                                                                 onKeyDown={handleNoteKeyDown(item.id)}
-                                                                                            // onBlur={console.log("blur")}
+                                                                                                onBlur={() => handleInputBlur(item.id)} // Handle blur event
+                                                                                                ref={inputRef} // Attach ref to the input
+                                                                                                autoFocus
                                                                                             />
                                                                                         </div>
                                                                                     )}
@@ -1233,6 +1253,6 @@ export default function Home_crear({ item }) {
 
                 </div>
             </div>
-        </div >
+        </div>
     );
 }

@@ -1,7 +1,8 @@
 import React from "react";
 
 const Recipt = ({ payment, item, discount, paymentAmt, paymentType, creditTotal }) => {
-  const role = localStorage.getItem("role");
+  console.log(payment.firstname ? payment.firstname : payment.business_name)
+  const role = localStorage.getItem("name");
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
   const currentMinute = currentDate.getMinutes();

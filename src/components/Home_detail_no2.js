@@ -275,18 +275,23 @@ function Home_detail_no2() {
                             ))}
                         <div className='my-4 mx-4 py-3 p-2' style={{ backgroundColor: "#374151", borderRadius: "10px" }}>
                             <div className='text-white'>
-                                <div className='ms-4 my-3'>
-                                    <div className='my-3 fw-bold' style={{ fontSize: "20px" }}>Costo total</div>
+                            <div className=' ms-4 my-3 '>
+                                    <div className='my-3  fw-bold' style={{ fontSize: "20px" }}>Costo total</div>
                                     <div className='d-flex justify-content-between'>
                                         <div>Productos</div>
                                         <div className='me-5'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0)}</div>
                                     </div>
+                                    <div className='d-flex justify-content-between mt-2'>
+                                        <div>IVA 19.00%</div>
+                                        <div className='me-5'>${(returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) * 0.19).toFixed(2)}</div>
+                                    </div>
                                     <hr className='w-100' />
                                     <div className='d-flex justify-content-between'>
                                         <div>Total</div>
-                                        <div className='me-5 fw-bold'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0)}</div>
+                                        <div className='me-5 fw-bold'>${returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) + parseFloat((returnDetails?.reduce((acc, v) => acc + v.amount * v.quantity, 0) * 0.19).toFixed(2))}</div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                         <div className='text-white ms-4'>

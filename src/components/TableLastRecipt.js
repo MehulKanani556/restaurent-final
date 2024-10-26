@@ -2,7 +2,8 @@ import React from "react";
 
 const TableLastRecipt = ({ data ,itemInfo , payment}) => {
   console.log("recipe",data,itemInfo,payment);
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("name");
+  
 console.log(data,itemInfo,payment);
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
@@ -38,7 +39,7 @@ console.log(data,itemInfo,payment);
     date: formattedDate,
     time: formattedTime,
     customer: {
-      name:data[0].customer_name|| payment.firstname,
+      name:data[0].customer_name|| payment.firstname || payment.business_name,
       email:payment.email,
       phone: payment.phone,
       address:payment.address,

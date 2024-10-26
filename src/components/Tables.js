@@ -753,30 +753,33 @@ const Tables = () => {
 
   const handleSubmitNote = async (e, index, oId) => {
     e.preventDefault();
-    console.log(e.target.value)
-    const finalNote = e.target.elements[0].value.trim() || e.target.value;
+    const finalNote = e.target.elements[0]?.value.trim() || e.target.value; // Use optional chaining
     if (finalNote) {
-      const flatIndex = tableData
-        .flatMap((t) => t.items)
-        .findIndex((_, i) => i === index);
-      const tableIndex = tableData.findIndex((t) =>
-        t.items.includes(tableData.flatMap((t) => t.items)[flatIndex])
-      );
-      const itemIndex = tableData[tableIndex].items.findIndex(
-        (item) => item === tableData.flatMap((t) => t.items)[flatIndex]
-      );
+        const flatIndex = tableData?.flatMap((t) => t.items)?.findIndex((_, i) => i === index); // Check if tableData is defined
+        if (flatIndex === -1) return; // If not found, exit early
 
-      const tableId = tableData[tableIndex].id;
-      const itemId = tableData[tableIndex].items[itemIndex].item_id;
+        const tableIndex = tableData?.findIndex((t) =>
+            t.items.includes(tableData.flatMap((t) => t.items)[flatIndex])
+        );
 
-      const success = await addNoteToDatabase(oId, finalNote);
+        if (tableIndex === -1) return; // If not found, exit early
 
-      if (success) {
-        handleNoteChange(index, finalNote);
-      } else {
-        // Handle error - maybe show an error message to the user
-        console.error("Failed to add note to database");
-      }
+        const itemIndex = tableData[tableIndex]?.items?.findIndex(
+            (item) => item === tableData.flatMap((t) => t.items)[flatIndex]
+        );
+
+        if (itemIndex === -1) return; // If not found, exit early
+
+        const tableId = tableData[tableIndex].id;
+        const itemId = tableData[tableIndex].items[itemIndex].item_id;
+
+        const success = await addNoteToDatabase(oId, finalNote);
+
+        if (success) {
+            handleNoteChange(index, finalNote);
+        } else {
+            console.error("Failed to add note to database");
+        }
     }
 
     const updatedAddNotes = [...addNotes];
@@ -1332,7 +1335,7 @@ const Tables = () => {
                 </div>
               </div>
               <div
-                style={{ flexGrow: "1" }}
+                style={{ flexGrow: "1", width: "min-content" }}
                 className=" col-9 j-card-width2 j-table-position-second m-0 p-0"
               >
                 <div className="m_bgblack j-tbl-font-5 j-block text-white">

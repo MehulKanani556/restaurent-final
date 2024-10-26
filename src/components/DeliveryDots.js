@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import { FaCalendarAlt, FaMinus, FaPlus } from "react-icons/fa";
 import { FaCircleCheck } from "react-icons/fa6";
@@ -17,6 +17,7 @@ const DeliveryDots = () => {
     const token = localStorage.getItem("token");
     const userName = localStorage.getItem("name");
     const [errors, setErrors] = useState({});
+    const noteInputRefs = useRef({});
     const [cartItems, setCartItems] = useState(
         JSON.parse(localStorage.getItem("cartItems")) || []
     );
@@ -43,10 +44,22 @@ const DeliveryDots = () => {
     const [isEditing, setIsEditing] = useState(
         Array(cartItems.length).fill(false)
     );
-    const handleNoteChange = (index, note) => {
-        const updatedCartItems = [...cartItems];
-        updatedCartItems[index].note = note;
-        setCartItems(updatedCartItems);
+    const handleNoteChange = (index, newNote) => {
+        // Update the input value directly using ref
+        if (noteInputRefs.current[index]) {
+            noteInputRefs.current[index].value = newNote;
+        }
+        
+        // Debounce the state update to reduce re-renders
+        const timeoutId = setTimeout(() => {
+            setCartItems(prevItems => {
+                const updatedItems = [...prevItems];
+                updatedItems[index] = { ...updatedItems[index], note: newNote };
+                return updatedItems;
+            });
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
     };
 
     const handleKeyDown = (index, e) => {
@@ -57,25 +70,20 @@ const DeliveryDots = () => {
         }
     };
 
-    // const handleAddNoteClick = (index) => {
-    //     const updatedIsEditing = [...isEditing];
-    //     updatedIsEditing[index] = true;
-    //     setIsEditing(updatedIsEditing);
-    //     const updatedCartItems = [...cartItems];
-    //     if (!updatedCartItems[index].note) {
-    //         updatedCartItems[index].note = "Nota: ";
-    //         setCartItems(updatedCartItems);
-    //     }
-    // };
-
     const handleAddNoteClick = (index) => {
-        const updatedCartItems = cartItems.map(
-            (item, i) =>
-                i === index
-                    ? { ...item, isEditing: true, note: item.note || "Nota: " }
-                    : item
+        const updatedCartItems = cartItems.map((item, i) =>
+            i === index
+                ? { ...item, isEditing: true, note: item.note || "Nota: " }
+                : item
         );
         setCartItems(updatedCartItems);
+        
+        // Focus the input after state update
+        setTimeout(() => {
+            if (noteInputRefs.current[index]) {
+                noteInputRefs.current[index].focus();
+            }
+        }, 0);
     };
 
     // cart
@@ -193,10 +201,58 @@ const DeliveryDots = () => {
     //   };
 
     const handleFinishEditing = (index) => {
-        const updatedCartItems = cartItems.map(
-            (item, i) => (i === index ? { ...item, isEditing: false } : item)
+        // Get final value from ref
+        const finalNote = noteInputRefs.current[index]?.value || "";
+        
+        setCartItems(prevItems => {
+            const updatedItems = [...prevItems];
+            updatedItems[index] = {
+                ...updatedItems[index],
+                isEditing: false,
+                note: finalNote
+            };
+            return updatedItems;
+        });
+    };
+    const renderNoteInput = (item, index) => {
+        if (item.isEditing) {
+            return (
+                <div>
+                    <input
+                        className="j-note-input"
+                        type="text"
+                        defaultValue={item.note}
+                        ref={el => noteInputRefs.current[index] = el}
+                        onChange={e => handleNoteChange(index, e.target.value)}
+                        onBlur={() => handleFinishEditing(index)}
+                        onKeyDown={e => {
+                            if (e.key === "Enter") handleFinishEditing(index);
+                        }}
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <div>
+                {item.note ? (
+                    <p 
+                        className="j-nota-blue" 
+                        style={{ cursor: "pointer" }} 
+                        onClick={() => handleAddNoteClick(index)}
+                    >
+                        {item.note}
+                    </p>
+                ) : (
+                    <button
+                        className="j-note-final-button"
+                        onClick={() => handleAddNoteClick(index)}
+                    >
+                        + Agregar nota
+                    </button>
+                )}
+            </div>
         );
-        setCartItems(updatedCartItems);
     };
 
     const getTotalCost = () => {
@@ -1046,11 +1102,21 @@ const DeliveryDots = () => {
                         className="j-counter-price position-sticky"
                         style={{ top: "77px" }}
                     >
-                        <div className="j_position_fixed j_b_hd_width">
+                        <div className="j_position_fixed j_b_hd_width ak-position">
                             <h2 className="text-white j-tbl-text-13">Resumen</h2>
-                            <div className="j-counter-price-data">
-                                <h3 className="text-white mt-3 j-tbl-text-13">Datos</h3>
-                                <div className="j_td_center my-3">
+                            <div className="j-counter-price-data ak-w-100">
+                            <h3 className="text-white mt-3 j-tbl-text-13 ak-w-100">Datos</h3>
+                                <div className="b-date-time b_date_time2 d-flex flex-wrap column-gap-3 me-2 justify-content-end text-white">
+                                    <div>
+                                        <FaCalendarAlt className="mb-2" />
+                                        <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
+                                    </div>
+                                    <div>
+                                        <MdOutlineAccessTimeFilled className="mb-2" />
+                                        <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </div>
+                                </div>
+                                <div className="j_td_center ak-w-100">
                                     <div className="j-busy-table j_busy_table_last d-flex align-items-center">
                                         <div className=''>
                                             <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
@@ -1061,14 +1127,6 @@ const DeliveryDots = () => {
                                         {/* <div className="j-b-table" /> */}
                                         {/* <p className="j-table-color j-tbl-font-6">Ocupado</p> */}
                                     </div>
-
-                                    <div className="b-date-time b_date_time2 d-flex align-items-center justify-content-end text-white">
-                                        <FaCalendarAlt />
-                                        <p className="mb-0 ms-2 me-3">{new Date().toLocaleDateString('en-GB')}</p>
-                                        <MdOutlineAccessTimeFilled />
-                                        <p className="mb-0 ms-2">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                    </div>
-
                                     {/* <div className="b-date-time b_date_time2  d-flex align-items-center">
                                         <svg
                                             class="j-canvas-svg-i"
@@ -1090,21 +1148,22 @@ const DeliveryDots = () => {
                                             {elapsedTime}
                                         </p>
                                     </div> */}
+
                                 </div>
                                 <div className="j-counter-price-data">
-                                    <div className="j-orders-inputs j_td_inputs">
-                                        <div className="j-orders-code">
+                                <div className="j-orders-inputs j_td_inputs ak-w-100">
+                                        <div className="j-orders-code ak-w-100">
                                             <label className="j-label-name text-white mb-2 j-tbl-btn-font-1">
                                                 Quién registra
                                             </label>
                                             <div>
                                                 <input
-                                                    className="j-input-name j_input_name520"
+                                                    className="j-input-name j_input_name520 ak-w-100"
                                                     type="text"
                                                     value={userName}
                                                     disabled
-                                                    // placeholder={orderType?.name}
-                                                    // value={orderType?.name}
+                                                // placeholder={orderType?.name}
+                                                // value={orderType?.name}
                                                 />
                                             </div>
                                         </div>
@@ -1123,7 +1182,7 @@ const DeliveryDots = () => {
                                             </div>
                                         </div> */}
                                     </div>
-                                    <div className="j-counter-order">
+                                    <div className="j-counter-order ak-w-100">
                                         {cartItems.length === 0 ? (
                                             <div>
                                                 <div className="b-product-order text-center">
@@ -1138,7 +1197,7 @@ const DeliveryDots = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="j-counter-order j_counter_width">
+                                            <div className="j-counter-order j_counter_width ak-w-100">
                                                 <h3 className="text-white j-tbl-font-5">Pedido </h3>
 
                                                 <div className={`j-counter-order-data `}>
@@ -1187,36 +1246,7 @@ const DeliveryDots = () => {
                                                                 </div>
 
                                                                 <div className="text-white j-order-count-why">
-                                                                    {item.isEditing ? (
-                                                                        <div>
-                                                                            <input
-                                                                                className="j-note-input"
-                                                                                type="text"
-                                                                                value={item.note}
-                                                                                onChange={(e) =>
-                                                                                    handleNoteChange(index, e.target.value)}
-                                                                                onBlur={() => handleFinishEditing(index)}
-                                                                                onKeyDown={(e) => {
-                                                                                    if (e.key === "Enter")
-                                                                                        handleFinishEditing(index);
-                                                                                }}
-                                                                                autoFocus
-                                                                            />
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div>
-                                                                            {item.note ? (
-                                                                                <p className="j-nota-blue" style={{ cursor: "pointer" }} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
-                                                                            ) : (
-                                                                                <button
-                                                                                    className="j-note-final-button"
-                                                                                    onClick={() => handleAddNoteClick(index)}
-                                                                                >
-                                                                                    + Agregar nota
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    )}
+                                                                    {renderNoteInput(item, index)}
                                                                 </div>
                                                             </div>
                                                         ))}
@@ -1226,7 +1256,7 @@ const DeliveryDots = () => {
                                                         </Link>
                                                     )}
                                                 </div>
-                                                <div className="j-counter-total">
+                                                <div className="j-counter-total ak-counter-total">
                                                     <h5 className="text-white j-tbl-text-15">Costo total</h5>
                                                     <div className="j-total-discount d-flex justify-content-between">
                                                         <p className="j-counter-text-2">Artículos</p>

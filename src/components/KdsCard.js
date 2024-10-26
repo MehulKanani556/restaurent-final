@@ -50,7 +50,7 @@ console.log("ss",orderId==15)
             <div className='' style={{ borderRight: '2px solid transparent ' }}>
                 <div className="j-kds-body-card-head p-3 mx-3 j-kds-body-card">
                     <div className="d-flex align-items-center justify-content-between mb-2">
-                        <h4 className='j-kds-body-text-1000 mb-0 text-white'>Meesa {table}</h4>
+                        <h4 className='j-kds-body-text-1000 mb-0 text-white'>Mesa {table}</h4>
                         <button className='j-kds-button-500'>{new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</button>
                     </div>
                     <div className="d-flex align-items-center justify-content-between mb-2">

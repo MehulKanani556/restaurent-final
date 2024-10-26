@@ -518,7 +518,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                                             .join('')}
                                     </div>
                                     <div className="sjcontact-info">
-                                        <div className="sjcontact-name">{ele.name}</div>
+                                        <div className="sjcontact-name text-nowrap">{ele.name}</div>
                                         <div className="sjcontact-message">{ele.messages[0]?.message} </div>
                                     </div>
                                     <div style={{ flexGrow: 1, textAlign: 'end', fontSize: '12px', color: '#9CA3AF' }}>
@@ -573,7 +573,7 @@ const ChatWindow = ({
 
     return (
         <div style={styles.container} className="j-chat-margin ">
-            <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "10" }}>
+            <div className="m_borbot jchat-padding-2 px-3 d-flex align-items-center j-chat-position-fixed" style={{ zIndex: "1" }}>
                 <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
                     {selectedContact.name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
                 </div>

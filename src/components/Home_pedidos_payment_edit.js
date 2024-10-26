@@ -433,40 +433,57 @@ const Home_pedidos_payment_edit = ({ item }) => {
     /*========= Add menu to Order =======*/
 
     // ===note ===========
+    const noteInputRef = useRef(null);
+
     const toggleInput = (id) => {
-        setVisibleInputId(prevId => prevId === id ? null : id);
+        setVisibleInputId(prevId => (prevId === id ? null : id));
     };
 
     const handleNoteChange = (id, e) => {
-        setNoteValues(e.target.value);
+        if (noteInputRef.current) {
+            noteInputRef.current.value = e.target.value; // Update the input value directly
+        }
     };
 
-    const handleNoteKeyDown = async(id) => {
-        console.log(id)
-          try {
-            const response = await axios.post(
-              `${apiUrl}/order/addNote/${id}`,
-              { notes: noteValues },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            // console.log("Note added successfully:", response.data);
-    
-            // setSavedNote(noteValues);
-            setNoteValues('');
-            setVisibleInputId(null);
-          } catch (error) {
-            console.error(
-              "Error adding note:",
-              error.response ? error.response.data : error.message
-            );
+    const handleNoteKeyDown = async (id) => {
+        const noteValue = noteInputRef.current ? noteInputRef.current.value : '';
+        if (noteValue) {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/order/addNote/${id}`,
+                    { notes: noteValue },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                setNoteValues(''); // Clear the input after submission
+                setVisibleInputId(null);
+                getOrder();
+                handleOrderDetails();
+            } catch (error) {
+                console.error(
+                    "Error adding note:",
+                    error.response ? error.response.data : error.message
+                );
+            }
         }
-        getOrder();
-        handleOrderDetails();
-      };
+    };
+
+    // Handle click outside to submit the note
+    const handleClickOutside = (event) => {
+        if (noteInputRef.current && !noteInputRef.current.contains(event.target)) {
+            handleNoteKeyDown(visibleInputId); // Submit the note if clicking outside
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [visibleInputId]);
 
 
     //    -------- Edite order Qyt ----
@@ -829,19 +846,6 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                                     </div>
                                                                 </div>
                                                                 <div style={{ marginBottom: "68px", cursor: "pointer" }}>
-                                                                    {/* {item.notes === index ? (
-                                                                        <input
-                                                                            type="text"
-                                                                            className='ms-4 j-note-input'
-                                                                            value={noteValue}
-                                                                            onChange={handleNoteChange}
-                                                                            onKeyDown={(e) => handleNoteKeyDown(index, e)}
-                                                                        />
-                                                                    ) : (
-                                                                        <div className='a_home_addnote ms-4' onClick={() => handleEditNoteClick(index, item.note)}>
-                                                                            {item.note}
-                                                                        </div>
-                                                                    )} */}
                                                                     {item.notes === null ? (
                                                                         <div key={item.id}>
                                                                             {visibleInputId !== item.id ? (
@@ -854,20 +858,22 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                                                     <input
                                                                                         type="text"
                                                                                         className='j-note-input'
-                                                                                        value={noteValues}
+                                                                                        ref={noteInputRef}
                                                                                         onChange={(e) => handleNoteChange(item.id, e)}
                                                                                         onBlur={() => handleNoteKeyDown(item.id)}
                                                                                         onKeyDown={(e) => {
-                                                                                            if (e.key === "Enter")
-                                                                                                handleNoteKeyDown(item.id)
+                                                                                            if (e.key === "Enter") {
+                                                                                                handleNoteKeyDown(item.id);
+                                                                                            }
                                                                                         }}
+                                                                                        autoFocus
                                                                                     />
                                                                                 </div>
                                                                             )}
                                                                         </div>
                                                                     ) : (
-                                                                        < div key={item.id}>
-                                                                            {visibleInputId != item.id ? (
+                                                                        <div>
+                                                                            {visibleInputId !== item.id ? (
                                                                                 <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(item.id)}>
                                                                                     <span className='j-nota-blue ms-4'>Nota: {item.notes}</span>
                                                                                 </div>
@@ -877,15 +883,15 @@ const Home_pedidos_payment_edit = ({ item }) => {
                                                                                     <input
                                                                                         type="text"
                                                                                         className='j-note-input'
-                                                                                        value={noteValues}
+                                                                                        ref={noteInputRef}
                                                                                         onChange={(e) => handleNoteChange(item.id, e)}
                                                                                         onBlur={() => handleNoteKeyDown(item.id)}
                                                                                         onKeyDown={(e) => {
-                                                                                            console.log(e.key);
-                                                                                            if (e.key == "Enter") {
-                                                                                                handleNoteKeyDown(item.id)
+                                                                                            if (e.key === "Enter") {
+                                                                                                handleNoteKeyDown(item.id);
                                                                                             }
                                                                                         }}
+                                                                                        autoFocus
                                                                                     />
                                                                                 </div>
                                                                             )}

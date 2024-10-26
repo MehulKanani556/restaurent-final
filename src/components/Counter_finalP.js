@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import { FaCircleCheck, FaMinus, FaPlus } from "react-icons/fa6";
 import { Accordion, Button, Modal, Spinner } from "react-bootstrap";
@@ -21,7 +21,7 @@ const Counter_finalP = () => {
 
 
 
-  console.log("orderId: " ,orderId);
+  console.log("orderId: ", orderId);
   const [cartItems, setCartItems] = useState(
     JSON.parse(localStorage.getItem("cartItems")) || []
   );
@@ -39,7 +39,7 @@ const Counter_finalP = () => {
   const [creditData, setCreditData] = useState({})
   const handleClose11 = () => {
     setShow11(false)
-    if(creditId){
+    if (creditId) {
       localStorage.removeItem("credit");
       navigate(`/home/client/detail_no2/${creditData?.order_id}`);
     }
@@ -86,7 +86,7 @@ const Counter_finalP = () => {
   const [formErrors, setFormErrors] = useState({});
   const [show, setShow] = useState(false);
   const [tipError, setTipError] = useState("");
- 
+
 
   const handleClose = () => {
     setShow(false);
@@ -108,30 +108,101 @@ const Counter_finalP = () => {
   const [isEditing, setIsEditing] = useState(
     Array(cartItems.length).fill(false)
   );
-  const handleNoteChange = (index, note) => {
-    const updatedCartItems = [...cartItems];
-    updatedCartItems[index].note = note;
-    setCartItems(updatedCartItems);
-  };
+  // Add ref for note inputs
+  const noteInputRefs = useRef({});
 
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Enter") {
-      const updatedIsEditing = [...isEditing];
-      updatedIsEditing[index] = false;
-      setIsEditing(updatedIsEditing);
+  // Modified note handling functions
+  const handleNoteChange = (index, newNote) => {
+    // Update the input value directly using ref
+    if (noteInputRefs.current[index]) {
+      noteInputRefs.current[index].value = newNote;
     }
+    
+    // Debounce the state update to reduce re-renders
+    const timeoutId = setTimeout(() => {
+      setCartItems(prevItems => {
+        const updatedItems = [...prevItems];
+        updatedItems[index] = { ...updatedItems[index], note: newNote };
+        return updatedItems;
+      });
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   };
 
   const handleAddNoteClick = (index) => {
-    const updatedIsEditing = [...isEditing];
-    updatedIsEditing[index] = true;
-    setIsEditing(updatedIsEditing);
-    const updatedCartItems = [...cartItems];
-    if (!updatedCartItems[index].note) {
-      updatedCartItems[index].note = "Nota: ";
-      setCartItems(updatedCartItems);
-    }
+    const updatedCartItems = cartItems.map((item, i) =>
+      i === index
+        ? { ...item, isEditing: true, note: item.note || "Nota: " }
+        : item
+    );
+    setCartItems(updatedCartItems);
+    
+    // Focus the input after state update
+    setTimeout(() => {
+      if (noteInputRefs.current[index]) {
+        noteInputRefs.current[index].focus();
+      }
+    }, 0);
   };
+
+  // const handleFinishEditing = (index) => {
+  //   // Get final value from ref
+  //   const finalNote = noteInputRefs.current[index]?.value || "";
+    
+  //   setCartItems(prevItems => {
+  //     const updatedItems = [...prevItems];
+  //     updatedItems[index] = {
+  //       ...updatedItems[index],
+  //       isEditing: false,
+  //       note: finalNote
+  //     };
+  //     return updatedItems;
+  //   });
+  // };
+
+  // Modified render section for the note input
+  const renderNoteInput = (item, index) => {
+    if (item.isEditing) {
+      return (
+        <div>
+          <input
+            className="j-note-input"
+            type="text"
+            defaultValue={item.note}
+            ref={el => noteInputRefs.current[index] = el}
+            onChange={e => handleNoteChange(index, e.target.value)}
+            onBlur={() => handleFinishEditing(index)}
+            onKeyDown={e => {
+              if (e.key === "Enter") handleFinishEditing(index);
+            }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {item.note ? (
+          <p 
+            className="j-nota-blue" 
+            style={{ cursor: "pointer" }} 
+            onClick={() => handleAddNoteClick(index)}
+          >
+            {item.note}
+          </p>
+        ) : (
+          <button
+            className="j-note-final-button"
+            onClick={() => handleAddNoteClick(index)}
+          >
+            + Agregar nota
+          </button>
+        )}
+      </div>
+    );
+  };
+
   useEffect(() => {
     if (!(role == "admin" || role == "cashier")) {
       navigate('/dashboard')
@@ -340,7 +411,7 @@ const Counter_finalP = () => {
 
       const credit = response.data.data?.find((v) => v.id == creditId);
       // console.log(credit);
-      
+
       const Total = credit.return_items?.reduce((acc, v) => acc + v.amount * v.quantity, 0);
       const creditTotal = parseFloat((Total + Total * 0.19).toFixed(2))
 
@@ -508,12 +579,14 @@ const Counter_finalP = () => {
 
     setIsProcessing(true);
     try {
-      if(!orderId){
+      if (!orderId) {
 
         const response = await axios.post(`${apiUrl}/order/place_new`, orderData, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        
+        if (!response.data.success) {
+          alert(response.data.message)
+        }
         order_master_id = response.data.kdsOrder.order_id;
         sessionStorage.setItem('orderId', order_master_id);
         setOrderId(order_master_id);
@@ -596,6 +669,7 @@ const Counter_finalP = () => {
       }
     } catch (error) {
       console.error("Error creating order : ", error);
+
       //enqueueSnackbar (error?.response?.data?.message, { variant: 'error' })
       setIsProcessing(false);
       setIsSubmitted(false);
@@ -1133,37 +1207,7 @@ const Counter_finalP = () => {
                                 key={index}
                                 className="text-white j-order-count-why"
                               >
-                                {item.isEditing ? (
-                                  <div>
-                                    <input
-                                      className="j-note-input"
-                                      type="text"
-                                      value={item.note}
-                                      onChange={(e) =>
-                                        handleNoteChange(index, e.target.value)}
-                                      onBlur={() => handleFinishEditing(index)}
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter")
-                                          handleFinishEditing(index);
-                                      }}
-                                      autoFocus
-                                    />
-                                  </div>
-                                ) : (
-                                  <div>
-                                    {item.note ? (
-                                      <p className="j-nota-blue">{item.note}</p>
-                                    ) : (
-                                      <button
-                                        className="j-note-final-button"
-                                        onClick={() =>
-                                          handleAddNoteClick(index)}
-                                      >
-                                        + Agregar nota
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
+                                {renderNoteInput(item, index)}
                               </div>
                             </div>
                           ))}
@@ -1257,7 +1301,7 @@ const Counter_finalP = () => {
                               discount={discount}
                               paymentAmt={customerData}
                               paymentType={selectedCheckboxes}
-                              creditTotal ={creditId && creditData.creditTotal}
+                              creditTotal={creditId && creditData.creditTotal}
                             />
                           </Modal.Body>
                           <Modal.Footer className="sjmodenone">

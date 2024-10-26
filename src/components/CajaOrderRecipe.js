@@ -23,7 +23,7 @@ const CajaOrderRecipe = ({ data }) => {
     }, [data]);
     console.log("user",user)
 
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("name");
 
   const currentDate = new Date();
   const currentHour = currentDate.getHours();

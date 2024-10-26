@@ -28,7 +28,7 @@ const TableDatos = () => {
   const id = queryParams.get("id");
   const orderId = queryParams.get("oId");
   const [users, setUsers] = useState([]);
-  const {state} = useLocation();
+  const { state } = useLocation();
 
   // console.log(id,orderId,state);
   const [rut1, setRut1] = useState("");
@@ -109,9 +109,9 @@ const TableDatos = () => {
     }
 
   };
-  useEffect (()=>{
+  useEffect(() => {
     fetchAllUser();
-  },token)
+  }, token)
   const fetchAllUser = async () => {
     setIsProcessing(true);
     try {
@@ -172,7 +172,7 @@ const TableDatos = () => {
   const getTableData = async (id) => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, {admin_id: admin_id}, {
+      const response = await axios.post(`${apiUrl}/table/getStats/${id}`, { admin_id: admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -211,7 +211,7 @@ const TableDatos = () => {
     const storedData = localStorage.getItem("tablePayment");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
-    
+
       setFormData((prevState) => ({
         ...prevState,
         fname: parsedData.firstname || prevState.fname,
@@ -225,9 +225,9 @@ const TableDatos = () => {
         rut1: parsedData.receiptType === "1" ? parsedData.rut : prevState.rut,
         rut2: parsedData.receiptType === "2" ? parsedData.rut : prevState.rut
       }));
-      setRut1(parsedData.receiptType === "1"? parsedData.rut : "");
-      setRut2(parsedData.receiptType === "2"? parsedData.rut : "")
-      setRut3(parsedData.receiptType === "3"? parsedData.rut : "")
+      setRut1(parsedData.receiptType === "1" ? parsedData.rut : "");
+      setRut2(parsedData.receiptType === "2" ? parsedData.rut : "")
+      setRut3(parsedData.receiptType === "3" ? parsedData.rut : "")
       setSelectedRadio(parsedData.receiptType || "1"); // Set default receipt type if not present
       setActiveAccordionItem(parsedData.receiptType || "1")
     }
@@ -301,7 +301,7 @@ const TableDatos = () => {
     setActiveAccordionItem(value);
   };
 
- 
+
 
   const handleRutChange = (e, setRut) => {
     let value = e.target.value.replace(/-/g, ""); // Remove any existing hyphen
@@ -442,9 +442,11 @@ const TableDatos = () => {
   // get product
   const fetchAllItems = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setObj1(response.data.items);
     } catch (error) {
       console.error(
@@ -582,9 +584,9 @@ const TableDatos = () => {
     updatedAddNotes[index] = true;
     setAddNotes(updatedAddNotes);
   };
-  const getUserName =   (id) => {
+  const getUserName = (id) => {
     const user = users.find(user => user.id === id);
-   
+
     if (user) {
       return user.name;
     } else {
@@ -1112,12 +1114,12 @@ const TableDatos = () => {
                     </svg>
 
                     {tableData && tableData.length > 0 ? (
-                          <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
-                        ) : (
-                          <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
-                            00 min 00 sg
-                          </p>
-                        )}
+                      <ElapsedTimeDisplay createdAt={tableData[0].created_at} />
+                    ) : (
+                      <p className="mb-0 ms-2 me-3 text-white j-tbl-btn-font-1">
+                        00 min 00 sg
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1218,10 +1220,37 @@ const TableDatos = () => {
                                 </div>
                               </div>
                               <div className="text-white j-order-count-why">
-                                {item.notes ? (
-                                  <span className="j-nota-blue">
-                                    Nota: {item.notes}
-                                  </span>
+                              {item.notes ? (
+                                  addNotes[index] ? (
+                                    <form
+                                      onSubmit={(e) =>
+                                        handleSubmitNote(e, index, item.id)}
+                                    >
+                                      <span className="j-nota-blue">
+                                        Nota:{" "}
+                                      </span>
+                                      <input
+                                        className="j-note-input"
+                                        type="text"
+                                        defaultValue={item.notes || ""}
+                                        autoFocus
+                                        onBlur={(e) => {
+                                          const syntheticEvent = {
+                                            preventDefault: () => {},
+                                            target: {
+                                              elements: [e.target]
+                                            }
+                                          };
+                                          handleSubmitNote(syntheticEvent, index, item.id);
+                                        }}
+                                      />
+                                    </form>
+                                  ) : (
+                                    <span className="j-nota-blue" style={{cursor:'pointer'}} onClick={() =>
+                                      handleAddNoteClick(index)}>
+                                      Nota: {item.notes}
+                                    </span>
+                                  )
                                 ) : (
                                   <div>
                                     {addNotes[index] ? (
@@ -1237,6 +1266,14 @@ const TableDatos = () => {
                                           type="text"
                                           defaultValue={item.notes || ""}
                                           autoFocus
+                                          onBlur={(e) => {const syntheticEvent = {
+                                              preventDefault: () => {},
+                                              target: {
+                                                elements: [e.target]
+                                              }
+                                            };
+                                            handleSubmitNote(syntheticEvent, index, item.id);
+                                          }}
                                         />
                                       </form>
                                     ) : (
@@ -1250,7 +1287,7 @@ const TableDatos = () => {
                                       </button>
                                     )}
                                   </div>
-                                )}
+                                )}  
                               </div>
                             </div>
                           );
@@ -1308,7 +1345,7 @@ const TableDatos = () => {
 
                         className="btn w-100 j-btn-primary text-white j-tbl-btn-font-1"
                       >
-                         Continuar
+                        Continuar
                       </div>
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Header from './Header'
 import Sidenav from './Sidenav'
 import { Badge, Button, Modal, Spinner } from 'react-bootstrap'
@@ -149,6 +149,28 @@ export default function Homeinformation() {
       setShow1AddSuc(false)
     }, 2000);
   };
+
+  const noteInputRef = useRef(null); // Create a ref for the note input
+
+  // Function to handle submission
+  const handleNoteSubmit = async (id) => {
+    const noteValues = noteInputRef.current ? noteInputRef.current.value : '';
+    // Your existing submission logic here
+    // ...
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (noteInputRef.current && !noteInputRef.current.contains(event.target)) {
+        handleNoteSubmit(); // Call the submit function when clicking outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     getOrder();
@@ -534,16 +556,29 @@ export default function Homeinformation() {
 
 
   // ===============note ========
-  const toggleInput = (id) => {
+  const toggleInput = (id, currentNote) => {
     setVisibleInputId(prevId => prevId === id ? null : id);
+    if (visibleInputId !== id) { // Change prevId to visibleInputId
+        setNoteValues(currentNote); // Set the note value when toggling the input
+    }
   };
 
-  const handleNoteChange = (id, e) => {
-    setNoteValues(e.target.value);
+  // Update the handleNoteChange function
+  const handleNoteChange = () => {
+    const noteValue = noteInputRef.current.value; // Get the value from the ref
+    setNoteValues(noteValue); // Update state with the note value
   };
+
+  // Use useEffect to set the input value when noteValues change
+  useEffect(() => {
+    if (noteInputRef.current) {
+      noteInputRef.current.value = noteValues; // Set the input value from state
+    }
+  }, [noteValues]);
 
   const handleNoteKeyDown = async (id) => {
     console.log(id)
+    const noteValues = noteInputRef.current ? noteInputRef.current.value : '';
     try {
       const response = await axios.post(
         `${API_URL}/order/addNote/${id}`,
@@ -559,6 +594,7 @@ export default function Homeinformation() {
       // setSavedNote(noteValues);
       setNoteValues('');
       setVisibleInputId(null);
+      noteInputRef.current.value = ''; // Clear the input after saving
     } catch (error) {
       console.error(
         "Error adding note:",
@@ -572,7 +608,7 @@ export default function Homeinformation() {
 
   const handleCredit = () => {
     { console.log(orderData) }
-    if (orderData?.[0]?.status == 'delivered') {
+    if (orderData?.[0].status == 'delivered') {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
       alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
@@ -880,57 +916,55 @@ export default function Homeinformation() {
                                   </div>
                                 </div>
 
-                                <div className='' style={{ marginBottom: "68px", cursor: "pointer" }}><a href='#' className='a_home_addnote ms-4 bj-delivery-text-3 '>
-                                  {v.notes === null ? (
-                                    <div key={v.id}>
-                                      {visibleInputId !== v.id ? (
-                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
-                                          <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
-                                        </div>
-                                      ) : (
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                          <span className='j-nota-blue ms-4'>Nota:</span>
-                                          <input
-                                            type="text"
-                                            className='j-note-input'
-                                            value={noteValues}
-                                            onChange={(e) => handleNoteChange(v.id, e)}
-                                            onBlur={() => handleNoteKeyDown(v.id)}
-                                            onKeyDown={(e) => {
-                                              if (e.key === "Enter")
-                                                handleNoteKeyDown(v.id)
-                                            }}
-                                          />
-                                        </div>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    < div key={v.id}>
-                                      {visibleInputId != v.id ? (
-                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id)}>
-                                          <span className='j-nota-blue ms-4'>Nota: {v.notes}</span>
-                                        </div>
-                                      ) : (
-                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                          <span className='j-nota-blue ms-4'>Nota:</span>
-                                          <input
-                                            type="text"
-                                            className='j-note-input'
-                                            value={noteValues}
-                                            onChange={(e) => handleNoteChange(v.id, e)}
-                                            onBlur={() => handleNoteKeyDown(v.id)}
-                                            onKeyDown={(e) => {
-                                              console.log(e.key);
-                                              if (e.key == "Enter") {
-                                                handleNoteKeyDown(v.id)
-                                              }
-                                            }}
-                                          />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </a></div>
+                                <div className='' style={{ marginBottom: "68px", cursor: "pointer" }}>
+                                  <a href='#' className='a_home_addnote ms-4 bj-delivery-text-3 text-decoration-none'>
+                                    {v.notes === null ? (
+                                      <div key={v.id}>
+                                        {visibleInputId !== v.id ? (
+                                          <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id, '')}>
+                                            <span className='j-nota-blue ms-4 text-decoration-underline'>+ Nota</span>
+                                          </div>
+                                        ) : (
+                                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <span className='j-nota-blue ms-4 text-decoration-none'>Nota:</span>
+                                            <input
+                                              type="text"
+                                              className='j-note-input'
+                                              ref={noteInputRef} // Attach the ref to the input
+                                              onBlur={() => handleNoteKeyDown(v.id)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === "Enter") handleNoteKeyDown(v.id);
+                                              }}
+                                              autoFocus
+                                            />
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div key={v.id}>
+                                        {visibleInputId !== v.id ? (
+                                          <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => toggleInput(v.id, v.notes)}>
+                                            <span className='j-nota-blue ms-4 text-decoration-none'>Nota: {v.notes}</span>
+                                          </div>
+                                        ) : (
+                                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <span className='j-nota-blue ms-4 text-decoration-none'>Nota:</span>
+                                            <input
+                                              type="text"
+                                              className='j-note-input'
+                                              ref={noteInputRef} // Attach the ref to the input
+                                              onBlur={() => handleNoteKeyDown(v.id)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === "Enter") handleNoteKeyDown(v.id);
+                                              }}
+                                              autoFocus
+                                            />
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </a>
+                                </div>
                               </div>
                             )
                           })

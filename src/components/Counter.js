@@ -42,8 +42,11 @@ const Counter = () => {
   const [orType, setOrType] = useState([]);
   const location = useLocation();
   const redirect = location?.state?.from
-  console.log("redirect: " , redirect,location)
+  
   const [admin_id, setAdminId] = useState(localStorage.getItem("admin_id"));
+  // Add ref for note inputs
+  const noteInputRefs = useRef({});
+
   useEffect(() => {
 
     const fetchData = async () => {
@@ -113,38 +116,98 @@ const Counter = () => {
   // const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   // const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
+  // Modified note handling functions
   const handleNoteChange = (index, newNote) => {
-    // Use functional updates to ensure you're working with the latest state
-    setCartItems((prevItems) => {
+    // Update the input value directly using ref
+    if (noteInputRefs.current[index]) {
+      noteInputRefs.current[index].value = newNote;
+    }
+    
+    // Debounce the state update to reduce re-renders
+    const timeoutId = setTimeout(() => {
+      setCartItems(prevItems => {
+        const updatedItems = [...prevItems];
+        updatedItems[index] = { ...updatedItems[index], note: newNote };
+        return updatedItems;
+      });
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  };
+
+  const handleAddNoteClick = (index) => {
+    const updatedCartItems = cartItems.map((item, i) =>
+      i === index
+        ? { ...item, isEditing: true, note: item.note || "Nota: " }
+        : item
+    );
+    setCartItems(updatedCartItems);
+    
+    // Focus the input after state update
+    setTimeout(() => {
+      if (noteInputRefs.current[index]) {
+        noteInputRefs.current[index].focus();
+      }
+    }, 0);
+  };
+
+  const handleFinishEditing = (index) => {
+    // Get final value from ref
+    const finalNote = noteInputRefs.current[index]?.value || "";
+    
+    setCartItems(prevItems => {
       const updatedItems = [...prevItems];
-      updatedItems[index] = { ...updatedItems[index], note: newNote }; // Update the note
+      updatedItems[index] = {
+        ...updatedItems[index],
+        isEditing: false,
+        note: finalNote
+      };
       return updatedItems;
     });
   };
-  const handleFinishEditing = (index) => {
-    const updatedCartItems = cartItems.map(
-      (item, i) => (i === index ? { ...item, isEditing: false } : item)
-    );
-    setCartItems(updatedCartItems);
-  };
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Enter") {
-      const updatedIsEditing = [...isEditing];
-      updatedIsEditing[index] = false;
-      setIsEditing(updatedIsEditing);
-    }
-  };
-  console.log("object");
 
-  const handleAddNoteClick = (index) => {
-    const updatedCartItems = cartItems.map(
-      (item, i) =>
-        i === index
-          ? { ...item, isEditing: true, note: item.note || "Nota: " }
-          : item
+  // Modified render section for the note input
+  const renderNoteInput = (item, index) => {
+    if (item.isEditing) {
+      return (
+        <div>
+          <input
+            className="j-note-input"
+            type="text"
+            defaultValue={item.note}
+            ref={el => noteInputRefs.current[index] = el}
+            onChange={e => handleNoteChange(index, e.target.value)}
+            onBlur={() => handleFinishEditing(index)}
+            onKeyDown={e => {
+              if (e.key === "Enter") handleFinishEditing(index);
+            }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {item.note ? (
+          <p 
+            className="j-nota-blue" 
+            style={{ cursor: "pointer" }} 
+            onClick={() => handleAddNoteClick(index)}
+          >
+            {item.note}
+          </p>
+        ) : (
+          <button
+            className="j-note-final-button"
+            onClick={() => handleAddNoteClick(index)}
+          >
+            + Agregar nota
+          </button>
+        )}
+      </div>
     );
-    setCartItems(updatedCartItems);
   };
+
   const handleDeleteConfirmation = (index) => {
     removeItemFromCart(index);
     handleCloseEditFam();
@@ -691,36 +754,7 @@ const Counter = () => {
                             </div>
                           </div>
                           <div className="text-white j-order-count-why">
-                            {item.isEditing ? (
-                              <div>
-                                <input
-                                  className="j-note-input"
-                                  type="text"
-                                  value={item.note}
-                                  onChange={(e) =>
-                                    handleNoteChange(index, e.target.value)}
-                                  onBlur={() => handleFinishEditing(index)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter")
-                                      handleFinishEditing(index);
-                                  }}
-                                  autoFocus
-                                />
-                              </div>
-                            ) : (
-                              <div>
-                                {item.note ? (
-                                  <p className="j-nota-blue" style={{ cursor: "pointer" }} onClick={() => handleAddNoteClick(index)}>{item.note}</p>
-                                ) : (
-                                  <button
-                                    className="j-note-final-button"
-                                    onClick={() => handleAddNoteClick(index)}
-                                  >
-                                    + Agregar nota
-                                  </button>
-                                )}
-                              </div>
-                            )}
+                            {renderNoteInput(item, index)}
                           </div>
                         </div>
                       ))}
