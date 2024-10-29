@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import Sidenav from "./Sidenav";
 import img1 from "../Image/Image (3).jpg";
@@ -65,6 +65,15 @@ const Usuarios = () => {
   });
   const [selectedUser, setSelectedUser] = useState(null);
   const [show, setShow] = useState(false);
+
+  // Add refs for form inputs
+  const formRefs = {
+    name: useRef(null),
+    email: useRef(null),
+    password: useRef(null),
+    confirm_password: useRef(null),
+    role_id: useRef(null)
+  };
 
   useEffect(
     () => {
@@ -346,39 +355,58 @@ const Usuarios = () => {
     return role ? role.name : "Unknown Role";
   };
 
+  // Replace handleChange with this optimized version
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Update form data without triggering re-render
+    formData[name] = value;
 
-    if (name === "role_id" && value) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        role: undefined // Clear the role error
-      }));
-    }
+    // Validate only the changed field
+    // const fieldError = validateField(name, value);
+    if(errors[name] || name == "role_id"){
+    setErrors(prev => ({
+      ...prev,
+      [name]: undefined,
+      role: name == "role_id" ? undefined : prev.role
+    }));
+  }
+}
 
-    if (name === "name") {
-      if (value.length >= 5) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          name: undefined // Clear the name error when length is 5 or more
-        }));
-      } else {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          name: "El nombre debe tener entre 5 caracteres" // Set error if less than 5 characters
-        }));
-      }
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: undefined // Clear error for other fields
-      }));
-    }
-  };
+  // // Add field-level validation
+  // const validateField = (fieldName, value) => {
+  //   switch (fieldName) {
+  //     case 'name':
+  //       if (!value.trim()) return "Se requiere el nombre";
+  //       if (value.length < 5) return "El nombre debe tener entre 5 caracteres";
+  //       return null;
+      
+  //     case 'email':
+  //       if (!value.trim()) return "correo electronico es requerido";
+  //       if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+  //         return "el correo electrónico es invalido";
+  //       }
+  //       return null;
+
+  //   if (name === "name") {
+  //     if (value.length >= 5) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         name: undefined // Clear the name error when length is 5 or more
+  //       }));
+  //     } else {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         name: "El nombre debe tener entre 5 caracteres" // Set error if less than 5 characters
+  //       }));
+  //     }
+  //   } else {
+  //     setErrors((prevErrors) => ({
+  //       ...prevErrors,
+  //       [name]: undefined // Clear error for other fields
+  //     }));
+  //   }
+  // };
 
   // update user
 
@@ -430,24 +458,40 @@ const Usuarios = () => {
 
   // create user
   const handleSubmit = async () => {
-    // Validation
-    const errors = validateForm(formData);
-    if (Object.keys(errors).length > 0) {
-      setErrors(errors);
-      return;
+    // Collect current form values
+    const currentFormData = {
+      name: formRefs.name.current.value,
+      email: formRefs.email.current.value,
+      password: formRefs.password.current.value,
+      confirm_password: formRefs.confirm_password.current.value,
+      role_id: formRefs.role_id.current.value,
+      invite: true
+    };
+
+    // Validate all fields
+    // console.log(currentFormData);
+    const validationErrors = validateForm(currentFormData);
+    setErrors(validationErrors);
+    // console.log(errors);
+    
+    if (Object.keys(validationErrors).length !== 0) {
+      // console.log(errors);
+      return;   
     }
-    handleClose();
+    // handleClose();
     setIsProcessing(true);
     try {
       if (selectedUser) {
-        const dataToUpdate = { ...formData };
+        const dataToUpdate = { ...currentFormData };
         if (!dataToUpdate.password) {
           delete dataToUpdate.password;
           delete dataToUpdate.confirm_password;
         }
+
+        // console.log(dataToUpdate);
         await updateUser(dataToUpdate);
       } else {
-        const emailExists = users.some((user) => user.email === formData.email);
+        const emailExists = users.some((user) => user.email === currentFormData.email);
         setIsProcessing(false);
 
         if (emailExists) {
@@ -464,8 +508,10 @@ const Usuarios = () => {
           return;
         }
         handleClose();
+        // console.log(currentFormData);
+        
         // Create new user
-        const response = await axios.post(`${apiUrl}/create-user`, {...formData,admin_id}, {
+        const response = await axios.post(`${apiUrl}/create-user`, {...currentFormData,admin_id}, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
@@ -478,8 +524,6 @@ const Usuarios = () => {
           setIsProcessing(false);
           //enqueueSnackbar (response.data.notification, { variant: 'success' })
           // playNotificationSound();;
-
-
         }
       }
     } catch (error) {
@@ -694,12 +738,12 @@ const Usuarios = () => {
                                   />
                                 </svg>
                                 <input
+                                  ref={formRefs.name}
                                   class="bm_input"
                                   style={{ width: "100%" }}
                                   type="text"
                                   placeholder="Escribir . . ."
                                   name="name"
-                                  value={formData.name}
                                   onChange={handleChange}
                                   autocomplete="off"
                                 />
@@ -715,9 +759,9 @@ const Usuarios = () => {
                                 <label className="mb-2">Rol</label>
                                 <div className="m_group">
                                   <select
+                                    ref={formRefs.role_id}
                                     className="jm_input"
                                     name="role_id"
-                                    value={formData.role_id}
                                     onChange={handleChange}
                                   >
                                     <option value="">Seleccionar Rol</option>
@@ -762,10 +806,11 @@ const Usuarios = () => {
                                   <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
                                 </svg>
                                 <input
+                                  ref={formRefs.email}
                                   class="bm_input"
                                   type="email"
                                   name="email"
-                                  value={formData.email}
+                                  // value={formData.email}
                                   onChange={handleChange}
                                   placeholder="Escribir . . ."
                                   autocomplete="new-email"
@@ -789,11 +834,12 @@ const Usuarios = () => {
                               <div className="icon-input">
                                 <IoMdLock className="i" />
                                 <input
+                                  ref={formRefs.password}
                                   type={showPassword ? "text" : "password"}
                                   className="form-control j-user-password"
                                   placeholder="Escribir . . ."
                                   name="password"
-                                  value={formData.password}
+                                  // value={formData.password}
                                   onChange={handleChange}
                                   autocomplete="new-password"
                                 />
@@ -831,6 +877,7 @@ const Usuarios = () => {
                                 <div className="icon-input">
                                   <IoMdLock className="i" />
                                   <input
+                                    ref={formRefs.confirm_password}
                                     type={
                                       showcomfirmPassword ? (
                                         "text"
@@ -842,7 +889,7 @@ const Usuarios = () => {
                                     id="password"
                                     placeholder="Escribir . . ."
                                     name="confirm_password"
-                                    value={formData.confirm_password}
+                                    // value={formData.confirm_password}
                                     onChange={handleChange}
                                     autocomplete="off"
                                   />
@@ -1145,12 +1192,13 @@ const Usuarios = () => {
                         </svg>
 
                         <input
+                          ref={formRefs.name}
                           class="bm_input"
                           style={{ width: "100%" }}
                           type="text"
                           placeholder="Escribir . . ."
                           name="name"
-                          value={formData.name}
+                          defaultValue={formData.name}
                           onChange={handleChange}
                           autoComplete="off"
                         />
@@ -1166,9 +1214,10 @@ const Usuarios = () => {
                         <label className="mb-2">Rol</label>
                         <div className="m_group">
                           <select
+                            ref={formRefs.role_id}
                             className="jm_input"
                             name="role_id"
-                            value={formData.role_id}
+                            defaultValue={formData.role_id}
                             onChange={handleChange}
                           >
                             {roles.map((role) => {
@@ -1207,11 +1256,12 @@ const Usuarios = () => {
                           <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z" />
                         </svg>
                         <input
+                          ref={formRefs.email}
                           class="bm_input"
                           type="email"
                           placeholder="Escribir . . ."
                           name="email"
-                          value={formData.email}
+                          defaultValue={formData.email}
                           onChange={handleChange}
                           autoComplete="off"
                         />
@@ -1231,11 +1281,12 @@ const Usuarios = () => {
                       <div className="icon-input">
                         <IoMdLock className="i" />
                         <input
+                          ref={formRefs.password}
                           type={editshowPassword ? "text" : "password"}
                           className="form-control j-user-password"
                           placeholder="-"
                           name="password"
-                          value={formData.password}
+                          defaultValue={formData.password}
                           onChange={handleChange}
                           autoComplete="new-password"
                         />
@@ -1258,11 +1309,12 @@ const Usuarios = () => {
                         <div className="icon-input">
                           <IoMdLock className="i" />
                           <input
+                            ref={formRefs.confirm_password}
                             type={editshowcomfirmPassword ? "text" : "password"}
                             className="form-control j-user-password"
                             placeholder="-"
                             name="confirm_password"
-                            value={formData.confirm_password}
+                            defaultValue={formData.confirm_password}
                             onChange={handleChange}
                             autoComplete="new-password"
                           />

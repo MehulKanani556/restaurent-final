@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import inbox1 from "../Image/Inbox.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -33,6 +33,10 @@ const Caja = () => {
     const admin_id = localStorage.getItem('admin_id');
     const { playNotificationSound } = useAudioManager();
 
+    // Add refs for the inputs
+    const boxNameRef = useRef(null);
+    const cashierAssignedRef = useRef(null);
+
     // useEffect(() => {
     //     if (role == 'admin') {
     //         setToken('3833|eXTXOfKbnxghwkcze0t6mtymYD4Z22IfHexv94yIa42cdbce')
@@ -44,19 +48,23 @@ const Caja = () => {
 
     // Clear specific error when input changes
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name } = e.target;
+        const value = e.target.value;
 
         // Clear error for the input being modified
-        setValidationErrors(prevErrors => ({
-            ...prevErrors,
-            [name]: undefined,
-        }));
-        console.log(value)
+       
 
         if (name === 'boxName') {
-            setBoxName(value);
+            boxNameRef.current.value = value;
         } else if (name === 'cashierAssigned') {
-            setCashierAssigned(value);
+            cashierAssignedRef.current.value = value;
+        }
+
+        if(validationErrors[name]){
+            setValidationErrors(prevErrors => ({
+                ...prevErrors,
+                [name]: undefined,
+            }));
         }
     };
 
@@ -137,21 +145,28 @@ const Caja = () => {
 
     // Create a box
     const handleCreateBox = async () => {
+        const boxNameValue = boxNameRef.current.value;
+        const cashierAssignedValue = cashierAssignedRef.current.value;
+
         const errors = {};
-        if (!boxName) errors.boxName = "El nombre de la casilla es obligatorio";
-        if (!cashierAssigned) errors.cashierAssigned = "Se requiere cajero asignado";
+        if (!boxNameValue) errors.boxName = "El nombre de la casilla es obligatorio";
+        if (!cashierAssignedValue) errors.cashierAssigned = "Se requiere cajero asignado";
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             return;
         }
+
+        console.log(boxNameValue,cashierAssignedValue);
+        
+
         handleClose();
         setIsProcessing(true);
 
         try {
            const response = await axios.post(`${apiUrl}/box/create`, {
-                name: boxName,
-                user_id: cashierAssigned,
-                admin_id: admin_id, // Get the admin_id from localStorage
+                name: boxNameValue,
+                user_id: cashierAssignedValue,
+                admin_id: admin_id,
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -257,7 +272,7 @@ const Caja = () => {
                                                 id="boxNameInput"
                                                 name="boxName"
                                                 placeholder="Caja#"
-                                                value={boxName}
+                                                ref={boxNameRef}
                                                 onChange={handleInputChange}
                                             />
                                             {validationErrors.boxName && (
@@ -272,7 +287,7 @@ const Caja = () => {
                                                 aria-label="Selecciona un cajero"
                                                 id="cashierAssignedSelect"
                                                 name="cashierAssigned"
-                                                value={cashierAssigned}
+                                                ref={cashierAssignedRef}
                                                 onChange={handleInputChange}
                                             >
                                                 <option value="">Selecciona un cajero</option>

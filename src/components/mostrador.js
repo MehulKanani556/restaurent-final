@@ -235,30 +235,63 @@ const Mostrador = () => {
   const [rut2, setRut2] = useState("");
   const [rut3, setRut3] = useState("");
 
-  // const handleRutChange = (e, setRut) => {
-  //   let value = e.target.value.replace(/[^0-9kK-]/g, ""); // Remove any existing hyphen
-  //   if (value.length > 6) {
-  //     value = value.slice(0, 6) + "-" + value.slice(6);
-  //   }
-  //   setRut(value);
-  //   // Clear the RUT error
-  //   setErrors((prevErrors) => ({
-  //     ...prevErrors,
-  //     rut: undefined
-  //   }));
-  // };
+  // Add refs for form inputs
+  const formRefs = {
+    rut1: useRef(),
+    rut2: useRef(), 
+    rut3: useRef(),
+    fname: useRef(),
+    lname: useRef(),
+    tour: useRef(),
+    address: useRef(),
+    email: useRef(),
+    number: useRef(),
+    bname: useRef(),
+    ltda: useRef()  // Added ltda ref
+  };
 
-  const handleRutChange = (e, setRut) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Update formData state for select elements
+    if (name === 'ltda') {
+        setFormData(prevData => ({
+            ...prevData,
+            ltda: value
+        }));
+    }
+    
+    // Check if the ref exists before accessing current
+    if (formRefs[name]) {
+        formRefs[name].current.value = value;
+        
+        // Clear errors for the specific field
+        if (errors[name] || (name === 'bname' && errors.business_name)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                [name]: undefined,
+                business_name: name === 'bname' ? undefined : prevErrors.business_name
+            }));
+        }
+    }
+};
+
+  // Update handleRutChange to only clear RUT error
+  const handleRutChange = (e, rutRef) => {
     let value = e.target.value.replace(/[^0-9]/g, "");
     if (value.length > 6) {
-      value = value.slice(0, 6) + "-" + value.slice(6);
+        value = value.slice(0, 6) + "-" + value.slice(6);
     }
-    setRut(value);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      rut: undefined,
-    }));
-  };
+    rutRef.current.value = value;
+    
+    // Only clear RUT error if it exists
+    if (errors.rut) {
+        setErrors(prevErrors => ({
+            ...prevErrors,
+            rut: undefined
+        }));
+    }
+};
 
 
   // ***************************************************API**************************************************
@@ -274,98 +307,81 @@ const Mostrador = () => {
     bname: "",
     tipoEmpresa: "0"
   });
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-    // Clear the specific error for business_name and ltda when typing
-    if (name === "bname") {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        business_name: undefined
-      }));
-    } else if (name === "ltda") {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        ltda: undefined
-      }));
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: undefined
-      }));
-    }
-  };
 
   const collectAccordionData = () => {
     const commonData = {
-      receiptType: selectedRadio,
-      rut: selectedRadio === "1" ? rut1 : selectedRadio === "2" ? rut2 : rut3,
-      firstname: formData.fname,
-      lastname: formData.lname,
-      tour: formData.tour,
-      address: formData.address,
-      email: formData.email,
-      phone: formData.number
+        receiptType: selectedRadio,
+        rut: selectedRadio === "1" ? formRefs.rut1.current.value : 
+             selectedRadio === "2" ? formRefs.rut2.current.value : 
+             formRefs.rut3.current.value,
+        firstname: formRefs.fname.current.value,
+        lastname: formRefs.lname.current.value,
+        tour: formRefs.tour.current.value,
+        address: formRefs.address.current.value,
+        email: formRefs.email.current.value,
+        phone: formRefs.number.current.value,
+        // ltda: formRefs.ltda.current.value  // Added ltda ref
     };
 
     let specificData = {};
-
     if (selectedRadio === "4") {
-      specificData = {
-        business_name: formData.bname,
-        ltda: formData.ltda
-      };
+        specificData = {
+            business_name: formRefs.bname.current.value,
+            ltda: formRefs.ltda.current.value  // Keep this in state since it's a select
+        };
     }
 
     return { ...commonData, ...specificData };
-  };
-  const validateForm = (data) => {
-    const errors = {};
+};
 
-    // RUT validation
-    if (!data.rut || data.rut.length < 7) {
-      errors.rut = "El RUT debe tener al menos 7 caracteres";
-    }
 
-    // Name validation
-    if (data.receiptType !== "4") {
+const validateForm = () => {
+  const data = collectAccordionData();
+  const newErrors = {};
+
+  // RUT validation
+  if (!data.rut || data.rut.length < 7) {
+      newErrors.rut = "El RUT debe tener al menos 7 caracteres";
+  }
+
+  // Name validation
+  if (data.receiptType !== "4") {
       if (!data.firstname || data.firstname.trim() === "") {
-        errors.fname = "Se requiere el primer nombre";
+          newErrors.fname = "Se requiere el primer nombre";
       }
-    }
-    console.log(data)
-    // Business name validation for receipt type 4
-    if (data.receiptType === "4") {
+  }
+  // console.log(data)
+  // Business name validation for receipt type 4
+  if (data.receiptType === "4") {
       if (!data.business_name || data.business_name.trim() === "") {
-        errors.business_name = "Se requiere el nombre de la empresa";
+          newErrors.business_name= "Se requiere el nombre de la empresa";
       }
       if (!data.ltda || data.ltda === "0") {
-        errors.ltda = "Seleccione una opción";
+          newErrors.ltda = "Seleccione una opción";
       }
-    }
+  }
 
-    // Last name validation
-    if (!data.lastname || data.lastname.trim() === "") {
-      errors.lname = "El apellido es obligatorio";
-    }
+  // Last name validation
+  if (!data.lastname || data.lastname.trim() === "") {
+      newErrors.lname = "El apellido es obligatorio";
+  }
 
-    // Tour validation
-  
-    if (!data.tour || data.tour.trim() === "") {
-      errors.tour = "Se requiere el Giro";
-    } 
+  // Tour validation
+  if (!data.tour || data.tour.trim() === "") {
+      newErrors.tour = "Se requiere tour";
+  }
 
-    // Address validation
-    if (!data.address || data.address.trim() === "") {
-      errors.address = "La dirección es necesaria";
-    }
+  // Address validation
+  if (!data.address || data.address.trim() === "") {
+      newErrors.address = "La dirección es necesaria";
+  }
+
+  setErrors(newErrors);
+  return newErrors;
+  // return errors;
+};
 
 
-    return errors;
-  };
   const [paymentData, setPaymentData] = useState(null);
 
   const [activeA, setActiveA] = useState(null)
@@ -377,9 +393,8 @@ const Mostrador = () => {
     }
   },[])
 
-  useEffect(()=>{
-    
-    if(paymentData){
+  useEffect(() => {
+    if(paymentData) {
       setFormData({
         fname: paymentData.firstname,
         lname: paymentData.lastname,
@@ -388,17 +403,24 @@ const Mostrador = () => {
         email: paymentData.email,
         number: paymentData.phone,
         bname: paymentData.business_name,
-        ltda: paymentData.ltda,
-        tipoEmpresa: paymentData.receiptType === "4"? paymentData.ltda : "0",
-        rut: paymentData.receiptType == "1"? paymentData.rut : paymentData.receiptType == "2"? paymentData.rut : paymentData.rut,
-      })
+        ltda: paymentData.ltda, // This should match the select options value
+        tipoEmpresa: paymentData.receiptType === "4" ? paymentData.ltda : "0",
+        rut: paymentData.receiptType == "1" ? paymentData.rut : 
+             paymentData.receiptType == "2" ? paymentData.rut : paymentData.rut,
+      });
+      
+      // Ensure the select element's value is set after form data is updated
+      if (formRefs.ltda.current) {
+        formRefs.ltda.current.value = paymentData.ltda;
+      }
+      
       setActiveAccordionItem(paymentData.receiptType); // {{ edit_1 }}
       paymentData.receiptType == "1"? setRut1(paymentData.rut) : paymentData.receiptType == "2" ? setRut2(paymentData.rut) : setRut3(paymentData.rut)
       handleAccordionClick(paymentData.receiptType);
       setSelectedRadio(paymentData.receiptType);
       setActiveA(paymentData.receiptType);
     }
-  },[paymentData])
+  }, [paymentData]);
 
   const handleSubmit = () => {
     setIsProcessing(true);
@@ -550,8 +572,9 @@ const Mostrador = () => {
                               <input
                                 type="text"
                                 name="rut1"
-                                value={rut1}
-                                onChange={(e) => handleRutChange(e, setRut1)}
+                                ref={formRefs.rut1}
+                                defaultValue={rut1}
+                                onChange={(e) => handleRutChange(e, formRefs.rut1)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -560,9 +583,9 @@ const Mostrador = () => {
                               <label className="mb-2">Nombre </label>
                               <input
                                 type="text"
-                                id="fname"
                                 name="fname"
-                                value={formData.fname}
+                                ref={formRefs.fname}
+                                defaultValue={formData.fname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -573,9 +596,9 @@ const Mostrador = () => {
                               <label className="mb-2">Apellido Paterno </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -586,9 +609,9 @@ const Mostrador = () => {
                               <label className="mb-2">Giro </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -599,9 +622,9 @@ const Mostrador = () => {
                               <label className="mb-2">Dirección </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -612,9 +635,9 @@ const Mostrador = () => {
                               <label className="mb-2">E-mail (opcional) </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -625,9 +648,9 @@ const Mostrador = () => {
                               </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -650,7 +673,7 @@ const Mostrador = () => {
                         <input
                           type="radio"
                           name="receiptType"
-                          value="1"
+                          value="2"
                           checked={selectedRadio === "2"}
                           onChange={() => setSelectedRadio("2")}
                           className="me-2 j-radio-checkbox"
@@ -667,8 +690,9 @@ const Mostrador = () => {
                               <input
                                 type="text"
                                 name="rut2"
-                                value={rut2}
-                                onChange={(e) => handleRutChange(e, setRut2)}
+                                ref={formRefs.rut2}
+                                defaultValue={rut2}
+                                onChange={(e) => handleRutChange(e, formRefs.rut2)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -678,9 +702,9 @@ const Mostrador = () => {
                               <label className="mb-2">Nombre </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="fname"
-                                value={formData.fname}
+                                ref={formRefs.fname}
+                                defaultValue={formData.fname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -691,9 +715,9 @@ const Mostrador = () => {
                               <label className="mb-2">Apellido Paterno </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -704,9 +728,9 @@ const Mostrador = () => {
                               <label className="mb-2">Giro </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -717,9 +741,9 @@ const Mostrador = () => {
                               <label className="mb-2">Dirección </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -730,9 +754,9 @@ const Mostrador = () => {
                               <label className="mb-2">E-mail (opcional) </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -743,9 +767,9 @@ const Mostrador = () => {
                               </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -785,8 +809,9 @@ const Mostrador = () => {
                               <input
                                 type="text"
                                 name="rut3"
-                                value={rut3}
-                                onChange={(e) => handleRutChange(e, setRut3)}
+                                ref={formRefs.rut3}
+                                defaultValue={rut3}
+                                onChange={(e) => handleRutChange(e, formRefs.rut3)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -796,9 +821,9 @@ const Mostrador = () => {
                               <label className="mb-2">Razón Social </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="bname"
-                                value={formData.bname}
+                                ref={formRefs.bname}
+                                defaultValue={formData.bname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -810,7 +835,9 @@ const Mostrador = () => {
                               <select
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white form-select"
                                 name="ltda"
-                                value={formData.ltda}
+                                ref={formRefs.ltda}
+                                value={formData.ltda} // Add this to control the select value
+                                defaultValue={formData.ltda}
                                 onChange={handleInputChange}
                               >
                                 <option value="0">Seleccionar opción</option>
@@ -825,9 +852,9 @@ const Mostrador = () => {
                               <label className="mb-2">Apellido Paterno</label>
                               <input
                                 type="text"
-                                id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -838,9 +865,9 @@ const Mostrador = () => {
                               <label className="mb-2">Giro </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -851,9 +878,9 @@ const Mostrador = () => {
                               <label className="mb-2">Dirección </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -864,9 +891,9 @@ const Mostrador = () => {
                               <label className="mb-2">E-mail (opcional) </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -877,9 +904,9 @@ const Mostrador = () => {
                               </label>
                               <input
                                 type="text"
-                                id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />

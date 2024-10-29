@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import box from "../Image/Ellipse 20.png";
 import box4 from "../Image/box5.png";
@@ -303,13 +303,20 @@ const TableDatos = () => {
 
 
 
-  const handleRutChange = (e, setRut) => {
-    let value = e.target.value.replace(/-/g, ""); // Remove any existing hyphen
+  const handleRutChange = (e, inputRef) => {
+    let value = e.target.value.replace(/[^0-9]/g, "");
     if (value.length > 6) {
       value = value.slice(0, 6) + "-" + value.slice(6);
     }
-    setRut(value);
+    inputRef.current.value = value;
+    if (errors.rut) {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        rut: undefined
+      }));
+    }
   };
+
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -320,32 +327,67 @@ const TableDatos = () => {
     bname: "",
     tipoEmpresa: "0"
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
+
+    // Update formData state for select elements
+    if (name === 'ltda') {
+      setFormData(prevData => ({
+        ...prevData,
+        ltda: value
+      }));
+    }
+
+    // Check if the ref exists before accessing current
+    if (formRefs[name]) {
+      formRefs[name].current.value = value;
+
+      // Clear errors for the specific field
+      if (errors[name] || (name === 'bname' && errors.business_name)) {
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          [name]: undefined,
+          business_name: name === 'bname' ? undefined : prevErrors.business_name
+        }));
+      }
+    }
+  };
+
+  // Add form refs
+  const formRefs = {
+    rut1: useRef(),
+    rut2: useRef(),
+    rut3: useRef(),
+    fname: useRef(),
+    lname: useRef(),
+    tour: useRef(),
+    address: useRef(),
+    email: useRef(),
+    number: useRef(),
+    bname: useRef(),
+    ltda: useRef()
   };
 
   const collectAccordionData = () => {
     const commonData = {
       receiptType: selectedRadio,
-      rut: selectedRadio === "1" ? rut1 : selectedRadio === "2" ? rut2 : rut3,
-      firstname: formData.fname,
-      lastname: formData.lname,
-      tour: formData.tour,
-      address: formData.address,
-      email: formData.email,
-      phone: formData.number
+      rut: selectedRadio === "1" ? formRefs.rut1.current?.value :
+        selectedRadio === "2" ? formRefs.rut2.current?.value :
+          formRefs.rut3.current?.value,
+      firstname: formRefs.fname.current?.value,
+      lastname: formRefs.lname.current?.value,
+      tour: formRefs.tour.current?.value,
+      address: formRefs.address.current?.value,
+      email: formRefs.email.current?.value,
+      phone: formRefs.number.current?.value
     };
 
     let specificData = {};
-
     if (selectedRadio === "3") {
       specificData = {
-        business_name: formData.bname,
-        ltda: formData.ltda
+        business_name: formRefs.bname.current?.value,
+         ltda: formRefs.ltda.current.value
       };
     }
 
@@ -393,8 +435,9 @@ const TableDatos = () => {
       errors.address = "La dirección es necesaria";
     }
 
-
+    setErrors(errors);
     return errors;
+
   };
   const handleSubmit = () => {
     const collectedData = collectAccordionData();
@@ -673,8 +716,9 @@ const TableDatos = () => {
                               <input
                                 type="text"
                                 name="rut"
-                                value={rut1}
-                                onChange={(e) => handleRutChange(e, setRut1)}
+                                ref={formRefs.rut1}
+                                defaultValue={rut1}
+                                onChange={(e) => handleRutChange(e, formRefs.rut1)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -686,7 +730,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="fname"
                                 name="fname"
-                                value={formData.fname}
+                                ref={formRefs.fname}
+                                defaultValue={formData.fname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -699,7 +744,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -712,7 +758,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -725,7 +772,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -737,7 +785,8 @@ const TableDatos = () => {
                               <input
                                 type="text"
                                 id="id" name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -750,7 +799,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -791,8 +841,9 @@ const TableDatos = () => {
                               <input
                                 type="text"
                                 name="rut"
-                                value={rut2}
-                                onChange={(e) => handleRutChange(e, setRut2)}
+                                ref={formRefs.rut2}
+                                defaultValue={rut2}
+                                onChange={(e) => handleRutChange(e, formRefs.rut2)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -804,7 +855,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="fname"
-                                value={formData.fname}
+                                ref={formRefs.fname}
+                                defaultValue={formData.fname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -817,7 +869,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -830,7 +883,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -843,7 +897,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -856,7 +911,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -869,7 +925,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -915,8 +972,9 @@ const TableDatos = () => {
                               <input
                                 type="text"
                                 name="rut"
-                                value={rut3}
-                                onChange={(e) => handleRutChange(e, setRut3)}
+                                ref={formRefs.rut3}
+                                defaultValue={rut3}
+                                onChange={(e) => handleRutChange(e, formRefs.rut3)}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
                               {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
@@ -928,7 +986,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="bname"
-                                value={formData.bname}
+                                ref={formRefs.bname}
+                                defaultValue={formData.bname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -939,6 +998,7 @@ const TableDatos = () => {
                               <label className="mb-2">Sa, Ltda, Spa </label>
                               <select
                                 name="ltda"
+                                ref={formRefs.ltda}
                                 value={formData.ltda}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white form-select">
@@ -956,7 +1016,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="lname"
-                                value={formData.lname}
+                                ref={formRefs.lname}
+                                defaultValue={formData.lname}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -969,7 +1030,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="tour"
-                                value={formData.tour}
+                                ref={formRefs.tour}
+                                defaultValue={formData.tour}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -982,7 +1044,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="address"
-                                value={formData.address}
+                                ref={formRefs.address}
+                                defaultValue={formData.address}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -995,7 +1058,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="email"
-                                value={formData.email}
+                                ref={formRefs.email}
+                                defaultValue={formData.email}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -1008,7 +1072,8 @@ const TableDatos = () => {
                                 type="text"
                                 id="id"
                                 name="number"
-                                value={formData.number}
+                                ref={formRefs.number}
+                                defaultValue={formData.number}
                                 onChange={handleInputChange}
                                 className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
                               />
@@ -1220,7 +1285,7 @@ const TableDatos = () => {
                                 </div>
                               </div>
                               <div className="text-white j-order-count-why">
-                              {item.notes ? (
+                                {item.notes ? (
                                   addNotes[index] ? (
                                     <form
                                       onSubmit={(e) =>
@@ -1236,7 +1301,7 @@ const TableDatos = () => {
                                         autoFocus
                                         onBlur={(e) => {
                                           const syntheticEvent = {
-                                            preventDefault: () => {},
+                                            preventDefault: () => { },
                                             target: {
                                               elements: [e.target]
                                             }
@@ -1246,7 +1311,7 @@ const TableDatos = () => {
                                       />
                                     </form>
                                   ) : (
-                                    <span className="j-nota-blue" style={{cursor:'pointer'}} onClick={() =>
+                                    <span className="j-nota-blue" style={{ cursor: 'pointer' }} onClick={() =>
                                       handleAddNoteClick(index)}>
                                       Nota: {item.notes}
                                     </span>
@@ -1266,8 +1331,9 @@ const TableDatos = () => {
                                           type="text"
                                           defaultValue={item.notes || ""}
                                           autoFocus
-                                          onBlur={(e) => {const syntheticEvent = {
-                                              preventDefault: () => {},
+                                          onBlur={(e) => {
+                                            const syntheticEvent = {
+                                              preventDefault: () => { },
                                               target: {
                                                 elements: [e.target]
                                               }
@@ -1287,7 +1353,7 @@ const TableDatos = () => {
                                       </button>
                                     )}
                                   </div>
-                                )}  
+                                )}
                               </div>
                             </div>
                           );

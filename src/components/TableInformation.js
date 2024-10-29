@@ -562,12 +562,12 @@ const TableInformation = () => {
     }, 2000);
   };
 
-  const [tableName, setTableName] = useState(null);
-  const [editErrorName, setEditErrorsName] = useState('');
+  let [tableName, setTableName] = useState(null);
+  let [editErrorName, setEditErrorsName] = useState('');
   //edit table
   const handleEditChange = (e) => {
     const name = e.target.value;
-    setTableName(name);
+    tableName = (name);
     if (name) {
       setEditErrorsName('');
     }
@@ -1295,7 +1295,7 @@ const TableInformation = () => {
                   className="form-control j-table_input"
                   id="exampleFormControlInput1"
                   placeholder={"-"}
-                  value={tableName}
+                  defaultValue={tableName}
                   name="name"
                   onChange={handleEditChange}
                 />

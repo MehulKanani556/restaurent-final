@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import home3 from "../Image/home3.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -205,35 +205,41 @@ const Informacira = () => {
   const [allpayments, setAllpayments] = useState([]);
 
   const navigate = useNavigate();
+  const boxNameRef = useRef(null);
+  const cashierIdRef = useRef(null);
+
   const handleEdit = (box) => {
+    if (!box || !box[0]) return;
+    
+    // Set initial values to refs instead of state
+    boxNameRef.current = box[0].name;
+    cashierIdRef.current = box[0].user_id?.toString() || "0";
+    
     setSelectedBox(box[0]);
-    setEditedBoxName(box[0]?.name);
-    setEditedCashierId(box[0]?.user_id);
     setShow(true);
   };
 
-  // update box
   const handleSaveChanges = async () => {
-    if (!editedBoxName) {
-      setBoxnameError("por favor ingrese el nombre")
-      return
+    // Validate inputs
+    if (!boxNameRef.current) {
+      setBoxnameError('El nombre de la caja es requerido');
+      return;
     }
-
-    if (!editedCashierId) {
-      setBoxcashError("por favor seleccione cajero")
+    if (cashierIdRef.current === "0") {
+      setBoxcashError('Por favor seleccione un cajero');
       return;
     }
 
-    if (!selectedBox) return;
     handleClose();
-
     setIsProcessing(true);
+
     try {
       const response = await axios.post(
         `${apiUrl}/box/update/${selectedBox.id}`,
         {
-          name: editedBoxName,
-          user_id: editedCashierId,
+          name: boxNameRef.current,
+          user_id: cashierIdRef.current,
+          admin_id: admin_id
         },
         {
           headers: {
@@ -243,39 +249,27 @@ const Informacira = () => {
       );
 
       if (response.status === 200) {
-        // Update was successful
         handleShowCreSuc();
-        handleClose();
         // Refresh the box data
         setBoxName(prev => prev.map(box =>
-          box.id === selectedBox.id ? { ...box, name: editedBoxName, user_id: editedCashierId } : box
+          box.id === selectedBox.id ? { 
+            ...box, 
+            name: boxNameRef.current, 
+            user_id: cashierIdRef.current 
+          } : box
         ));
 
         fetchAllBox();
-
         getBox();
         setBoxcashError('');
         setBoxnameError('');
-        if (response.data && response.data.notification) {
-          //enqueueSnackbar (response.data.notification, { variant: 'success' });
-          // playNotificationSound();;
-        }
-        console.log("Update Successfully");
-      } else {
-        // Handle error
-        console.error('Failed to update box');
-        //enqueueSnackbar (response.data?.alert, { variant: 'error' })
-        // playNotificationSound();;
       }
     } catch (error) {
       console.error('Error updating box:', error);
-      //enqueueSnackbar (error?.response?.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
-
     }
     setIsProcessing(false);
   };
-  // delete box 
+
   const handleDelete = async () => {
     if (!selectedBox) return;
     setShowDeleteModal(false); // Close the modal
@@ -314,9 +308,6 @@ const Informacira = () => {
     }
     setIsProcessing(false);
   };
-
-
-
 
   const [finalAmount, setFinalAmount] = useState()
 
@@ -1045,13 +1036,13 @@ const Informacira = () => {
 
   }
 
-  const handleorderRecipt = (data) => {
+  const handleorderRecipt = (data) =>{
 
     const payament = allpayments.some((v) => v.order_master_id == data.id)
     console.log(payament);
-    if (payament) {
+    if(payament){
       setShowModalOrder(true)
-    } else {
+    }else{
       handleClosepay()
     }
   }
@@ -1391,10 +1382,10 @@ const Informacira = () => {
                               className="form-control j-table_input"
                               placeholder="Caja#"
                               id="boxName"
-                              value={editedBoxName}
+                              defaultValue={boxNameRef.current}
                               onChange={(e) => {
-                                setEditedBoxName(e.target.value)
-                                if (e.target.value) {
+                                boxNameRef.current = e.target.value;
+                                if (boxnameError) {
                                   setBoxnameError('');
                                 }
                               }}
@@ -1415,10 +1406,10 @@ const Informacira = () => {
                               style={{ borderRadius: "6px" }}
                               aria-label="Selecciona un título"
                               id="cashierSelect"
-                              value={editedCashierId}
+                              defaultValue={cashierIdRef.current}
                               onChange={(e) => {
-                                setEditedCashierId(e.target.value);
-                                if (e.target.value) {
+                                cashierIdRef.current = e.target.value;
+                                if (e.target.value !== "0") {
                                   setBoxcashError('');
                                 }
                               }
@@ -1630,11 +1621,12 @@ const Informacira = () => {
                             className="btn j-btn-primary text-white j-caja-text-1"
                             onClick={() => {
                               // Check if closePrice is greater than openPrice
-                              if (parseFloat(closePrice) < parseInt(data[data.length - 1]?.open_amount, 10)) {
-                                setErrorClosePrice("El monto final debe ser mayor que el monto inicial."); // New error message
-                              } else if (!finalAmount || isNaN(finalAmount) || parseFloat(finalAmount) <= 0) {
-                                setErrorClosePrice("Monto inicial debe ser un número positivo."); // Set error if validation fails
-                              } else if (!pricesecond || isNaN(pricesecond) || parseFloat(pricesecond) <= 0) {
+                              // if (parseFloat(closePrice) < parseInt(data[data.length - 1]?.open_amount, 10)) {
+                              //   setErrorClosePrice("El monto final debe ser mayor que el monto inicial."); // New error message
+                              // } else if (!finalAmount || isNaN(finalAmount) || parseFloat(finalAmount) <= 0) {
+                              //   setErrorClosePrice("Monto inicial debe ser un número positivo."); // Set error if validation fails
+                              // } else 
+                              if (!pricesecond || isNaN(pricesecond) || parseFloat(pricesecond) <= 0) {
                                 setErrorCashPrice("Monto efectivo debe ser un número positivo."); // Set error if validation fails
                               } else if (parseFloat(pricesecond) > parseFloat(closePrice)) {
                                 setErrorCashPrice("Monto efectivo no puede ser mayor que el monto final."); // Set error if validation fails

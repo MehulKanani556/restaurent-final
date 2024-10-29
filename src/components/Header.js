@@ -183,7 +183,7 @@ export default function Header() {
                     fontSize: '0.6rem',
                     padding: '0.25em 0.4em',
                     top: '7px',
-                    right: '-15px',
+                   left:'95%',
                     border: '2px solid #282828', // Adjust the color to match your background
                     minWidth: '20px',
                     height: '20px',

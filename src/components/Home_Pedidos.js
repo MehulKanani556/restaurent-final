@@ -21,6 +21,8 @@ const Home_Pedidos = () => {
     const [orderData, setOrderData] = useState([]);
     const admin_id = localStorage.getItem("admin_id");
     const [users, setUsers] = useState([]);
+  const [allpayments, setAllpayments] = useState([]);
+
     // const [selectedFilters, setSelectedFilters] = useState({
     //     All: false,
     //     Received: false,
@@ -43,6 +45,8 @@ const Home_Pedidos = () => {
         getAllorder();
         getSector();
         getUser();
+        fetchAllpayment();
+
     }, [])
 
     useEffect(() => {
@@ -51,6 +55,24 @@ const Home_Pedidos = () => {
 
         // setIsProcessing(false);
     }, [orderAlldata, sectordata, boxes])
+    const fetchAllpayment = async () => {
+        setIsProcessing(true);
+        try {
+          const response = await axios.post(
+            `${apiUrl}/get-payments`, { admin_id: admin_id },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
+          setAllpayments(response.data.result);
+    
+        } catch (error) {
+          console.error("Error fetching boxes:", error);
+        }
+        setIsProcessing(false);
+      }
 
     const getUser = async () => {
         // setIsProcessing(true);
@@ -544,8 +566,10 @@ const Home_Pedidos = () => {
                                                 <td className='b_text_w  bj-delivery-text-2'>{order.box}</td>
                                                 {/* <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center ${order.estado === 'Recibido' ? 'b_indigo' : order.estado === 'Preparado' ? 'b_ora ' : order.estado === 'Entregado' ? 'b_blue' : order.estado === 'Finalizado' ? 'b_green' : order.estado === 'Retirar' ? 'b_indigo' : order.estado === 'Local' ? 'b_purple' : 'text-danger'}`}>{order.estado}</td> */}
                                                 <td className={`bj-delivery-text-2  b_btn1 mb-3 ms-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
-                                                        ${order.status.toLowerCase() === 'received' ? 'b_indigo' : order.status.toLowerCase() === 'prepared' ? 'b_ora' : order.status.toLowerCase() === 'delivered' ? 'b_blue' : order.status.toLowerCase() === 'finalized' ? 'b_green' : order.status.toLowerCase() === 'withdraw' ? 'b_indigo' : order.status.toLowerCase() === 'local' ? 'b_purple' : 'text-danger'}`}>
-                                                    {order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : ' '}
+                                                        ${allpayments.some(payment => payment.order_master_id === order.id)&& order?.status.toLowerCase() === 'delivered' ? 'b_blue' : 
+                                                        order.status.toLowerCase() === 'received' ? 'b_indigo' : order.status.toLowerCase() === 'prepared' ? 'b_ora' : order.status.toLowerCase() === 'delivered' ? 'b_blue' : order.status.toLowerCase() === 'finalized' ? 'b_green' : order.status.toLowerCase() === 'withdraw' ? 'b_indigo' : order.status.toLowerCase() === 'local' ? 'b_purple' : 'text-danger'}`}>
+                                                    {allpayments.some(payment => payment.order_master_id === order.id)&& order.status.toLowerCase() === 'delivered' ? 'Pagado' : 
+                                                    order.status.toLowerCase() === 'received' ? 'Recibido' : order.status.toLowerCase() === 'prepared' ? 'Preparado ' : order.status.toLowerCase() === 'delivered' ? 'Entregado' : order.status.toLowerCase() === 'finalized' ? 'Finalizado' : order.status.toLowerCase() === 'withdraw' ? 'Retirar' : order.status.toLowerCase() === 'local' ? 'Local' : ' '}
                                                 </td>
                                                 <td className=' bj-delivery-text-2'>{new Date(order.created_at).toLocaleDateString('en-GB')}</td>
                                                 <td className=' bj-delivery-text-2'>{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>

@@ -207,13 +207,19 @@ const Tables = () => {
   // Modify handleChange function
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAddsector({
-      ...addsector,
-      [name]: value
-    });
+
+
+    addsector[name] = value;
+    // setAddsector({
+    //   ...addsector,
+    //   [name]: value
+    // });
     // Clear error when user types
-    setCreateErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    if(createErrors[name]){
+      setCreateErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    }
   };
+
   const handleNewTableChange = (e) => {
     const { name, value } = e.target;
     setNewTable((prev) => ({
@@ -468,10 +474,13 @@ const Tables = () => {
   //edit sector
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setSelectedFamily((prevFamily) => ({
-      ...prevFamily,
-      [name]: value
-    }));
+
+    selectedFamily[name] = value;
+
+    // setSelectedFamily((prevFamily) => ({
+    //   ...prevFamily,
+    //   [name]: value
+    // }));
   };
 
   const hundleEditDeletePop = (sector) => {
@@ -1201,7 +1210,7 @@ const Tables = () => {
                           className="form-control j-table_input"
                           id="exampleFormControlInput1"
                           placeholder="Eje. Sector 1"
-                          value={addsector.name}
+                          // value={addsector.name}
                           name="name"
                           onChange={handleChange}
                         />
@@ -1224,7 +1233,7 @@ const Tables = () => {
                           id="exampleFormControlInput1"
                           placeholder="0"
                           name="noOfTables"
-                          value={addsector.noOfTables}
+                          // value={addsector.noOfTables}
                           onChange={handleChange}
                         />
                         {createErrors.noOfTables && (
@@ -1305,6 +1314,7 @@ const Tables = () => {
                   <div className="py-3 m_borbot ms-3 pe-3 me-3 ">
                     {Array.isArray(checkboxes) ? (
                       checkboxes.map((item, index) => (
+                        // console.log(item),
                         <div key={item.id}>
                           <div className="d-flex justify-content-between align-items-center">
                             <div className="text-nowrap">
@@ -1564,7 +1574,7 @@ const Tables = () => {
                 className="form-control j-table_input"
                 id="exampleFormControlInput1"
                 placeholder="Sector 1"
-                value={selectedFamily.name}
+                defaultValue={selectedFamily.name}
                 name="name"
                 onChange={handleEditChange}
               />
@@ -1587,7 +1597,7 @@ const Tables = () => {
                 id="exampleFormControlInput1"
                 placeholder="10"
                 name="noOfTables"
-                value={selectedFamily.noOfTables}
+                defaultValue={selectedFamily.noOfTables}
                 onChange={handleEditChange}
                 disabled
               />

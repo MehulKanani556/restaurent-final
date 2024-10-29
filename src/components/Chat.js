@@ -27,7 +27,7 @@ const styles = {
         gap: "16px",
         left: "621px",
         width: "67%",
-        height: "612px",
+        height: "calc(100vh - 320px)",
         overflowY: "auto",
         textAlign: "left",
         fontSize: "14px",
@@ -99,6 +99,9 @@ const styles = {
         padding: "2px 6px",
         borderRadius: "4px",
         fontWeight: "500",
+    },
+    messageSubgroup: {
+        marginBottom: '8px',
     }
 };
 
@@ -248,13 +251,13 @@ const Chat = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             // Clear both the ref value and the input field
             inputTextRef.current = '';
             if (inputFieldRef.current) {
                 inputFieldRef.current.value = '';
             }
-            
+
             fetchMessages();
             fetchAllUsers();
         } catch (error) {
@@ -280,7 +283,7 @@ const Chat = () => {
             try {
                 await axios.post(`${apiUrl}/mark-as-read`, {
                     chat_id: cardIds,
-                    admin_id:admin_id
+                    admin_id: admin_id
                 });
                 fetchAllUsers();
                 // console.log('Marked as read successfully');
@@ -314,6 +317,7 @@ const Chat = () => {
             return <div style={{ display: 'grid', placeItems: 'center' }}><p>No hay mensajes disponibles.</p></div>;
         }
 
+        // Group messages by date first
         const messageGroups = messages.reduce((acc, message) => {
             const date = getMessageDate(message.created_at);
             if (!acc[date]) acc[date] = [];
@@ -321,21 +325,86 @@ const Chat = () => {
             return acc;
         }, {});
 
-        return Object.entries(messageGroups).map(([date, dateGroup]) => (
-            <div key={date}>
-                <p style={styles.date}><span style={styles.dateSpan}>{date}</span></p>
-                {dateGroup.map((message, index) => renderMessage(message, index))}
-            </div>
-        ));
+        return Object.entries(messageGroups).map(([date, dateGroup]) => {
+            // Group messages by sender and consecutive timing
+            let currentSender = null;
+            let currentTime = null;
+            let messageSubgroups = [];
+            let currentSubgroup = [];
+
+            dateGroup.forEach((message) => {
+                const messageTime = new Date(message.created_at).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false 
+                });
+                
+                // Start a new subgroup if:
+                // 1. Different sender
+                // 2. Same sender but time difference > 5 minutes
+                const shouldStartNewGroup = 
+                    currentSender !== message.sender_id ||
+                    (currentTime && getTimeDifferenceInMinutes(currentTime, messageTime) > 5);
+
+                if (shouldStartNewGroup && currentSubgroup.length > 0) {
+                    messageSubgroups.push([...currentSubgroup]);
+                    currentSubgroup = [];
+                }
+
+                currentSubgroup.push({
+                    ...message,
+                    showTime: shouldStartNewGroup // Only show time for first message in group
+                });
+                
+                currentSender = message.sender_id;
+                currentTime = messageTime;
+            });
+
+            // Push the last subgroup
+            if (currentSubgroup.length > 0) {
+                messageSubgroups.push(currentSubgroup);
+            }
+
+            return (
+                <div key={date} className="overflow-hidden">
+                    <p style={styles.date}><span style={styles.dateSpan}>{date}</span></p>
+                    {messageSubgroups.map((subgroup, groupIndex) => (
+                        <div key={`${date}-${groupIndex}`} className="message-subgroup">
+                            {subgroup.map((message, messageIndex) => (
+                                <div key={message.id}>
+                                    {message.sender_id == userId ? (
+                                        <ChatBubble 
+                                            details={{
+                                                ...message,
+                                                showTime: message.showTime
+                                            }}
+                                        />
+                                    ) : (
+                                        message.receiver_id == userId || 
+                                        message.group_id == selectedContact?.pivot?.group_id ? (
+                                            <Home_ChatBubble 
+                                                details={{
+                                                    ...message,
+                                                    showTime: message.showTime
+                                                }}
+                                                receiver={selectedContact}
+                                            />
+                                        ) : null
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            );
+        });
     };
 
-    const renderMessage = (message, index) => {
-        if (message.sender_id == userId) {
-            return <ChatBubble key={index} details={message} />;
-        } else if (message.receiver_id == userId || message.group_id == selectedContact?.pivot?.group_id) {
-            return <Home_ChatBubble key={index} details={message} receiver={selectedContact} />;
-        }
-        return null;
+    // Helper function to calculate time difference in minutes
+    const getTimeDifferenceInMinutes = (time1, time2) => {
+        const [hours1, minutes1] = time1.split(':').map(Number);
+        const [hours2, minutes2] = time2.split(':').map(Number);
+        return Math.abs((hours2 * 60 + minutes2) - (hours1 * 60 + minutes1));
     };
 
     const getMessageDate = (createdAt) => {
@@ -429,8 +498,9 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
     const sortedContacts = [...allUser]
         .filter(user => user.id != userId && user.name.toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a, b) => {
-            if (!a.messages.length || !b.messages.length) return 0;
-            return new Date(b.messages[0].created_at) - new Date(a.messages[0].created_at);
+            const aLastMessageDate = a.messages.length ? new Date(a.messages[0].created_at) : 0;
+            const bLastMessageDate = b.messages.length ? new Date(b.messages[0].created_at) : 0;
+            return bLastMessageDate - aLastMessageDate; // Sort by last message date
         });
 
     return (
@@ -511,11 +581,14 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                         return (
                             <div key={ele.id} className={`sjcontacts-list ${selectedContact?.email === ele.email ? 'jchat-active' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleContactClick(ele)} >
                                 <div className={`sjcontact-item `}>
-                                    <div className="sjavatar me-2" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
-                                        {onlineUsers?.map((v) => v.id == ele.id && <div className="sjonline-status"></div>)}
-                                        {ele.name.split(' ')
-                                            .map(word => word.charAt(0).toUpperCase())
-                                            .join('')}
+                                    <div>
+
+                                        <div className="sjavatar me-1" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                            {onlineUsers?.map((v) => v.id == ele.id && <div className="sjonline-status"></div>)}
+                                            {ele.name.split(' ')
+                                                .map(word => word.charAt(0).toUpperCase())
+                                                .join('')}
+                                        </div>
                                     </div>
                                     <div className="sjcontact-info">
                                         <div className="sjcontact-name text-nowrap">{ele.name}</div>
@@ -543,20 +616,20 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
     );
 };
 
-const ChatWindow = ({ 
-    selectedContact, 
+const ChatWindow = ({
+    selectedContact,
     inputTextRef,
     inputFieldRef,
-    handleInputChange, 
-    handleKeyPress, 
-    sendMessage, 
-    renderMessageGroups, 
-    onlineUsers, 
+    handleInputChange,
+    handleKeyPress,
+    sendMessage,
+    renderMessageGroups,
+    onlineUsers,
     isLoading,
     messages // Receive messages as a prop
 }) => {
     const messagesEndRef = useRef(null);
-// console.log("aisss",messages)
+    // console.log("aisss",messages)
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
     };
@@ -592,7 +665,7 @@ const ChatWindow = ({
                 </div>
             </div>
 
-            <div className="w-100" style={{ overflowY: 'auto' }}>
+            <div className="w-100 " style={{ overflowY: 'auto' }}>
                 {isLoading && <p>Loading messages...</p>}
                 {renderMessageGroups()}
                 <div ref={messagesEndRef} />
@@ -609,25 +682,25 @@ const ChatWindow = ({
                         gap: "12px",
                         marginBottom: "12px",
                     }}>
-                        <button 
+                        <button
                             onClick={() => {
                                 inputTextRef.current = 'Hola ¿Cómo estas?';
                                 if (inputFieldRef.current) {
                                     inputFieldRef.current.value = 'Hola ¿Cómo estas?';
                                 }
-                            }} 
-                            className="j_chat_default_button" 
+                            }}
+                            className="j_chat_default_button"
                             style={styles.button}
                         >
                             Hola ¿Cómo estas?
                         </button>
-                        <button 
+                        <button
                             onClick={() => {
                                 inputTextRef.current = 'Corregir pedido';
                                 if (inputFieldRef.current) {
                                     inputFieldRef.current.value = 'Corregir pedido';
                                 }
-                            }} 
+                            }}
                             style={styles.button}
                         >
                             Corregir pedido

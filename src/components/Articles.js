@@ -31,9 +31,24 @@ export default function Articles() {
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => {
     setShow1(false);
-    setErrorMessages({});
+    // resetForm();
   };
   const handleShow1 = () => setShow1(true);
+
+  // const resetForm = () => {
+  //   formRef.current = {
+  //     name: "",
+  //     code: "",
+  //     production_center_id: "",
+  //     cost_price: "",
+  //     sale_price: "",
+  //     family_id: "",
+  //     sub_family_id: "",
+  //     description: ""
+  //   };
+  //   setSelectedFile(null);
+  //   setErrorMessages({});
+  // };
 
   // Add product success
   const [show1AddSuc, setShow1AddSuc] = useState(false);
@@ -589,9 +604,10 @@ export default function Articles() {
   };
 
   // Add Product
-  const [formData, setFormData] = useState({
+  // Replace formData state with refs
+  const formRef = useRef({
     name: "",
-    code: "", // Default to 1 if obj1 is empty
+    code: "",
     production_center_id: "",
     cost_price: "",
     sale_price: "",
@@ -599,35 +615,31 @@ export default function Articles() {
     sub_family_id: "",
     description: ""
   });
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [uploadedFile, setUploadedFile] = useState();
   const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [errorMessages, setErrorMessages] = useState({});
 
+  // Update the handleInputChange function
   const handleInputChange = (e) => {
-    if (!e || !e.target) {
-      console.error("Invalid event object passed to handleInputChange");
-      return;
-    }
-
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    formRef.current[name] = value;
 
-    // Clear the error for this field when the user types
+    // Clear error for this field
     if (errorMessages[name]) {
-      setErrorMessages((prevErrors) => ({
-        ...prevErrors,
+      setErrorMessages(prev => ({
+        ...prev,
         [name]: ""
       }));
     }
 
-    // Clear sale price error when cost price or sale price changes
-    if (name === "cost_price" || name === "sale_price") {
-      setErrorMessages((prevErrors) => ({
-        ...prevErrors,
-        sale_price: ""
-      }));
-    }
+    // // Clear sale price error when cost price or sale price changes
+    // if (name === "cost_price" || name === "sale_price") {
+    //   setErrorMessages(prev => ({
+    //     ...prev,
+    //     sale_price: ""
+    //   }));
+    // }
   };
 
   const handleFileChange = (e) => {
@@ -659,121 +671,100 @@ export default function Articles() {
     setUploadedFile(null);
   };
 
-  const [errorMessages, setErrorMessages] = useState("");
-  const handleSelectChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-
-    // Clear the error for this field when the user selects an option
-    if (errorMessages[name]) {
-      setErrorMessages((prevErrors) => ({
-        ...prevErrors,
-        [name]: ""
-      }));
-    }
-
-    // If it's the family select, also clear the subfamily error
-    if (name === "family_id") {
-      setErrorMessages((prevErrors) => ({
-        ...prevErrors,
-        sub_family_id: ""
-      }));
-      getSubFamilies(); // Assuming this function needs to be called on change
-    }
-  };
-  const validate = async () => {
-    // Validation
+  // Update the validate function
+  const validate = () => {
+    const formData = formRef.current;
     let errors = {};
 
-    // Name validation
     if (!formData.name.trim()) {
       errors.name = "El nombre es obligatorio";
     }
 
-
-    // Production center validation
     if (!formData.production_center_id) {
       errors.production_center_id = "El centro de producción es obligatorio";
     }
 
-    // Cost price validation
     if (!formData.cost_price.trim() || isNaN(parseFloat(formData.cost_price))) {
       errors.cost_price = "El precio de costo debe ser un número válido";
     }
 
-    // Sale price validation
     if (!formData.sale_price.trim() || isNaN(parseFloat(formData.sale_price))) {
       errors.sale_price = "El precio de venta debe ser un número válido";
     } else {
-      // Check if sale price is not lower than cost price
       const costPrice = parseFloat(formData.cost_price);
       const salePrice = parseFloat(formData.sale_price);
       if (salePrice < costPrice) {
-        errors.sale_price =
-          "El precio de venta no puede ser menor que el precio de costo";
+        errors.sale_price = "El precio de venta no puede ser menor que el precio de costo";
       }
     }
 
-    // Family validation
     if (!formData.family_id) {
       errors.family_id = "La familia es obligatoria";
     }
 
-    // Subfamily validation
     if (!formData.sub_family_id) {
       errors.sub_family_id = "La subfamilia es obligatoria";
     }
 
-    // Image validation
     if (!selectedFile) {
       errors.image = "Se requiere una imagen";
-    } else if (selectedFile.size > 2 * 1024 * 1024) {
-      // 2MB in bytes
-      errors.image = "El tamaño de la imagen debe ser inferior a 2 MB.";
     }
 
-    // If there are errors, set them and return false
+    // Set errors if any
     if (Object.keys(errors).length > 0) {
       setErrorMessages(errors);
       return false;
     }
 
-    // If no errors, return true
     return true;
   };
 
-
+  // Update form submission
   const handleFormSubmit = async (e) => {
-    const isValid = await validate();
+    e.preventDefault();
+    const isValid = validate();
 
-    if (!isValid) {
-      return; // Stop here if validation failed
-    }
+    if (!isValid) return;
 
-    // If validation passed, proceed with form submission
-    handleClose1(); // Close the model first
-    setIsProcessing(true); // Then show processing model
-    const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
+    handleClose1();
+    setIsProcessing(true);
+
+    // Create FormData object
+    const formData = new FormData();
+    console.log(formRef.current);
+    
+    // Append all form fields to FormData
+    Object.keys(formRef.current).forEach(key => {
+      if (formRef.current[key]) { // Only append if value exists
+        formData.append(key, formRef.current[key]);
+      }
     });
+    console.log(formData);
+    // Append image file if selected
     if (selectedFile) {
-      data.append("image", selectedFile);
-      data.append("code", 100)
+      formData.append("image", selectedFile);
     }
+
+    // Log FormData entries for debugging
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+
     try {
-      const response = await axios.post(`${apiUrl}/item/create`, data, {
+      const response = await axios.post(`${apiUrl}/item/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`
         }
       });
-      if (response.status === 200) {
+
+      if (response.data.success) {
         setUploadedFile(response.data.file);
         handleShow1AddSuc();
         fetchAllItems();
-        // Reset form data and errors after successful submission
-        setFormData({
+        
+        // Reset form
+        formRef.current = {
           name: "",
           code: "",
           production_center_id: "",
@@ -782,20 +773,19 @@ export default function Articles() {
           family_id: "",
           sub_family_id: "",
           description: ""
-        });
-        setSelectedFile("")
+        };
+        setSelectedFile(null);
         setErrorMessages({});
-        //enqueueSnackbar (response.data?.notification, { variant: 'success' })
-        // playNotificationSound();;
       }
-    } catch (er) {
-      setErrorMessages({ general: er.response.data.errors.code });
-      //enqueueSnackbar (er.response.data?.alert, { variant: 'error' })
-      // playNotificationSound();;
+    } catch (error) {
+      setErrorMessages({ 
+        general: error.response?.data?.errors?.code || "Error creating item" 
+      });
     } finally {
       setIsProcessing(false);
     }
   };
+
   // Handle family selection change
 
   // Handle family selection change
@@ -1544,7 +1534,7 @@ export default function Articles() {
                                   id="exampleFormControlInput1"
                                   placeholder="-"
                                   name="name"
-                                  value={formData.name}
+                                  defaultValue={formRef.current.name}
                                   onChange={handleInputChange}
                                 />
                                 {errorMessages.name && (
@@ -1568,14 +1558,9 @@ export default function Articles() {
                                   id="exampleFormControlInput2"
                                   name="code"
                                   placeholder=""
-
+                                  defaultValue={formRef.current.code}
                                   disabled
                                 />
-                                {errorMessages.code && (
-                                  <div className="text-danger errormessage">
-                                    {errorMessages.code}
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -1589,12 +1574,11 @@ export default function Articles() {
                               </label>
                               <select
                                 className="form-select m_input"
-                                aria-label="Default select example"
                                 name="production_center_id"
-                                value={formData.production_center_id}
+                                defaultValue={formRef.current.production_center_id}
                                 onChange={handleInputChange}
                               >
-                                <option selected>Seleccionar</option>
+                                <option value="">Seleccionar</option>
                                 {productionSel?.map((ele) => (
                                   <option key={ele.id} value={ele.id}>
                                     {ele.name}
@@ -1623,7 +1607,7 @@ export default function Articles() {
                                   id="exampleFormControlInput4"
                                   name="cost_price"
                                   placeholder="$0.00"
-                                  value={formData.cost_price}
+                                  defaultValue={formRef.current.cost_price}
                                   onChange={handleInputChange}
                                 />
                                 {errorMessages.cost_price && (
@@ -1647,7 +1631,7 @@ export default function Articles() {
                                   id="exampleFormControlInput5"
                                   placeholder="$0.00"
                                   name="sale_price"
-                                  value={formData.sale_price}
+                                  defaultValue={formRef.current.sale_price}
                                   onChange={handleInputChange}
                                 />
                                 {errorMessages.sale_price && (
@@ -1669,25 +1653,20 @@ export default function Articles() {
                                 </label>
                                 <select
                                   className="form-select m_input"
-                                  aria-label="Default select example"
                                   name="family_id"
                                   id="family"
-                                  value={formData.family_id}
+                                  defaultValue={formRef.current.family_id}
                                   onChange={(e) => {
                                     const selectedFamilyId = e.target.value;
-                                    setFormData({
-                                      ...formData,
-                                      family_id: selectedFamilyId
-                                    });
-                                    getSubFamilies(); // Assuming this function needs to be called on change
-                                    // Clear the error message for the family field
-                                    setErrorMessages(prevErrors => ({
-                                      ...prevErrors,
+                                    formRef.current.family_id = selectedFamilyId;
+                                    getSubFamilies();
+                                    setErrorMessages(prev => ({
+                                      ...prev,
                                       family_id: ''
                                     }));
                                   }}
                                 >
-                                  <option selected>Seleccionar</option>
+                                  <option value="">Seleccionar</option>
                                   {families?.map((family) => (
                                     <option key={family.id} value={family.id}>
                                       {family.name}
@@ -1711,17 +1690,13 @@ export default function Articles() {
                                 </label>
                                 <select
                                   className="form-select m_input"
-                                  aria-label="Default select example"
                                   name="sub_family_id"
-                                  value={formData.sub_family_id}
+                                  defaultValue={formRef.current.sub_family_id}
                                   onChange={handleInputChange}
                                 >
-                                  <option selected>Seleccionar</option>
+                                  <option value="">Seleccionar</option>
                                   {subFamilies?.map((subFamily) => (
-                                    <option
-                                      key={subFamily.id}
-                                      value={subFamily.id}
-                                    >
+                                    <option key={subFamily.id} value={subFamily.id}>
                                       {subFamily.name}
                                     </option>
                                   ))}
@@ -1748,7 +1723,7 @@ export default function Articles() {
                                 id="exampleFormControlInput8"
                                 name="description"
                                 placeholder="-"
-                                value={formData.description}
+                                defaultValue={formRef.current.description}
                                 onChange={handleInputChange}
                               />
                             </div>
@@ -1790,7 +1765,7 @@ export default function Articles() {
                                   </div>
                                 ) : (
                                   <div
-                                    className="m_file-upload .m_file-upload1"
+                                    className="m_file-upload"
                                     onClick={() => fileInputRef.current.click()}
                                   >
                                     <input
@@ -1839,9 +1814,7 @@ export default function Articles() {
                         <Button
                           variant="primary"
                           style={{ backgroundColor: "#147BDE" }}
-                          onClick={(e) => {
-                            handleFormSubmit(e);
-                          }}
+                          onClick={handleFormSubmit}
                         >
                           Agregar
                         </Button>

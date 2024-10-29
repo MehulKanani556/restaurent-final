@@ -12,7 +12,7 @@ const Home_ChatBubble = ({ details, receiver }) => {
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        padding: "0px 680px 0px 0px",
+        // padding: "0px 680px 0px 0px",
         boxSizing: "border-box",
         gap: "10px",
         maxWidth: "100%",
@@ -23,9 +23,19 @@ const Home_ChatBubble = ({ details, receiver }) => {
       }}
       className="j-right-padding"
     >
-      <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
-        {details.sender_name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
-      </div>
+      <div 
+                className={`sjavatar me-2 ${details.showTime ? 'roundedCircle' : ''}`} 
+                style={{ 
+                    backgroundColor: details.showTime ? "#ab7171" : "transparent", 
+                    textAlign: "center", 
+                    alignContent: "center", 
+                    fontWeight: "bold", 
+                    width: "35px", 
+                    height: "35px" 
+                }}
+            >
+                {details.showTime && details.sender_name.split(' ').map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "").join('')}
+            </div>
       <div
         style={{
           flex: "1",
@@ -35,6 +45,7 @@ const Home_ChatBubble = ({ details, receiver }) => {
           justifyContent: "flex-start",
           gap: "4px",
           minWidth: "125px",
+          maxWidth: "60%",
         }}
       >
         <div
@@ -53,9 +64,11 @@ const Home_ChatBubble = ({ details, receiver }) => {
               fontWeight: "600",
               display: "inline-block",
 
+
             }}
+            
           >
-            {details.sender_name}
+            {details.showTime && details.sender_name}
           </div>
           <div
             style={{
@@ -67,7 +80,15 @@ const Home_ChatBubble = ({ details, receiver }) => {
               whiteSpace: "nowrap",
             }}
           >
-            {new Date(details.created_at).getHours() + ":" + new Date(details.created_at).getMinutes()}
+            {details.showTime && (
+                <div className="message-time">
+                    {new Date(details.created_at).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    })}
+                </div>
+            )}
           </div>
         </div>
         <div
@@ -92,7 +113,7 @@ const Home_ChatBubble = ({ details, receiver }) => {
               padding: "16px",
             }}
           >
-            <div style={{ position: "relative", lineHeight: "150%" }}>
+            <div className="p-2" style={{ position: "relative", lineHeight: "150%" }}>
               {details.message}
             </div>
           </div>
