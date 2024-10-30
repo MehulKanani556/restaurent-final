@@ -772,7 +772,9 @@ const Usuarios = () => {
                                       </option>
                                     ))} */}
                                     {roles.map((role) => {
-                                      if (role.name !== 'admin') {
+                                      console.log();
+                                      
+                                      if (role.name !== 'admin'  && role.name !== 'superadmin') {
                                         return (
                                           <option key={role.id} value={role.id}>
                                             {roleNamesInSpanish[role.id] || role.name}
@@ -1221,7 +1223,7 @@ const Usuarios = () => {
                             onChange={handleChange}
                           >
                             {roles.map((role) => {
-                              if (role.name !== 'admin') {
+                               if (role.name !== 'admin'  && role.name !== 'superadmin') {
                                 return (
                                   <option key={role.id} value={role.id}>
                                     {roleNamesInSpanish[role.id] ||
@@ -1424,7 +1426,7 @@ const Usuarios = () => {
                   />
                   <p className="mb-0 mt-2 h6">
                     {" "}
-                    ¿Quieres activar a esta usuaria?
+                    ¿Quieres activar a esta Usuario?
                   </p>
                 </div>
               </Modal.Body>

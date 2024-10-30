@@ -24,6 +24,7 @@ const DeliveryDots = () => {
     const [orderType, setOrderType] = useState(
         JSON.parse(localStorage.getItem("currentOrder")) || []
     );
+    const [orderTypeError,setOrderTypeError] = useState("")
 
     const navigate = useNavigate();
     // const { state} = useLocation();
@@ -48,7 +49,7 @@ const DeliveryDots = () => {
         if (noteInputRefs.current[index]) {
             noteInputRefs.current[index].value = newNote;
         }
-        
+
         // Debounce the state update to reduce re-renders
         const timeoutId = setTimeout(() => {
             setCartItems(prevItems => {
@@ -76,7 +77,7 @@ const DeliveryDots = () => {
                 : item
         );
         setCartItems(updatedCartItems);
-        
+
         // Focus the input after state update
         setTimeout(() => {
             if (noteInputRefs.current[index]) {
@@ -202,7 +203,7 @@ const DeliveryDots = () => {
     const handleFinishEditing = (index) => {
         // Get final value from ref
         const finalNote = noteInputRefs.current[index]?.value || "";
-        
+
         setCartItems(prevItems => {
             const updatedItems = [...prevItems];
             updatedItems[index] = {
@@ -235,9 +236,9 @@ const DeliveryDots = () => {
         return (
             <div>
                 {item.note ? (
-                    <p 
-                        className="j-nota-blue" 
-                        style={{ cursor: "pointer" }} 
+                    <p
+                        className="j-nota-blue"
+                        style={{ cursor: "pointer" }}
                         onClick={() => handleAddNoteClick(index)}
                     >
                         {item.note}
@@ -290,7 +291,7 @@ const DeliveryDots = () => {
     // Update handleInputChange to properly handle select elements
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        
+
         // Update formData state for select elements
         if (name === 'ltda') {
             setFormData(prevData => ({
@@ -298,11 +299,11 @@ const DeliveryDots = () => {
                 ltda: value
             }));
         }
-        
+
         // Check if the ref exists before accessing current
         if (formRefs[name]) {
             formRefs[name].current.value = value;
-            
+
             // Clear errors for the specific field
             if (errors[name] || (name === 'bname' && errors.business_name)) {
                 setErrors(prevErrors => ({
@@ -321,7 +322,7 @@ const DeliveryDots = () => {
             value = value.slice(0, 6) + "-" + value.slice(6);
         }
         rutRef.current.value = value;
-        
+
         // Only clear RUT error if it exists
         if (errors.rut) {
             setErrors(prevErrors => ({
@@ -332,7 +333,7 @@ const DeliveryDots = () => {
     };
 
     console.log("sasdasd");
-    
+
 
     // ***************************************************API**************************************************
     // form
@@ -351,9 +352,9 @@ const DeliveryDots = () => {
     const collectAccordionData = () => {
         const commonData = {
             receiptType: selectedRadio,
-            rut: selectedRadio === "1" ? formRefs.rut1.current.value : 
-                 selectedRadio === "2" ? formRefs.rut2.current.value : 
-                 formRefs.rut3.current.value,
+            rut: selectedRadio === "1" ? formRefs.rut1.current.value :
+                selectedRadio === "2" ? formRefs.rut2.current.value :
+                    formRefs.rut3.current.value,
             firstname: formRefs.fname.current.value,
             lastname: formRefs.lname.current.value,
             tour: formRefs.tour.current.value,
@@ -393,7 +394,7 @@ const DeliveryDots = () => {
         // Business name validation for receipt type 4
         if (data.receiptType === "3") {
             if (!data.business_name || data.business_name.trim() === "") {
-                newErrors.business_name= "Se requiere el nombre de la empresa";
+                newErrors.business_name = "Se requiere el nombre de la empresa";
             }
             if (!data.ltda || data.ltda === "0") {
                 newErrors.ltda = "Seleccione una opción";
@@ -420,6 +421,14 @@ const DeliveryDots = () => {
         // return errors;
     };
     const handleSubmit = () => {
+
+        if (!orderType || orderType?.orderType == 0) {
+            // console.log("Dgd");
+            // setOrderTypeError("Por favor seleccione tipo de pedido");
+            setOrderTypeError("Por favor seleccione un tipo de pedido");
+            return;
+          }
+
         const collectedData = collectAccordionData();
         const validationErrors = validateForm(collectedData);
 
@@ -444,6 +453,12 @@ const DeliveryDots = () => {
         setOrderType(storedOrder);
     }, []);
     const handleOrderTypeChange = (e) => {
+
+        if(e.target.value == 0){
+        setOrderTypeError("Por favor seleccione un tipo de pedido");
+        }else{
+            setOrderTypeError("");
+        }
         const newOrderType = e.target.value;
         const updatedOrder = { ...orderType, orderType: newOrderType };
         setOrderType(updatedOrder);
@@ -1145,10 +1160,26 @@ const DeliveryDots = () => {
                         style={{ top: "77px" }}
                     >
                         <div className="j_position_fixed j_b_hd_width ak-position">
-                            <h2 className="text-white j-tbl-text-13">Resumen</h2>
+                            {/* <h2 className="text-white j-tbl-text-13">Resumen</h2> */}
                             <div className="j-counter-price-data ak-w-100">
-                            <h3 className="text-white mt-3 j-tbl-text-13 ak-w-100">Datos</h3>
-                                <div className="b-date-time b_date_time2 d-flex flex-wrap column-gap-3 me-2 justify-content-end text-white">
+                                <div className="b-summary-center mb-4 align-items-center text-white d-flex justify-content-between">
+                                    {/* <div className="j_position_fixed j_b_hd_width"> */}
+                                    <h2 class="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
+                                    {/* <FaXmark className="b-icon" /> */}
+                                </div>
+                                <div className="b-date-time d-flex flex-wrap column-gap-3 align-items-center justify-content-end text-white">
+                                    <div>
+                                        <FaCalendarAlt className="mb-1" />
+                                        <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
+                                    </div>
+                                    <div>
+                                        <MdOutlineAccessTimeFilled className="mb-1" />
+                                        <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </div>
+                                </div>
+                                <h3 className="text-white j-kds-body-text-1000 ak-w-100">Datos</h3>
+                                {/* <h3 className="text-white mt-3 j-tbl-text-13 ak-w-100">Datos</h3> */}
+                                {/* <div className="b-date-time b_date_time2 d-flex flex-wrap column-gap-3 me-2 justify-content-end text-white">
                                     <div>
                                         <FaCalendarAlt className="mb-2" />
                                         <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
@@ -1157,8 +1188,8 @@ const DeliveryDots = () => {
                                         <MdOutlineAccessTimeFilled className="mb-2" />
                                         <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                     </div>
-                                </div>
-                                <div className="j_td_center ak-w-100">
+                                </div> */}
+                                {/* <div className="j_td_center ak-w-100">
                                     <div className="j-busy-table j_busy_table_last d-flex align-items-center">
                                         <div className=''>
                                             <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
@@ -1166,10 +1197,10 @@ const DeliveryDots = () => {
                                                 {orderType?.orderType?.toLowerCase() === 'local' ? 'Local' : orderType?.orderType?.toLowerCase().includes("with") ? 'Retiro ' : orderType?.orderType?.toLowerCase() === 'delivery' ? 'Entrega' : orderType?.orderType?.toLowerCase() === 'uber' ? 'Uber' : orderType?.orderType}
                                             </div>
                                         </div>
-                                        {/* <div className="j-b-table" /> */}
-                                        {/* <p className="j-table-color j-tbl-font-6">Ocupado</p> */}
+                                        <div className="j-b-table" />
+                                        <p className="j-table-color j-tbl-font-6">Ocupado</p>
                                     </div>
-                                    {/* <div className="b-date-time b_date_time2  d-flex align-items-center">
+                                    <div className="b-date-time b_date_time2  d-flex align-items-center">
                                         <svg
                                             class="j-canvas-svg-i"
                                             aria-hidden="true"
@@ -1189,11 +1220,55 @@ const DeliveryDots = () => {
                                         <p className="mb-0 ms-2 me-3 text-white j-tbl-font-6">
                                             {elapsedTime}
                                         </p>
-                                    </div> */}
+                                    </div>
 
-                                </div>
+                                </div> */}
                                 <div className="j-counter-price-data">
-                                <div className="j-orders-inputs j_td_inputs ak-w-100">
+                                    <form className="d-flex">
+                                        <div className="j-orders-type ak-w-50">
+                                            <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
+                                                Tipo pedido
+                                            </label>
+                                            <select
+                                                className="form-select j-input-name-2 j-input-name-23 ak-input"
+                                                onChange={handleOrderTypeChange}
+                                                value={orderType.orderType}
+                                            // value={orType.orderType}
+                                            >
+                                                <option value="0">Seleccionar</option>
+                                                <option value="delivery">Entrega</option>
+                                                <option value="local">Local</option>
+                                                <option value="withdraw">Retirar</option>
+                                            </select>
+                                            {orderTypeError && (
+                                                <div className="text-danger errormessage">{orderTypeError}</div>
+                                            )}
+                                        </div>
+                                        <div className="align-content-end mt-2 ak-w-50">
+                                            {/* {console.log(orderType)} */}
+                                            
+                                            {(orderType && orderType.orderType != 0) && <div
+                                                className={`bj-delivery-text-2  b_btn1 m-1 p-2 ${orderType.orderType?.toLowerCase() === 'local'
+                                                    ? 'b_indigo'
+                                                    : orderType.orderType?.toLowerCase() === 'delivery'
+                                                        ? 'b_blue'
+                                                        : orderType.orderType?.toLowerCase().includes("with")
+                                                            ? 'b_purple'
+                                                            : 'b_ora text-danger'
+                                                    }`}
+                                            >
+                                                {orderType.orderType?.toLowerCase() === 'local'
+                                                    ? 'Local'
+                                                    : orderType.orderType?.toLowerCase().includes("with")
+                                                        ? 'Retirar'
+                                                        : orderType.orderType?.toLowerCase() === 'delivery'
+                                                            ? 'Entrega'
+                                                            : orderType.orderType}
+                                            </div>}
+
+                                        </div>
+                                    </form>
+                                    {/* <div className="j-orders-inputs j_td_inputs ak-w-100">
                                         <div className="j-orders-code ak-w-100">
                                             <label className="j-label-name text-white mb-2 j-tbl-btn-font-1">
                                                 Quién registra
@@ -1209,7 +1284,7 @@ const DeliveryDots = () => {
                                                 />
                                             </div>
                                         </div>
-                                        {/* <div className="j-orders-code">
+                                        <div className="j-orders-code">
                                             <label className="j-label-name j-tbl-btn-font-1 text-white mb-2">
                                             Personas
                                             </label>
@@ -1222,8 +1297,8 @@ const DeliveryDots = () => {
 
                                                 />
                                             </div>
-                                        </div> */}
-                                    </div>
+                                        </div>
+                                    </div> */}
                                     <div className="j-counter-order ak-w-100">
                                         {cartItems.length === 0 ? (
                                             <div>

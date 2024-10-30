@@ -176,10 +176,11 @@ export default function Home_Pedidos_paymet() {
   }, [orderData, items, show1Prod]);
 
   useEffect(() => {
-    if (user && roles.length > 0) {
-      getuserRole();
+    if (user) {
+      setUserRole(user.name)
+      // getuserRole();
     }
-  }, [user, roles]);
+  }, [user]);
 
   useEffect(() => {
     getPaymentsData();
@@ -325,12 +326,16 @@ export default function Home_Pedidos_paymet() {
   const getUser = async () => {
     setIsProcessing(true);
     try {
+      console.log(orderData.user_id);
+      
       const response = await axios.get(`${apiUrl}/get-user/${orderData.user_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setUser(response.data);
+      // console.log(response.data[0]);
+      
+      setUser(response.data[0]);
     } catch (error) {
       console.error(
         "Error fetching user:",
@@ -359,14 +364,14 @@ export default function Home_Pedidos_paymet() {
     setIsProcessing(false);
   };
 
-  const getuserRole = () => {
-    if (user && roles.length > 0) {
-      const role = roles?.find((v) => v.id === user[0]?.role_id);
-      if (role) {
-        setUserRole(role.name);
-      }
-    }
-  };
+  // const getuserRole = () => {
+  //   if (user && roles.length > 0) {
+  //     const role = roles?.find((v) => v.id === user[0]?.role_id);
+  //     if (role) {
+  //       setUserRole(role.name);
+  //     }
+  //   }
+  // };
 
   const handleOrderDetails = () => {
     // Check if orderData is not null before accessing its properties

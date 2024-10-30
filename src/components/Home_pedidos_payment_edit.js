@@ -128,10 +128,10 @@ const Home_pedidos_payment_edit = ({ item }) => {
     }, [orderData, items, show1Prod, deleteProductId]);
 
     useEffect(() => {
-        if (user && roles.length > 0) {
-            getuserRole();
+        if (user) {
+            setUserRole(user.name);
         }
-    }, [user, roles]);
+    }, [user]);
 
     const getOrder = async () => {
         try {
@@ -214,7 +214,7 @@ const Home_pedidos_payment_edit = ({ item }) => {
                 },
             });
             // console.log(response.data);
-            setUser(response.data);
+            setUser(response.data[0]);
         } catch (error) {
             console.error(
                 "Error fetching user:",
@@ -241,14 +241,14 @@ const Home_pedidos_payment_edit = ({ item }) => {
         }
     };
 
-    const getuserRole = () => {
-        if (user && roles.length > 0) {
-            const role = roles.find((v) => v.id === user[0]?.role_id);
-            if (role) {
-                setUserRole(role.name);
-            }
-        }
-    };
+    // const getuserRole = () => {
+    //     if (user && roles.length > 0) {
+    //         const role = roles.find((v) => v.id === user[0]?.role_id);
+    //         if (role) {
+    //             setUserRole(role.name);
+    //         }
+    //     }
+    // };
 
     const getFamily = async () => {
         try {

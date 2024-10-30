@@ -15,7 +15,6 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 
 const BHomeDelivery = () => {
 
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -37,7 +36,7 @@ const BHomeDelivery = () => {
   const [lastOrder, setLastOrder] = useState([]);
   const [isEditing, setIsEditing] = useState([]);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [orderType, setOrderType] = useState("delivery");
+  const [orderType, setOrderType] = useState("");
   const [orType, setOrType] = useState([]);
   const [cname, setCName] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -432,11 +431,10 @@ const BHomeDelivery = () => {
   const placeNewOrder = async () => {
     console.log(orderType, cname);
 
-    if (!orderType || !userName) {
-      console.log("Dgd");
-
-      setOrderTypeError("Por favor ingrese su nombre");
-      // setOrderTypeError("Por favor seleccione un tipo de pedido");
+    if (!orderType || orderType == 0 || !userName) {
+      // console.log("Dgd");
+      // setOrderTypeError("Por favor seleccione tipo de pedido");
+      setOrderTypeError("Por favor seleccione un tipo de pedido");
       return;
     }
 
@@ -637,9 +635,9 @@ const BHomeDelivery = () => {
     return (
       <div>
         {item.note ? (
-          <p 
-            className="j-nota-blue" 
-            style={{ cursor: "pointer" }} 
+          <p
+            className="j-nota-blue"
+            style={{ cursor: "pointer" }}
             onClick={() => handleAddNoteClick(index)}
           >
             {item.note}
@@ -776,26 +774,64 @@ const BHomeDelivery = () => {
             <div className="b-summary-center mb-4 align-items-center text-white d-flex justify-content-between">
               {/* <div className="j_position_fixed j_b_hd_width"> */}
               <h2 class="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
-              <FaXmark className="b-icon" />
+              {/* <FaXmark className="b-icon" /> */}
             </div>
             <div className="b-date-time d-flex flex-wrap column-gap-3 align-items-center justify-content-end text-white">
               <div>
-              <FaCalendarAlt className="mb-1" />
-              <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
+                <FaCalendarAlt className="mb-1" />
+                <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleDateString('en-GB')}</p>
               </div>
               <div>
-              <MdOutlineAccessTimeFilled className="mb-1"/>
-              <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <MdOutlineAccessTimeFilled className="mb-1" />
+                <p className="mb-0 ms-2 d-inline-block">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
               </div>
             </div>
-            <div className="b-delivery-button mt-2">
-              <button className="bj-delivery-text-2">Delivery</button>
-            </div>
-
-            <div className="j-counter-price-data mt-4 ak-w-100">
             <h3 className="text-white j-kds-body-text-1000 ak-w-100">Datos</h3>
-              <form>
-              <div className="mb-3 b-input-registers ak-w-100">
+            <div className="j-counter-price-data mt-3 ak-w-100">
+              <form className="d-flex">
+                <div className="j-orders-type ak-w-50">
+                  <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
+                    Tipo pedido
+                  </label>
+                  <select
+                    className="form-select j-input-name-2 j-input-name-23 ak-input"
+                    onChange={(e) => { setOrderType(e.target.value); setOrderTypeError('') }}
+                  // value={orType.orderType}
+                  >
+                    <option value="0">Seleccionar</option>
+                    <option value="delivery">Entrega</option>
+                    <option value="local">Local</option>
+                    <option value="withdraw">Retirar</option>
+                  </select>
+                  {orderTypeError && (
+                    <div className="text-danger errormessage">{orderTypeError}</div>
+                  )}
+                </div>
+                <div className="align-content-end mt-2 ak-w-50">
+                  {orderType != 0 && <div
+                    className={`bj-delivery-text-2  b_btn1 m-1 p-2 ${orderType.toLowerCase() === 'local'
+                      ? 'b_indigo'
+                      : orderType.toLowerCase() === 'delivery'
+                        ? 'b_blue'
+                        : orderType.toLowerCase().includes("with")
+                          ? 'b_purple'
+                          : 'b_ora text-danger'
+                      }`}
+                  >
+                    {orderType.toLowerCase() === 'local'
+                      ? 'Local'
+                      : orderType.toLowerCase().includes("with")
+                        ? 'Retiro'
+                        : orderType.toLowerCase() === 'delivery'
+                          ? 'Entrega'
+                          : orderType}
+                  </div>}
+
+                </div>
+              </form>
+
+
+              {/* <div className="mb-3 b-input-registers ak-w-100">
                   <label
                     htmlFor="exampleFormControlInput1"
                     className="form-label text-white"
@@ -811,15 +847,13 @@ const BHomeDelivery = () => {
                     disabled
                   />
                   {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>}
-
-                </div>
-              </form>
+                </div> */}
               {/* <div className="b-product-order text-center">
               <MdRoomService className="i-product-order" />
               <h6 className="h6-product-order text-white">Empezar pedido</h6>
               <p className="p-product-order">Agregar producto para empezar <br />
                 con el pedido</p>
-            </div> */}
+              </div> */}
               {cartItems.length === 0 ? (
                 <div className="ak-w-100">
                   <div className="b-product-order text-center mx-auto">

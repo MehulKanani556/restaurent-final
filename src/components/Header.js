@@ -176,7 +176,7 @@ export default function Header() {
           <div className="m_bell position-relative" style={{ cursor: "pointer" }} onClick={() => setShow(true)}>
             <span className="m_grey" >
               <IoNotifications />
-              {notificationCount > 0 && (
+              {prevNotificationCount > 0 && (
                 <span
                   className="position-absolute translate-middle badge rounded-pill bg-danger"
                   style={{
@@ -192,7 +192,7 @@ export default function Header() {
                     justifyContent: 'center'
                   }}
                 >
-                  {notificationCount}
+                  {prevNotificationCount}
                   <span className="visually-hidden">unread notifications</span>
                 </span>
               )}

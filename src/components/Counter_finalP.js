@@ -13,6 +13,7 @@ const Counter_finalP = () => {
   const [token] = useState(localStorage.getItem("token"));
   const [role] = useState(localStorage.getItem("role"));
   const [creditId] = useState(localStorage.getItem("credit"));
+  const userName = localStorage.getItem("name");
   const API = process.env.REACT_APP_IMAGE_URL;
   const userId = localStorage.getItem("userId");
   const admin_id = localStorage.getItem("admin_id");
@@ -470,6 +471,7 @@ const Counter_finalP = () => {
     setOrderType(updatedOrder);
     localStorage.setItem("currentOrder", JSON.stringify(updatedOrder));
   };
+
   const paymentData = {
     ...payment,
     amount: customerData.amount,
@@ -533,10 +535,10 @@ const Counter_finalP = () => {
 
   // submit
   const handleSubmit = async () => {
-    if (role !== "cashier") {
-      alert("Solo los cajeros pueden realizar pedidos.");
-      return;
-    }
+    // if (role !== "cashier") {
+    //   alert("Solo los cajeros pueden realizar pedidos.");
+    //   return;
+    // }
 
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -587,6 +589,7 @@ const Counter_finalP = () => {
         if (!response.data.success) {
           alert(response.data.message)
         }
+        console.log(response.data);
         order_master_id = response.data.kdsOrder.order_id;
         sessionStorage.setItem('orderId', order_master_id);
         setOrderId(order_master_id);
@@ -594,7 +597,6 @@ const Counter_finalP = () => {
       // console.log("order_master_id", response.data.kdsOrder.id);
       // alert("sdv");
       if (order_master_id || orderId) {
-
         const paymentData = {
           ...payment,
           amount: totalPaymentAmount,
@@ -1137,7 +1139,24 @@ const Counter_finalP = () => {
                       disabled
                     />
                   </div>
-                  <div className="j-orders-type  ak-w-50">
+                  <div className="mb-3 b-input-registers ak-w-50">
+                  <label
+                    htmlFor="exampleFormControlInput1"
+                    className="form-label text-white"
+                  >Quién lo registra
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control b-form-control"
+                    id="exampleFormControlInput1"
+                    placeholder=""
+                    // onChange={handlename}
+                    value={userName}
+                    disabled
+                  />
+                  {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
+                </div>
+                  {/* <div className="j-orders-type  ak-w-50">
                     <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                       Tipo pedido
                     </label>
@@ -1151,7 +1170,7 @@ const Counter_finalP = () => {
                       <option value="local">Local</option>
                       <option value="withdraw">Retirar</option>
                     </select>
-                  </div>
+                  </div> */}
                 </div>
 
                 {cartItems.length === 0 ? (
@@ -1286,6 +1305,7 @@ const Counter_finalP = () => {
                           <Modal.Header
                             closeButton
                             className="j-caja-border-bottom p-0 m-3 mb-0 pb-3"
+                            onClick={handleClose11}
                           >
                             <Modal.Title
                               className="modal-title j-caja-pop-up-text-1"

@@ -21,6 +21,7 @@ const Counter = () => {
   const API = process.env.REACT_APP_IMAGE_URL;
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role] = useState(localStorage.getItem("role"));
+  const userName = localStorage.getItem("name");
   // const [ tId, setTId ] = useState(queryValue);
   const navigate = useNavigate();
 
@@ -38,7 +39,7 @@ const Counter = () => {
   const [lastOrder, setLastOrder] = useState('');
   const [isEditing, setIsEditing] = useState([]);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [orderType, setOrderType] = useState("");
+  const [orderType, setOrderType] = useState("local");
   const [orType, setOrType] = useState([]);
   const location = useLocation();
   const redirect = location?.state?.from
@@ -677,7 +678,24 @@ const Counter = () => {
                     disabled
                   />
                 </div>
-                <div className="j-orders-type ak-w-50">
+                <div className="mb-3 b-input-registers ak-w-50">
+                  <label
+                    htmlFor="exampleFormControlInput1"
+                    className="form-label text-white"
+                  >Quién lo registra
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control b-form-control"
+                    id="exampleFormControlInput1"
+                    placeholder=""
+                    // onChange={handlename}
+                    value={userName}
+                    disabled
+                  />
+                  {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>}
+                </div>
+                {/* <div className="j-orders-type ak-w-50">
                   <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                     Tipo pedido
                   </label>
@@ -694,7 +712,7 @@ const Counter = () => {
                   {orderTypeError && (
                     <div className="text-danger errormessage">{orderTypeError}</div>
                   )}
-                </div>
+                </div> */}
               </div>
               {cartItems.length === 0 ? (
                 <div>

@@ -186,17 +186,19 @@ export default function Homeinformation() {
       handleOrderDetails();
       getSector();
     }
-    if (orderData?.user_id) {
+    if (orderData?.[0]?.user_id) {
       console.log(orderData?.user_id);
       getUser();
     }
   }, [orderData, items, show1Prod]);
 
   useEffect(() => {
-    if (user && roles.length > 0) {
-      getuserRole();
+    if (user ) {
+      console.log(user);
+      
+     setUserRole(user.name);
     }
-  }, [user, roles]);
+}, [user]);
 
   useEffect(() => {
     getPaymentsData();
@@ -271,14 +273,14 @@ export default function Homeinformation() {
       let sectors = response.data.data;
 
       const sectorWithTable = sectors.find(v =>
-        v.tables.some(a => a.id == orderData.table_id)
+        v.tables.some(a => a.id == orderData?.[0]?.table_id)
       );
 
       // console.log(sectors);
 
       if (sectorWithTable) {
         setSector(sectorWithTable);
-        setTable(sectorWithTable.tables.find(a => a.id == orderData.table_id));
+        setTable(sectorWithTable.tables.find(a => a.id == orderData?.[0]?.table_id));
       }
     } catch (error) {
       console.error(
@@ -313,13 +315,15 @@ export default function Homeinformation() {
     setIsProcessing(true);
 
     try {
-      const response = await axios.get(`${API_URL}/get-user/${orderData.user_id}`, {
+      console.log(orderData);
+      
+      const response = await axios.get(`${API_URL}/get-user/${orderData?.[0].user_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
-      setUser(response.data);
+      // console.log(response.data[0]);
+      setUser(response.data[0]);
     } catch (error) {
       console.error(
         "Error fetching user:",
@@ -352,14 +356,14 @@ export default function Homeinformation() {
 
   };
 
-  const getuserRole = () => {
-    if (user && roles.length > 0) {
-      const role = roles.find((v) => v.id === user[0].role_id);
-      if (role) {
-        setUserRole(role.name);
-      }
-    }
-  };
+  // const getuserRole = () => {
+  //   if (user && roles.length > 0) {
+  //     const role = roles.find((v) => v.id === user[0].role_id);
+  //     if (role) {
+  //       setUserRole(role.name);
+  //     }
+  //   }
+  // };
 
   const handleOrderDetails = () => {
     const details = orderData[0]?.order_details?.map((orderItem) => {
