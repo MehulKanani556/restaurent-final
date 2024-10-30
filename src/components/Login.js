@@ -11,6 +11,7 @@ import { Modal } from "react-bootstrap";
 //import { enqueueSnackbar  } from "notistack";
 import useAudioManager from "./audioManager";
 import useSocket from "../hooks/useSocket";
+import { useNotifications } from "../contexts/NotificationContext";
 
 const Login = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -24,10 +25,10 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState([]);
+  // const [notificationMessage, setNotificationMessage] = useState([]);
   const { playNotificationSound } = useAudioManager();
   const echo = useSocket();
-
+  const { updateToken } = useNotifications(); // Use the context
 
   const location = useLocation();
  
@@ -93,8 +94,10 @@ const Login = () => {
         setSuccessMessage("iniciar sesión exitosamente");
         setShowSuccessModal(true);
         updateActiveStatus(id,name,email,access_token);
+        updateToken(access_token)
         // Play notification sound
         // playNotificationSound();;
+
         if(role=="superadmin"){
           setShowSuccessModal(false);
           navigate('/enlaceAdmin');

@@ -41,7 +41,7 @@ const KdsCard = ({ table, time, orderId, startTime, waiter, center, items, notes
         }
     };
 
-console.log("ss",orderId==15)
+
 
     const waiterName = user.find(u => u.id === waiter)?.name || 'Unknown'; // Get the waiter's name
     const centerName = centerProduction.find(c => c.id === center)?.name || 'Unknown'; // Get the center's name

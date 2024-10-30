@@ -20,6 +20,7 @@ const KdsEntregado = () => {
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);
     const [allItems, setAllItems] = useState([]);
+    const [tableInfo, setTableInfo] = useState([]);
     const [categories, setCategories] = useState([
         'Todo',
         'Cocina',
@@ -33,12 +34,13 @@ const KdsEntregado = () => {
         fetchUser();
         fetchCenter();
         fetchAllItems();
+        fetchTable();
     }, []);
 
     const fetchOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/order/getAllKds?delivered=yes`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/order/getAllKds?delivered=yes`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -67,10 +69,25 @@ const KdsEntregado = () => {
         }
         setIsProcessing(false);
     }
+    const fetchTable = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            // console.log(response.data.data)
+            setTableInfo(response.data.data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+        setIsProcessing(false);
+    }
     const fetchCenter = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/production-centers`, { admin_id: admin_id }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -111,7 +128,7 @@ const KdsEntregado = () => {
                 return false;
             });
         });
-        
+
     };
     return (
         <>
@@ -122,7 +139,7 @@ const KdsEntregado = () => {
                     <div className="j-kds-head">
                         <h5 className='text-white j-counter-text-1'>KDS</h5>
                         <div className="j-show-items">
-                        <ul className="nav">
+                            <ul className="nav">
                                 <li
                                     className={`nav-item j-nav-item-size ${selectedCategory === 'Todo' ? "active" : ""}`}
                                     onClick={() => setSelectedCategory('Todo')}
@@ -155,14 +172,18 @@ const KdsEntregado = () => {
                             </div>
                         </Link>
                         <div className="row">
-                        {filterOrdersByCategory(allOrder, selectedCategory)
-                                        // .filter(section => section.status === orderTypeMapping[orderType])
-                                        .map((section, sectionIndex) => (
-                                            <div key={sectionIndex} className="col-3 px-0">
+                            {filterOrdersByCategory(allOrder, selectedCategory)
+                                // .filter(section => section.status === orderTypeMapping[orderType])
+                                .map((section, sectionIndex) => {
+                                    // Find the table based on table_id
+                                    const table = tableInfo.flatMap(sector => sector.tables).find(table => table.id === section.table_id);
+                                    const tableName = table ? table.table_no : ''; // Default if not found
+                                    return (
+                                        <div key={sectionIndex} className="col-3 px-0">
                                             <KdsCard
                                                 key={sectionIndex}
-                                                table={section.table_id}
-                                                time={section.created_at}
+                                                table={tableName} // Use the table name here
+                                                time={section.updated_at}
                                                 orderId={section.order_id}
                                                 startTime={section.created_at}
                                                 waiter={section.user_id}
@@ -195,7 +216,8 @@ const KdsEntregado = () => {
                                                 }
                                             />
                                         </div>
-                                        ))}
+                                    )
+                                })}
                         </div>
                     </div>
                     {/* processing */}

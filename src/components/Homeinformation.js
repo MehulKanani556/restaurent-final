@@ -612,7 +612,7 @@ export default function Homeinformation() {
 
   const handleCredit = () => {
     { console.log(orderData) }
-    if (orderData?.[0].status == 'delivered') {
+    if (orderData?.[0].status == 'delivered' || orderData?.[0].status == 'cancelled') {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
       alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
@@ -751,7 +751,7 @@ export default function Homeinformation() {
                 <div className='d-flex flex-wrap me-4'>
                   {showCancelOrderButton ? (
                     !(orderData?.[0].status == 'delivered' || orderData?.[0].status == 'finalized' || orderData?.[0].status == "cancelled") &&
-                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Cancelar Pedido</div>
+                    <div onClick={handleShow} className='btn btn-danger me-2  text-nowrap  me-2 py-2 d-flex align-items-center justify-content-center' style={{ backgroundColor: "#F05252", borderRadius: '10px' }}> <IoMdCloseCircle className='me-2' />Anular pedido</div>
                   ) : (
                     !(orderData?.[0].status == "cancelled" || pamentDone) && <>
                       <Link className='text-decoration-none' to={`/home/usa/information/payment_edit/${id}`}>

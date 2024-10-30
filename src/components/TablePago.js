@@ -44,6 +44,7 @@ const TablePago = () => {
   const [tipAmount, setTipAmount] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [tabNo,setTabNo]= useState('');
   /* get table data */
   useEffect(
     () => {
@@ -53,6 +54,7 @@ const TablePago = () => {
         if (id) {
           getTableData(id);
           fetchAllItems();
+          getTable(id)
           setIsProcessing(false);
           fetchAllUser();
         }
@@ -60,7 +62,26 @@ const TablePago = () => {
     },
     [id, role]
   );
-  console.log("object")
+  const getTable = async (id) => {
+    setIsProcessing(true);
+      try {
+        const response = await axios.get(`${apiUrl}/single-table/${id}`,  {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (response.data)  {
+          const no = response.data.tables.table_no;
+          setTabNo(no);
+        } else {
+          console.error("Response data is not a non-empty array:", response.data);
+        }
+        
+      } catch{
+  
+      }
+  }
+  
   const fetchAllUser = async () => {
     setIsProcessing(true);
     try {
@@ -342,7 +363,7 @@ const TablePago = () => {
     console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
-      [name]: undefined
+      amount: undefined
     }));
   };
 
@@ -551,7 +572,7 @@ const TablePago = () => {
         tip: tipAmount ? tipAmount : 0,
         payment_type: selectedCheckboxes[0],
         box_id: boxId?.id,
-        transaction_code: true,customer_name:payment.firstname || payment.business_name
+        transaction_code: true,customer_name:payment.firstname || payment.business_name || ""
       },
         {
           headers: {
@@ -687,7 +708,7 @@ const TablePago = () => {
                 </button>
               </div>
             </Link>
-            <h2 className="text-white j-table-font-1 mb-0">Mesa {tId}</h2>
+            <h2 className="text-white j-table-font-1 mb-0">Mesa {tabNo}</h2>
             <div className="j-menu-bg-color">
               <div className="j-table-cart-2 d-flex justify-content-between ">
                 <div className="line1  flex-grow-1">

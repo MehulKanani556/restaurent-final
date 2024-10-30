@@ -25,6 +25,7 @@ const KdsFinalizado = () => {
         'Barra',
         'Postres'
     ]);
+    const [tableInfo, setTableInfo] = useState([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(categories[0]);
     useEffect(() => {
@@ -32,12 +33,13 @@ const KdsFinalizado = () => {
         fetchUser();
         fetchCenter();
         fetchAllItems();
+        fetchTable();
     }, []);
 
     const fetchOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/order/getAllKds?finalized=yes`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/order/getAllKds?finalized=yes`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -49,6 +51,21 @@ const KdsFinalizado = () => {
 
         } catch (error) {
             console.error("Error fetching orders:", error);
+        }
+        setIsProcessing(false);
+    }
+    const fetchTable = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            // console.log(response.data.data)
+            setTableInfo(response.data.data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
         }
         setIsProcessing(false);
     }
@@ -69,7 +86,7 @@ const KdsFinalizado = () => {
     const fetchCenter = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/production-centers`, { admin_id: admin_id }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -156,45 +173,50 @@ const KdsFinalizado = () => {
                         <div className="row">
                             {filterOrdersByCategory(allOrder, selectedCategory)
                                 // .filter(section => section.status === orderTypeMapping[orderType])
-                                .map((section, sectionIndex) => (
-                                    <div key={sectionIndex} className="col-3 px-0">
-                                        <KdsCard
-                                            key={sectionIndex}
-                                            table={section.table_id}
-                                            time={section.created_at}
-                                            orderId={section.order_id}
-                                            startTime={section.created_at}
-                                            waiter={section.user_id}
-                                            center={section.discount}
-                                            notes={section.reason}
-                                            finishedAt={section.finished_at}
-                                            user={user}
-                                            centerProduction={centerProduction}
-                                            fetchOrder={fetchOrder}
-                                            status={section.status}
-                                            items={section.order_details.filter(detail => {
-                                                if (selectedCategory === 'Todo') return true;
-                                                const item = allItems.find(item => item.id === detail.item_id);
-                                                if (item) {
-                                                    const matchingCenter = centerProduction.find(center => center.id === item.production_center_id);
-                                                    return matchingCenter && matchingCenter.name === selectedCategory;
-                                                }
-                                                return false;
-                                            })}
-                                            productionCenter={selectedCategory === 'Todo' ?
-                                                section.order_details.map(order => {
-                                                    const item = allItems.find(item => item.id === order.item_id);
+                                .map((section, sectionIndex) => {
+                                    // Find the table based on table_id
+                                    const table = tableInfo.flatMap(sector => sector.tables).find(table => table.id === section.table_id);
+                                    const tableName = table ? table.table_no : ''; // Default if not found
+                                    return (
+                                        <div key={sectionIndex} className="col-3 px-0">
+                                            <KdsCard
+                                                key={sectionIndex}
+                                                table={tableName} // Use the table name here
+                                                time={section.updated_at}
+                                                orderId={section.order_id}
+                                                startTime={section.created_at}
+                                                waiter={section.user_id}
+                                                center={section.discount}
+                                                notes={section.reason}
+                                                finishedAt={section.finished_at}
+                                                user={user}
+                                                centerProduction={centerProduction}
+                                                fetchOrder={fetchOrder}
+                                                status={section.status}
+                                                items={section.order_details.filter(detail => {
+                                                    if (selectedCategory === 'Todo') return true;
+                                                    const item = allItems.find(item => item.id === detail.item_id);
                                                     if (item) {
                                                         const matchingCenter = centerProduction.find(center => center.id === item.production_center_id);
-                                                        return matchingCenter ? matchingCenter.name : null;
+                                                        return matchingCenter && matchingCenter.name === selectedCategory;
                                                     }
-                                                    return null;
-                                                }).filter(item => item !== null)
-                                                : [selectedCategory]
-                                            }
-                                        />
-                                    </div>
-                                ))}
+                                                    return false;
+                                                })}
+                                                productionCenter={selectedCategory === 'Todo' ?
+                                                    section.order_details.map(order => {
+                                                        const item = allItems.find(item => item.id === order.item_id);
+                                                        if (item) {
+                                                            const matchingCenter = centerProduction.find(center => center.id === item.production_center_id);
+                                                            return matchingCenter ? matchingCenter.name : null;
+                                                        }
+                                                        return null;
+                                                    }).filter(item => item !== null)
+                                                    : [selectedCategory]
+                                                }
+                                            />
+                                        </div>
+                                    )
+                                })}
                         </div>
                     </div>
                     {/* processing */}

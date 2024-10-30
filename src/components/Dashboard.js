@@ -2044,7 +2044,7 @@ const Dashboard = () => {
                         </div>
                         <div className="j-order-data">
                           <h4 className="sjfs-16">{item.name}</h4>
-                          <p className="sjfs-12">Padido {item.order_count}</p>
+                          <p className="sjfs-12">Pedido {item.order_count}</p>
                         </div>
                       </div>
                       <div className="j-order-price sjfs-16 me-2">
@@ -2158,32 +2158,36 @@ const Dashboard = () => {
                 </div>
 
                 <div className="j-delivery-body">
-                  <div className="row">
-                    <div className="col-6">
+                  <div className="row align-items-center mt-4">
+                    <div className="col-4">
                       <div className="j-delivery-data">
                         <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Delivery</p>
                         <h5 className="sjfs-2">{deliveryData.delivery}</h5>
                       </div>
                     </div>
-                    <div className="col-6">
+                    <div className="col-4 text-center">
                       <div className="j-delivery-data">
                         <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Retiro</p>
                         <h5 className="sjfs-2">{deliveryData.withdrawal}</h5>
                       </div>
                     </div>
-                    <div className="col-6">
+                    <div className="col-4 text-end">
                       <div className="j-delivery-data">
                         <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Local</p>
                         <h5 className="sjfs-2">{deliveryData.local}</h5>
                       </div>
                     </div>
-                    <div className="col-6">
+
+                    {/* <div className="col-6">
                       <div className="j-delivery-data">
                         <p className="sjfs-16"style={{fontWeight:"500", lineHeight:'21px'}}>Plataforma</p>
                         <h5 className="sjfs-2">{deliveryData.platform}</h5>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
+                  <div >&nbsp;</div>
+                  <div >&nbsp;</div>
+                  <div >&nbsp;</div>
 
                   <div className="j-delivery-chart">
                     <div id="chart">
@@ -2209,12 +2213,12 @@ const Dashboard = () => {
                             data: deliveryData.local ? [deliveryData.local] : [0], // Provide default value
                             color: "#fdba8c"
                           },
-                          {
-                            name: 'Plataforma',
-                            // data: [deliveryData.platform],
-                            data: deliveryData.platform ? [deliveryData.platform] : [0], // Provide default value
-                            color: "#31c48d"
-                          },
+                          // {
+                          //   name: 'Plataforma',
+                          //   // data: [deliveryData.platform],
+                          //   data: deliveryData.platform ? [deliveryData.platform] : [0], // Provide default value
+                          //   color: "#31c48d"
+                          // },
                         ]}
                         type="bar"
                         height={75}
@@ -2237,10 +2241,10 @@ const Dashboard = () => {
                         <img src={chart2} className="jj_img me-2" />
                         <p className="ss_fontsize mb-0 sjfs-12">Local</p>
                       </div>
-                      <div className="d-flex align-items-center">
+                      {/* <div className="d-flex align-items-center">
                         <img src={green} className="jj_img me-2" />
                         <p className="ss_fontsize mb-0 sjfs-12">Plataforma</p>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

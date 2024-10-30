@@ -9,147 +9,6 @@ import axios from 'axios';
 import { Modal, Spinner } from 'react-bootstrap';
 
 
-const orders = [
-    {
-        type: 'Recibido',
-        sections: [
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                fromTime: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote']
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote', 'Al clima']
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo'],
-                notes: ['Sin salsa de tote']
-            }
-        ]
-    },
-    {
-        sections: [
-            {
-                title: 'Delivery',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo'],
-                notes: ['Sin salsa de tote']
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                fromTime: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote']
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote', 'Al clima']
-            }
-        ]
-    },
-    {
-
-        sections: [
-            {
-                title: 'Delivery',
-                time: '15:20',
-                orderNumber: '01234',
-                fromTime: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote']
-            },
-            {
-                title: 'Delivery',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo'],
-                notes: ['Sin salsa de tote']
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote', 'Al clima'],
-            }
-        ]
-    },
-    {
-        sections: [
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                fromTime: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote', 'Al clima'],
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo', 'Cola Fanta', 'Pastel'],
-                notes: ['Sin salsa de tote', 'Al clima'],
-            },
-            {
-                title: 'Mesa 2',
-                time: '15:20',
-                orderNumber: '01234',
-                hrtimestart: '10:00 AM',
-                who: 'Damian Lopez',
-                center: 'Cocina',
-                list: ['Almuerzo'],
-                notes: ['Sin salsa de tote'],
-            }
-        ]
-    }
-];
-
 
 const KdsRecibido = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -159,12 +18,7 @@ const KdsRecibido = () => {
     const [user, setUser] = useState([]);
     const [centerProduction, setCenterProduction] = useState([]);
     const [allItems, setAllItems] = useState([]);
-    const [categories, setCategories] = useState([
-        'Todo',
-        'Cocina',
-        'Barra',
-        'Postres'
-    ]);
+    const [tableInfo, setTableInfo] = useState([]);
     const [isProcessing, setIsProcessing] = useState(false);
 
 
@@ -175,12 +29,28 @@ const KdsRecibido = () => {
         fetchUser();
         fetchCenter();
         fetchAllItems();
+        fetchTable();
     }, []);
+    const fetchTable = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(`${apiUrl}/sector/getWithTable`, { admin_id }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            // console.log(response.data.data)
+            setTableInfo(response.data.data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+        setIsProcessing(false);
+    }
 
     const fetchOrder = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/order/getAllKds?received=yes`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/order/getAllKds?received=yes`, { admin_id: admin_id }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -212,7 +82,7 @@ const KdsRecibido = () => {
     const fetchCenter = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
+            const response = await axios.post(`${apiUrl}/production-centers`, { admin_id: admin_id }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -252,7 +122,7 @@ const KdsRecibido = () => {
                 return false;
             });
         });
-        
+
     };
 
     return (
@@ -297,15 +167,19 @@ const KdsRecibido = () => {
                             </div>
                         </Link>
                         <div className="row">
-                            
-                        {filterOrdersByCategory(allOrder, selectedCategory)
-                                        // .filter(section => section.status === orderTypeMapping[orderType])
-                                        .map((section, sectionIndex) => (
-                                            <div key={sectionIndex} className="col-3 px-0">
+
+                            {filterOrdersByCategory(allOrder, selectedCategory)
+                                // .filter(section => section.status === orderTypeMapping[orderType])
+                                .map((section, sectionIndex) => {
+                                    // Find the table based on table_id
+                                    const table = tableInfo.flatMap(sector => sector.tables).find(table => table.id === section.table_id);
+                                    const tableName = table ? table.table_no : ''; // Default if not found
+                                    return (
+                                        <div key={sectionIndex} className="col-3 px-0">
                                             <KdsCard
                                                 key={sectionIndex}
-                                                table={section.table_id}
-                                                time={section.created_at}
+                                                table={tableName} // Use the table name here
+                                                time={section.updated_at}
                                                 orderId={section.order_id}
                                                 startTime={section.created_at}
                                                 waiter={section.user_id}
@@ -338,7 +212,8 @@ const KdsRecibido = () => {
                                                 }
                                             />
                                         </div>
-                                        ))}
+                                    )
+                                })}
                         </div>
                     </div>
                 </div>

@@ -301,21 +301,21 @@ const DeliveryPago = () => {
       const totalDue = finalTotal + taxAmount + tipAmount;
       const otherAmount = Math.max(totalDue - currentValue, 0);
 
-      console.log(otherAmount);
+      // console.log(otherAmount);
 
       const updatedState = {
         ...prevState,
         [name]: value,
       };
 
-      console.log(updatedState);
+      // console.log(updatedState);
 
 
       if (otherbox.length > 0) {
         const otherPaymentType = otherbox[0] + 'Amount';
         updatedState[otherPaymentType] = otherAmount.toFixed(2);
       }
-      console.log(updatedState);
+      // console.log(updatedState);
 
       // New calculation for turn
       const totalAmount = parseFloat(updatedState.cashAmount || 0) + parseFloat(updatedState.debitAmount || 0) + parseFloat(updatedState.creditAmount || 0) + parseFloat(updatedState.transferAmount || 0);
@@ -323,10 +323,10 @@ const DeliveryPago = () => {
       return updatedState;
 
     });
-    console.log("Payment", customerData);
+    // console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
-      [name]: undefined
+      amount: undefined
     }));
   };
 
@@ -532,7 +532,7 @@ const DeliveryPago = () => {
           customer_name:
             payment.firstname && payment.firstname.trim() !== ""
               ? payment.firstname
-              : payment.business_name,
+              : payment.business_name || "",
           reason: "",
           person: "",
           tip: tipAmount,
@@ -551,11 +551,13 @@ const DeliveryPago = () => {
       admin_id: admin_id,
     };
 
-    console.log(paymentData);
+    // console.log(paymentData);
 
     setIsProcessing(true)
 
     try {
+      // console.log(orderData);
+      
       const response = await axios.post(`${apiUrl}${url}`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -602,6 +604,7 @@ const DeliveryPago = () => {
           console.log("Payment not done." + error.message);
         }
       } else {
+        console.log(response);
         alert(response.data.message)
       }
     } catch (error) {

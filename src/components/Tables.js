@@ -39,6 +39,7 @@ const Tables = () => {
   const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const { playNotificationSound } = useAudioManager();
+  const [selectedTabNo,setSelectedTabNo] = useState('');
 
   const [newTable, setNewTable] = useState({
     sectorName: "",
@@ -678,11 +679,12 @@ const Tables = () => {
     // });
     // console.log("Updated Cards:", updatedCards);
   };
-  const handleShowAvailableModal = (id) => {
+  const handleShowAvailableModal = (id,no) => {
     setSelectedTable(id);
     setShowAvailableModal(true);
     setShowOcupadoModal(false);
     setIsOffcanvasOpen(true);
+    setSelectedTabNo(no);
   };
 
   const handleCloseOcupadoModal = async () => {
@@ -711,11 +713,12 @@ const Tables = () => {
     setSelectedTable(null); // for socket 
   };
 
-  const handleShowOcupadoModal = (id) => {
+  const handleShowOcupadoModal = (id,no) => {
     setSelectedTable(id);
     setShowOcupadoModal(true);
     setShowAvailableModal(false);
     setIsOffcanvasOpen(true);
+    setSelectedTabNo(no);
   };
 
   /* get name and image */
@@ -1146,6 +1149,7 @@ const Tables = () => {
   // });
 
 
+
   return (
     <section>
       <Header />
@@ -1511,14 +1515,16 @@ const Tables = () => {
                       <TableCard
                         isOffcanvasOpen={isOffcanvasOpen}
                         onShowAvailableModal={() =>
-                          handleShowAvailableModal(ele.id)}
-                        onShowOcupadoModal={() => handleShowOcupadoModal(ele.id)}
+                          handleShowAvailableModal(ele.id,ele.table_no)}
+                        onShowOcupadoModal={() => handleShowOcupadoModal(ele.id,ele.table_no)}
                         name={ele.name}
                         no={ele.id}
                         code={ele.code}
                         status={ele.status}
                         selectedTable={selectedTable}
+                       
                         tId={ele.id}
+                        tableId={ele.table_no}
                         userId={ele.user_id} // Access user_id from tableData
                         oId={ele.order_id}
                         selectedCards={selectedCards}
@@ -1707,7 +1713,7 @@ const Tables = () => {
         >
           <Offcanvas.Header closeButton className="j-close-btn">
             <Offcanvas.Title className="j-offcanvas-title text-white j-tbl-font-5">
-              Mesa {selectedTable}
+              Mesa {selectedTabNo}
             </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body className="j-canvas-buttons">
@@ -1804,7 +1810,7 @@ const Tables = () => {
         >
           <Offcanvas.Header closeButton className="j-close-btn">
             <Offcanvas.Title className="j-offcanvas-title text-white j-tbl-font-5">
-              Mesa {selectedTable}
+              Mesa {selectedTabNo}
             </Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body className="j-canvas-buttons">

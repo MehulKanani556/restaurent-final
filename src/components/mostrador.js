@@ -13,8 +13,8 @@ import { MdRoomService } from "react-icons/md";
 const Mostrador = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const API = process.env.REACT_APP_IMAGE_URL;
-  const [token ]=useState( localStorage.getItem("token"));
-  const [role] = useState( localStorage.getItem("role"));
+  const [token] = useState(localStorage.getItem("token"));
+  const [role] = useState(localStorage.getItem("role"));
   const userName = localStorage.getItem("name");
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState({});
@@ -50,7 +50,7 @@ const Mostrador = () => {
     if (noteInputRefs.current[index]) {
       noteInputRefs.current[index].value = newNote;
     }
-    
+
     // Debounce the state update to reduce re-renders
     const timeoutId = setTimeout(() => {
       setCartItems(prevItems => {
@@ -78,7 +78,7 @@ const Mostrador = () => {
         : item
     );
     setCartItems(updatedCartItems);
-    
+
     // Focus the input after state update
     setTimeout(() => {
       if (noteInputRefs.current[index]) {
@@ -87,11 +87,11 @@ const Mostrador = () => {
     }, 0);
   }; // {{ edit_3 }}
 
-  useEffect(()=>{
+  useEffect(() => {
     if (!(role == "admin" || role == "cashier")) {
       navigate('/dashboard')
     }
-  },[role])
+  }, [role])
 
   // cart
   useEffect(() => {
@@ -210,7 +210,7 @@ const Mostrador = () => {
   const handleFinishEditing = (index) => {
     // Get final value from ref
     const finalNote = noteInputRefs.current[index]?.value || "";
-    
+
     setCartItems(prevItems => {
       const updatedItems = [...prevItems];
       updatedItems[index] = {
@@ -239,7 +239,7 @@ const Mostrador = () => {
   // Add refs for form inputs
   const formRefs = {
     rut1: useRef(),
-    rut2: useRef(), 
+    rut2: useRef(),
     rut3: useRef(),
     fname: useRef(),
     lname: useRef(),
@@ -253,46 +253,46 @@ const Mostrador = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update formData state for select elements
     if (name === 'ltda') {
-        setFormData(prevData => ({
-            ...prevData,
-            ltda: value
-        }));
+      setFormData(prevData => ({
+        ...prevData,
+        ltda: value
+      }));
     }
-    
+
     // Check if the ref exists before accessing current
     if (formRefs[name]) {
-        formRefs[name].current.value = value;
-        
-        // Clear errors for the specific field
-        if (errors[name] || (name === 'bname' && errors.business_name)) {
-            setErrors(prevErrors => ({
-                ...prevErrors,
-                [name]: undefined,
-                business_name: name === 'bname' ? undefined : prevErrors.business_name
-            }));
-        }
+      formRefs[name].current.value = value;
+
+      // Clear errors for the specific field
+      if (errors[name] || (name === 'bname' && errors.business_name)) {
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          [name]: undefined,
+          business_name: name === 'bname' ? undefined : prevErrors.business_name
+        }));
+      }
     }
-};
+  };
 
   // Update handleRutChange to only clear RUT error
   const handleRutChange = (e, rutRef) => {
     let value = e.target.value.replace(/[^0-9]/g, "");
     if (value.length > 6) {
-        value = value.slice(0, 6) + "-" + value.slice(6);
+      value = value.slice(0, 6) + "-" + value.slice(6);
     }
     rutRef.current.value = value;
-    
+
     // Only clear RUT error if it exists
     if (errors.rut) {
-        setErrors(prevErrors => ({
-            ...prevErrors,
-            rut: undefined
-        }));
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        rut: undefined
+      }));
     }
-};
+  };
 
 
   // ***************************************************API**************************************************
@@ -311,91 +311,92 @@ const Mostrador = () => {
 
   const collectAccordionData = () => {
     const commonData = {
-        receiptType: selectedRadio,
-        rut: selectedRadio === "1" ? formRefs.rut1.current.value : 
-             selectedRadio === "2" ? formRefs.rut2.current.value : 
-             formRefs.rut3.current.value,
-        firstname: formRefs.fname.current.value,
-        lastname: formRefs.lname.current.value,
-        tour: formRefs.tour.current.value,
-        address: formRefs.address.current.value,
-        email: formRefs.email.current.value,
-        phone: formRefs.number.current.value,
-        // ltda: formRefs.ltda.current.value  // Added ltda ref
+      receiptType: selectedRadio,
+      rut: selectedRadio === "1" ? formRefs.rut1.current.value :
+        selectedRadio === "2" ? formRefs.rut2.current.value :
+          formRefs.rut3.current.value,
+      firstname: formRefs.fname.current.value,
+      lastname: formRefs.lname.current.value,
+      tour: formRefs.tour.current.value,
+      address: formRefs.address.current.value,
+      email: formRefs.email.current.value,
+      phone: formRefs.number.current.value,
+      // ltda: formRefs.ltda.current.value  // Added ltda ref
     };
 
     let specificData = {};
-    if (selectedRadio === "4") {
-        specificData = {
-            business_name: formRefs.bname.current.value,
-            ltda: formRefs.ltda.current.value  // Keep this in state since it's a select
-        };
+    if (selectedRadio === "3") {
+      specificData = {
+        business_name: formRefs.bname.current.value,
+        ltda: formRefs.ltda.current.value  // Keep this in state since it's a select
+      };
     }
 
     return { ...commonData, ...specificData };
-};
+  };
 
 
-const validateForm = () => {
-  const data = collectAccordionData();
-  const newErrors = {};
+  const validateForm = () => {
+    const data = collectAccordionData();
+    const newErrors = {};
 
-  // RUT validation
-  if (!data.rut || data.rut.length < 7) {
-      newErrors.rut = "El RUT debe tener al menos 7 caracteres";
-  }
+    if (data.receiptType !== "4") {
+      // RUT validation
+      if (!data.rut || data.rut.length < 7) {
+        newErrors.rut = "El RUT debe tener al menos 7 caracteres";
+      }
 
-  // Name validation
-  if (data.receiptType !== "4") {
-      if (!data.firstname || data.firstname.trim() === "") {
+      // Name validation
+      if (data.receiptType !== "3") {
+        if (!data.firstname || data.firstname.trim() === "") {
           newErrors.fname = "Se requiere el primer nombre";
+        }
       }
-  }
-  // console.log(data)
-  // Business name validation for receipt type 4
-  if (data.receiptType === "4") {
-      if (!data.business_name || data.business_name.trim() === "") {
-          newErrors.business_name= "Se requiere el nombre de la empresa";
-      }
-      if (!data.ltda || data.ltda === "0") {
+      // console.log(data)
+      // Business name validation for receipt type 4
+      if (data.receiptType === "3") {
+        if (!data.business_name || data.business_name.trim() === "") {
+          newErrors.business_name = "Se requiere el nombre de la empresa";
+        }
+        if (!data.ltda || data.ltda === "0") {
           newErrors.ltda = "Seleccione una opción";
+        }
       }
-  }
 
-  // Last name validation
-  if (!data.lastname || data.lastname.trim() === "") {
-      newErrors.lname = "El apellido es obligatorio";
-  }
+      // Last name validation
+      if (!data.lastname || data.lastname.trim() === "") {
+        newErrors.lname = "El apellido es obligatorio";
+      }
 
-  // Tour validation
-  if (!data.tour || data.tour.trim() === "") {
-      newErrors.tour = "Se requiere tour";
-  }
+      // Tour validation
+      if (!data.tour || data.tour.trim() === "") {
+        newErrors.tour = "Se requiere tour";
+      }
 
-  // Address validation
-  if (!data.address || data.address.trim() === "") {
-      newErrors.address = "La dirección es necesaria";
-  }
-
-  setErrors(newErrors);
-  return newErrors;
-  // return errors;
-};
+      // Address validation
+      if (!data.address || data.address.trim() === "") {
+        newErrors.address = "La dirección es necesaria";
+      }
+    }
+    setErrors(newErrors);
+    return newErrors;
+    // return errors;
+  };
 
 
   const [paymentData, setPaymentData] = useState(null);
 
   const [activeA, setActiveA] = useState(null)
 
-  useEffect(()=>{
+  useEffect(() => {
     const storedPayment = JSON.parse(localStorage.getItem("payment"));
-    if(storedPayment){
+    if (storedPayment) {
       setPaymentData(storedPayment);
     }
-  },[])
+  }, [])
 
   useEffect(() => {
-    if(paymentData) {
+    if (paymentData) {
       setFormData({
         fname: paymentData.firstname,
         lname: paymentData.lastname,
@@ -405,18 +406,18 @@ const validateForm = () => {
         number: paymentData.phone,
         bname: paymentData.business_name,
         ltda: paymentData.ltda, // This should match the select options value
-        tipoEmpresa: paymentData.receiptType === "4" ? paymentData.ltda : "0",
-        rut: paymentData.receiptType == "1" ? paymentData.rut : 
-             paymentData.receiptType == "2" ? paymentData.rut : paymentData.rut,
+        tipoEmpresa: paymentData.receiptType === "3" ? paymentData.ltda : "0",
+        rut: paymentData.receiptType == "1" ? paymentData.rut :
+          paymentData.receiptType == "2" ? paymentData.rut : paymentData.rut,
       });
-      
+
       // Ensure the select element's value is set after form data is updated
       if (formRefs.ltda.current) {
         formRefs.ltda.current.value = paymentData.ltda;
       }
-      
+
       setActiveAccordionItem(paymentData.receiptType); // {{ edit_1 }}
-      paymentData.receiptType == "1"? setRut1(paymentData.rut) : paymentData.receiptType == "2" ? setRut2(paymentData.rut) : setRut3(paymentData.rut)
+      paymentData.receiptType == "1" ? setRut1(paymentData.rut) : paymentData.receiptType == "2" ? setRut2(paymentData.rut) : setRut3(paymentData.rut)
       handleAccordionClick(paymentData.receiptType);
       setSelectedRadio(paymentData.receiptType);
       setActiveA(paymentData.receiptType);
@@ -479,9 +480,9 @@ const validateForm = () => {
     return (
       <div>
         {item.note ? (
-          <p 
-            className="j-nota-blue" 
-            style={{ cursor: "pointer" }} 
+          <p
+            className="j-nota-blue"
+            style={{ cursor: "pointer" }}
             onClick={() => handleAddNoteClick(index)}
           >
             {item.note}
@@ -781,21 +782,21 @@ const validateForm = () => {
                     </Accordion.Body>
                   </Accordion.Item>
 
-                  <Accordion.Item eventKey="4" className="mb-2">
+                  <Accordion.Item eventKey="3" className="mb-2">
                     <Accordion.Header>
                       <div
                         className={`sj_bg_dark px-4 py-2 sj_w-75 ${activeAccordionItem ===
-                          "4"
+                          "3"
                           ? "active"
                           : ""}`}
-                        onClick={() => handleAccordionClick("4")}
+                        onClick={() => handleAccordionClick("3")}
                       >
                         <input
                           type="radio"
                           name="receiptType"
                           value="4"
-                          checked={selectedRadio === "4"}
-                          onChange={() => setSelectedRadio("4")}
+                          checked={selectedRadio === "3"}
+                          onChange={() => setSelectedRadio("3")}
                           className="me-2 j-radio-checkbox"
                         />
                         <p className="d-inline px-3">Factura:</p>
@@ -917,6 +918,33 @@ const validateForm = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
+
+                  <Accordion.Item eventKey="4" className="mb-3">
+                    <Accordion.Header>
+                      {" "}
+                      <div
+                        onClick={() => handleAccordionClick("4")}
+                        className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
+                          "4"
+                          ? "active"
+                          : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name="receiptType"
+                          value="1"
+                          checked={selectedRadio === "4"}
+                          onChange={() => setSelectedRadio("4")}
+                          className="me-2 j-radio-checkbox"
+                        />
+                        <p className="d-inline px-3">Recibo personal</p>
+                      </div>
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      {/* <div className="sj_gay_border px-3 py-4 mt-2 j_tb_size ">
+                                            </div> */}
+                    </Accordion.Body>
+                  </Accordion.Item>
                 </Accordion>
               </div>
             </div>
@@ -943,22 +971,22 @@ const validateForm = () => {
                     />
                   </div>
                   <div className="mb-3 b-input-registers ak-w-50">
-                  <label
-                    htmlFor="exampleFormControlInput1"
-                    className="form-label text-white"
-                  >Quién lo registra
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control b-form-control"
-                    id="exampleFormControlInput1"
-                    placeholder=""
-                    // onChange={handlename}
-                    value={userName}
-                    disabled
-                  />
-                  {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
-                </div>
+                    <label
+                      htmlFor="exampleFormControlInput1"
+                      className="form-label text-white"
+                    >Quién lo registra
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control b-form-control"
+                      id="exampleFormControlInput1"
+                      placeholder=""
+                      // onChange={handlename}
+                      value={userName}
+                      disabled
+                    />
+                    {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
+                  </div>
                   {/* <div className="j-orders-type ak-w-50">
                     <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                       Tipo pedido
@@ -1039,7 +1067,7 @@ const validateForm = () => {
                             </div>
 
                             <div className="text-white j-order-count-why">
-                              {renderNoteInput(item, index)} 
+                              {renderNoteInput(item, index)}
                             </div>
                           </div>
                         ))}

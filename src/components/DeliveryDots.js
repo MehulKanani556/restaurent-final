@@ -24,7 +24,7 @@ const DeliveryDots = () => {
     const [orderType, setOrderType] = useState(
         JSON.parse(localStorage.getItem("currentOrder")) || []
     );
-    const [orderTypeError,setOrderTypeError] = useState("")
+    const [orderTypeError, setOrderTypeError] = useState("")
 
     const navigate = useNavigate();
     // const { state} = useLocation();
@@ -353,8 +353,7 @@ const DeliveryDots = () => {
         const commonData = {
             receiptType: selectedRadio,
             rut: selectedRadio === "1" ? formRefs.rut1.current.value :
-                selectedRadio === "2" ? formRefs.rut2.current.value :
-                    formRefs.rut3.current.value,
+                selectedRadio === "2" ? formRefs.rut2.current.value : formRefs.rut3.current.value,
             firstname: formRefs.fname.current.value,
             lastname: formRefs.lname.current.value,
             tour: formRefs.tour.current.value,
@@ -378,42 +377,44 @@ const DeliveryDots = () => {
     const validateForm = () => {
         const data = collectAccordionData();
         const newErrors = {};
-
-        // RUT validation
-        if (!data.rut || data.rut.length < 7) {
-            newErrors.rut = "El RUT debe tener al menos 7 caracteres";
-        }
-
-        // Name validation
-        if (data.receiptType !== "3") {
-            if (!data.firstname || data.firstname.trim() === "") {
-                newErrors.fname = "Se requiere el primer nombre";
+        if (data.receiptType !== "4") {
+            // RUT validation
+            if (!data.rut || data.rut.length < 7) {
+                newErrors.rut = "El RUT debe tener al menos 7 caracteres";
             }
-        }
-        // console.log(data)
-        // Business name validation for receipt type 4
-        if (data.receiptType === "3") {
-            if (!data.business_name || data.business_name.trim() === "") {
-                newErrors.business_name = "Se requiere el nombre de la empresa";
+
+            // Name validation
+            if (data.receiptType !== "3") {
+                if (!data.firstname || data.firstname.trim() === "") {
+                    newErrors.fname = "Se requiere el primer nombre";
+                }
             }
-            if (!data.ltda || data.ltda === "0") {
-                newErrors.ltda = "Seleccione una opción";
+            // console.log(data)
+            // Business name validation for receipt type 4
+            if (data.receiptType === "3") {
+                if (!data.business_name || data.business_name.trim() === "") {
+                    newErrors.business_name = "Se requiere el nombre de la empresa";
+                }
+                if (!data.ltda || data.ltda === "0") {
+                    newErrors.ltda = "Seleccione una opción";
+                }
             }
-        }
 
-        // Last name validation
-        if (!data.lastname || data.lastname.trim() === "") {
-            newErrors.lname = "El apellido es obligatorio";
-        }
+            // Last name validation
+            if (!data.lastname || data.lastname.trim() === "") {
+                newErrors.lname = "El apellido es obligatorio";
+            }
 
-        // Tour validation
-        if (!data.tour || data.tour.trim() === "") {
-            newErrors.tour = "Se requiere tour";
-        }
+            // Tour validation
+            if (!data.tour || data.tour.trim() === "") {
+                newErrors.tour = "Se requiere tour";
+            }
 
-        // Address validation
-        if (!data.address || data.address.trim() === "") {
-            newErrors.address = "La dirección es necesaria";
+            // Address validation
+            if (!data.address || data.address.trim() === "") {
+                newErrors.address = "La dirección es necesaria";
+            }
+
         }
 
         setErrors(newErrors);
@@ -421,14 +422,12 @@ const DeliveryDots = () => {
         // return errors;
     };
     const handleSubmit = () => {
-
         if (!orderType || orderType?.orderType == 0) {
             // console.log("Dgd");
             // setOrderTypeError("Por favor seleccione tipo de pedido");
             setOrderTypeError("Por favor seleccione un tipo de pedido");
             return;
-          }
-
+        }
         const collectedData = collectAccordionData();
         const validationErrors = validateForm(collectedData);
 
@@ -454,9 +453,9 @@ const DeliveryDots = () => {
     }, []);
     const handleOrderTypeChange = (e) => {
 
-        if(e.target.value == 0){
-        setOrderTypeError("Por favor seleccione un tipo de pedido");
-        }else{
+        if (e.target.value == 0) {
+            setOrderTypeError("Por favor seleccione un tipo de pedido");
+        } else {
             setOrderTypeError("");
         }
         const newOrderType = e.target.value;
@@ -957,10 +956,9 @@ const DeliveryDots = () => {
                                             </div>
                                         </Accordion.Body>
                                     </Accordion.Item>
-                                    {/* <Accordion.Item eventKey="4" className="mb-3">
+                                    <Accordion.Item eventKey="4" className="mb-3">
                                         <Accordion.Header>
                                             {" "}
-                                           
                                             <div
                                                 onClick={() => handleAccordionClick("4")}
                                                 className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
@@ -976,121 +974,14 @@ const DeliveryDots = () => {
                                                     onChange={() => setSelectedRadio("4")}
                                                     className="me-2 j-radio-checkbox"
                                                 />
-                                                <p className="d-inline px-3">Factura:</p>
+                                                <p className="d-inline px-3">Recibo personal</p>
                                             </div>
                                         </Accordion.Header>
                                         <Accordion.Body>
-                                            <div className="sj_gay_border px-3 py-4 mt-2 j_tb_size ">
-                                                <form>
-                                                    <div className="row j_col_width">
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Rut </label>
-                                                            <input
-                                                                type="text"
-                                                                name="rut"
-                                                                value={rut3}
-                                                                onChange={(e) => handleRutChange(e, setRut3)}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.rut && <div className="text-danger errormessage">{errors.rut}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Razón Social </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="bname"
-                                                                value={formData.bname}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.business_name && <div className="text-danger errormessage">{errors.business_name}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Sa, Ltda, Spa </label>
-                                                            <select
-                                                                name="ltda"
-                                                                value={formData.ltda}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white form-select">
-                                                                <option value="0">Seleccionar opción</option>
-                                                                <option value="sa">Sa</option>
-                                                                <option value="ltda">Ltda</option>
-                                                                <option value="spa">Spa</option>
-                                                            </select>
-                                                            {errors.ltda && <div className="text-danger errormessage">{errors.ltda}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Apellido Paterno</label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="lname"
-                                                                value={formData.lname}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.lname && <div className="text-danger errormessage">{errors.lname}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Giro </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="tour"
-                                                                value={formData.tour}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.tour && <div className="text-danger errormessage">{errors.tour}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 mb-2">
-                                                            <label className="mb-2">Dirección </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="address"
-                                                                value={formData.address}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                            {errors.address && <div className="text-danger errormessage">{errors.address}</div>}
-
-                                                        </div>
-                                                        <div className="col-6 ">
-                                                            <label className="mb-2">E-mail (opcional) </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="email"
-                                                                value={formData.email}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                        </div>
-                                                        <div className="col-6 ">
-                                                            <label className="mb-2">
-                                                                Teléfono móvil (opcional){" "}
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                id="id"
-                                                                name="number"
-                                                                value={formData.number}
-                                                                onChange={handleInputChange}
-                                                                className="sj_bg_dark sj_width_input ps-2 pe-4 py-2 text-white"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                            {/* <div className="sj_gay_border px-3 py-4 mt-2 j_tb_size ">
+                                            </div> */}
                                         </Accordion.Body>
-                                    </Accordion.Item> */}
+                                    </Accordion.Item>
                                     {/* <Accordion.Item eventKey="3" >
                                         <Accordion.Header>
                                             <div onClick={() => handleAccordionClick("4")}
@@ -1246,7 +1137,7 @@ const DeliveryDots = () => {
                                         </div>
                                         <div className="align-content-end mt-2 ak-w-50">
                                             {/* {console.log(orderType)} */}
-                                            
+
                                             {(orderType && orderType.orderType != 0) && <div
                                                 className={`bj-delivery-text-2  b_btn1 m-1 p-2 ${orderType.orderType?.toLowerCase() === 'local'
                                                     ? 'b_indigo'

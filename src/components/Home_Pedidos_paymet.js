@@ -662,7 +662,7 @@ export default function Home_Pedidos_paymet() {
     if (orderData?.status == 'delivered' || orderData?.status == "cancelled") {
       navigate(`/home/client/crear/${id}`, { replace: true })
     } else {
-      alert('No puedes generar una nota de crédito si el pedido actual no ha sido entregado')
+      alert('No puedes crear un nuevo pedido si el pedido actual no ha sido entregado')
     }
   }
 
@@ -1042,7 +1042,7 @@ export default function Home_Pedidos_paymet() {
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " v value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 "  value={table?.name ? `${table.name} (${table.table_no})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
                     </div>
                   </div>
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>

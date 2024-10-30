@@ -6,9 +6,9 @@ import useAudioManager from '../components/audioManager';
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
-    const [token,setToken] = useState(sessionStorage.getItem("token"));
-    const admin_id = sessionStorage.getItem("admin_id");
-    const user_id = sessionStorage.getItem("userId");
+    const [token,setToken] = useState(localStorage.getItem("token"));
+    const admin_id = localStorage.getItem("admin_id");
+    const user_id = localStorage.getItem("userId");
     const apiUrl = process.env.REACT_APP_API_URL;
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -16,37 +16,42 @@ export const NotificationProvider = ({ children }) => {
   const echo = useSocket();
   const { playNotificationSound } = useAudioManager();
   const [prevNotificationCount, setPrevNotificationCount] = useState(() => {
-    return parseInt(sessionStorage.getItem('prevNotificationCount') || '0');
+    const storedData = JSON.parse(localStorage.getItem('prevNotificationCount')) || [];
+    return storedData;
   });
-
   const fetchNotifications = useCallback(async () => {
     if (isFetching) return;
+    console.log("ddv",prevNotificationCount);
+    
     setIsFetching(true);
     try {
-      const admin_id = sessionStorage.getItem("admin_id");
-      const user_id = sessionStorage.getItem("userId");
-    //   const token = sessionStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_URL;
       const response = await axios.post(`${apiUrl}/notification/getAll`, 
         { admin_id, user_id }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
       const newCount = response.data.length;
       setNotifications(response.data.reverse());
-      setNotificationCount(newCount);
-
-      if (newCount > prevNotificationCount) {
-        playNotificationSound();
-        setPrevNotificationCount(newCount);
-        sessionStorage.setItem('prevNotificationCount', newCount.toString());
+      // setNotificationCount(newCount);
+      
+      const existingUser = prevNotificationCount.find(item => item.id === user_id);
+      if (existingUser) {
+        setNotificationCount(newCount - existingUser.count); 
+        // if (newCount > existingUser.count) {
+        //   existingUser.count = newCount;
+        //   // localStorage.setItem('prevNotificationCount', JSON.stringify(prevNotificationCount));
+        // }
+      } else {
+        setNotificationCount(newCount); 
+        const updatedCounts = [...prevNotificationCount, { id: user_id, count: newCount }];
+        setPrevNotificationCount(updatedCounts);
+        localStorage.setItem('prevNotificationCount', JSON.stringify(updatedCounts));
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     } finally {
       setIsFetching(false);
     }
-  }, [prevNotificationCount,token]);
+  }, [prevNotificationCount,token,user_id]);
 
   const debounceFetchNotifications = useRef(null); // Create a ref for debounce
 
@@ -58,27 +63,35 @@ export const NotificationProvider = ({ children }) => {
         debounceFetchNotifications.current = setTimeout(fetchNotifications, 1000); // Set a new timeout
         // playNotificationSound();; // Play sound when a new notification is received
       });
-    // console.log("Socket connection established")
   }
-
-   // Add a function to update the token
    const updateToken = useCallback((newToken) => {
+    console.log(token,newToken);
+    if(!token){
     setToken(newToken);
+  }
 }, []);
 
-//   useEffect(() => {
-//     // fetchNotifications();
+  const handleRead = useCallback(() => {
+    // console.log(user_id, notificationCount);
+    
+    const updatedData = prevNotificationCount.map(item => 
+      item.id == user_id ? { ...item, count: notifications.length } : item 
+    );
+    // console.log(updatedData);
+    // console.log(prevNotificationCount);
+    setPrevNotificationCount(updatedData);
+    // fetchNotifications();
+    localStorage.setItem('prevNotificationCount', JSON.stringify(updatedData));
+    
+    setNotificationCount(0);
+}, [notificationCount, prevNotificationCount, user_id]);
 
-//     if (echo) {
-//       echo.channel('notifications')
-//         .listen('NotificationMessage', () => {
-//           fetchNotifications();
-//         });
-//     }
-//   }, [echo, fetchNotifications]);
+  useEffect(() => {
+    fetchNotifications();
+  }, [token]);
 
   return (
-    <NotificationContext.Provider value={{ notifications, notificationCount, fetchNotifications, updateToken }}>
+    <NotificationContext.Provider value={{ notifications, notificationCount, fetchNotifications, updateToken,handleRead }}>
       {children}
     </NotificationContext.Provider>
   );

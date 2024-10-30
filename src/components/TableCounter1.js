@@ -50,7 +50,7 @@ const TableCounter1 = () => {
   const [personError, setPersonError] = useState("");
   const [cartError, setCartError] = useState("");
   const [itemToDelete, setItemToDelete] = useState(null);
-
+const [tabNo,setTabNo]= useState('');
   /*   const [ selectedCategory, setSelectedCategory ] = useState(categories[0]); */
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
@@ -75,6 +75,7 @@ const TableCounter1 = () => {
     if (!(role == "admin" || role == "cashier" || role == "waitress")) {
       navigate('/dashboard')
     }
+    
   }, [role])
 
 
@@ -82,6 +83,30 @@ const TableCounter1 = () => {
     // Store URL parameters in state when component mounts
     setUrlParams(new URLSearchParams(location.search));
   }, []);
+
+
+// get single table
+
+const getTable = async (id) => {
+  setIsProcessing(true);
+    try {
+      const response = await axios.get(`${apiUrl}/single-table/${id}`,  {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.data)  {
+        const no = response.data.tables.table_no;
+        setTabNo(no);
+      } else {
+        console.error("Response data is not a non-empty array:", response.data);
+      }
+      
+    } catch{
+
+    }
+}
+
 
   /* get table data */
 
@@ -114,6 +139,7 @@ const TableCounter1 = () => {
     if (tableStatus === "busy") {
       if (id) getTableData(id);
     }
+    getTable(id);
   },
     [id]
   );
@@ -1128,7 +1154,7 @@ const TableCounter1 = () => {
                 {tableData && Object.keys(tableData).length > 0 ? (
                   // Display table data
                   <div>
-                    <h4 className="j-table-co4 j-tbl-text-13">Mesa {tId}</h4>
+                    <h4 className="j-table-co4 j-tbl-text-13">Mesa {tabNo}</h4>
                     <div className="d-flex align-items-center justify-content-between my-3 ak-w-100">
                       <div className="j-busy-table d-flex align-items-center ak-w-50">
                         <div className="j-b-table" />
@@ -1379,7 +1405,7 @@ const TableCounter1 = () => {
                 ) : // If tableData is empty, check cartItems
                   cartItems.length === 0 ? (
                     <div>
-                      <h4 className="j-table-co4 j-tbl-text-13">Mesa {tId}</h4>
+                      <h4 className="j-table-co4 j-tbl-text-13">Mesa {tabNo}</h4>
                       <div className="d-flex align-items-center justify-content-between my-3 ak-w-100">
                         <div className="j-busy-table d-flex align-items-center ak-w-50">
                           <div className="j-a-table" />
@@ -1469,7 +1495,7 @@ const TableCounter1 = () => {
                     // If cartItems is not empty, display cart items
                     <div>
                       {/* Existing cart items display code */}
-                      <h4 className="j-table-co4 j-tbl-text-13">Mesa {tId}</h4>
+                      <h4 className="j-table-co4 j-tbl-text-13">Mesa {tabNo}</h4>
                       <div className="d-flex align-items-center justify-content-between my-3 ak-w-100">
                         <div className="j-busy-table d-flex align-items-center ak-w-50">
                           <div className="j-a-table" />

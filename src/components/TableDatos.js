@@ -41,6 +41,7 @@ const TableDatos = () => {
   const [tableData, setTableData] = useState([]);
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [tabNo, setTabNo] = useState('');
   const orderitem = [
     {
       image: img2,
@@ -76,6 +77,25 @@ const TableDatos = () => {
   const toggleShowAllItems = () => {
     setShowAllItems(!showAllItems);
   };
+  const getTable = async (id) => {
+    setIsProcessing(true);
+    try {
+      const response = await axios.get(`${apiUrl}/single-table/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.data) {
+        const no = response.data.tables.table_no;
+        setTabNo(no);
+      } else {
+        console.error("Response data is not a non-empty array:", response.data);
+      }
+
+    } catch {
+
+    }
+  }
 
   const increment = async (proid, item_id, quantity, tableId) => {
     // setCountsoup((prevCounts) =>
@@ -203,6 +223,7 @@ const TableDatos = () => {
       if (id) {
         getTableData(id);
         fetchAllItems();
+        getTable(id);
       }
       setIsProcessing(false);
     }
@@ -387,7 +408,7 @@ const TableDatos = () => {
     if (selectedRadio === "3") {
       specificData = {
         business_name: formRefs.bname.current?.value,
-         ltda: formRefs.ltda.current.value
+        ltda: formRefs.ltda.current.value
       };
     }
 
@@ -396,43 +417,45 @@ const TableDatos = () => {
   const validateForm = (data) => {
     const errors = {};
 
-    // RUT validation
-    if (!data.rut || data.rut.length < 7) {
-      errors.rut = "El RUT debe tener al menos 7 caracteres";
-    }
-
-    // Name validation
-    // if (data.receiptType != "4") {
-    if (data.receiptType != "3") {
-      if (!data.firstname || data.firstname.trim() === "") {
-        errors.fname = "Se requiere el primer nombre";
+    if (data.receiptType != "4") {
+      // RUT validation
+      if (!data.rut || data.rut.length < 7) {
+        errors.rut = "El RUT debe tener al menos 7 caracteres";
       }
-    }
 
-    // Business name validation for receipt type 4
-    // if (data.receiptType === "4") {
-    if (data.receiptType === "3") {
-      if (!data.business_name || data.business_name.trim() === "") {
-        errors.business_name = "Se requiere el nombre de la empresa";
+      // Name validation
+      // if (data.receiptType != "4") {
+      if (data.receiptType != "3") {
+        if (!data.firstname || data.firstname.trim() === "") {
+          errors.fname = "Se requiere el primer nombre";
+        }
       }
-      if (!data.ltda || data.ltda === "0") {
-        errors.ltda = "Seleccione una opción";
+
+      // Business name validation for receipt type 4
+      // if (data.receiptType === "4") {
+      if (data.receiptType === "3") {
+        if (!data.business_name || data.business_name.trim() === "") {
+          errors.business_name = "Se requiere el nombre de la empresa";
+        }
+        if (!data.ltda || data.ltda === "0") {
+          errors.ltda = "Seleccione una opción";
+        }
       }
-    }
 
-    // Last name validation
-    if (!data.lastname || data.lastname.trim() === "") {
-      errors.lname = "El apellido es obligatorio";
-    }
+      // Last name validation
+      if (!data.lastname || data.lastname.trim() === "") {
+        errors.lname = "El apellido es obligatorio";
+      }
 
-    // Tour validation
-    if (!data.tour || data.tour.trim() === "") {
-      errors.tour = "Se requiere tour";
-    }
+      // Tour validation
+      if (!data.tour || data.tour.trim() === "") {
+        errors.tour = "Se requiere tour";
+      }
 
-    // Address validation
-    if (!data.address || data.address.trim() === "") {
-      errors.address = "La dirección es necesaria";
+      // Address validation
+      if (!data.address || data.address.trim() === "") {
+        errors.address = "La dirección es necesaria";
+      }
     }
 
     setErrors(errors);
@@ -654,7 +677,7 @@ const TableDatos = () => {
                   </button>
                 </div>
               </Link>
-              <h2 className="text-white j-table-font-1 mb-0">Mesa {tId}</h2>
+              <h2 className="text-white j-table-font-1 mb-0">Mesa {tabNo}</h2>
               <div className="j-menu-bg-color">
                 <div className="j-table-cart-2 d-flex justify-content-between ">
                   <div className="line1  flex-grow-1">
@@ -810,6 +833,7 @@ const TableDatos = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
+
                   <Accordion.Item eventKey="2" className="mb-3">
                     <Accordion.Header>
                       {" "}
@@ -936,6 +960,7 @@ const TableDatos = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
+
                   <Accordion.Item eventKey="3" className="mb-3">
                     <Accordion.Header>
                       {" "}
@@ -1083,6 +1108,34 @@ const TableDatos = () => {
                       </div>
                     </Accordion.Body>
                   </Accordion.Item>
+
+                  <Accordion.Item eventKey="4" className="mb-3">
+                    <Accordion.Header>
+                      {" "}
+                      <div
+                        onClick={() => handleAccordionClick("4")}
+                        className={`sj_bg_dark j_td_mp sj_w-75 ${activeAccordionItem ===
+                          "4"
+                          ? "active"
+                          : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name="receiptType"
+                          value="1"
+                          checked={selectedRadio === "4"}
+                          onChange={() => setSelectedRadio("4")}
+                          className="me-2 j-radio-checkbox"
+                        />
+                        <p className="d-inline px-3">Recibo personal</p>
+                      </div>
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      {/* <div className="sj_gay_border px-3 py-4 mt-2 j_tb_size ">
+                                            </div> */}
+                    </Accordion.Body>
+                  </Accordion.Item>
+
                   {/* <Accordion.Item eventKey="3" >
                                         <Accordion.Header>
                                             <div onClick={() => handleAccordionClick("4")}

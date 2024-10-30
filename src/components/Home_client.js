@@ -28,9 +28,6 @@ function Home_client() {
   const [orderUser, setOrderUser] = useState([]);
   const [filteredOrderUser, setFilteredOrderUser] = useState([]);
 
-  // console.log(orderUser);
-
-
   document.addEventListener("DOMContentLoaded", function () {
     const tabs = document.querySelectorAll("#pills-tab button");
 

@@ -110,7 +110,7 @@ function Home_Usuarios() {
                     Metodo: order.payment_type == 'cash' ? 'Efectivo' :
                         order.payment_type == 'debit' ? 'Débito' :
                             order.payment_type == 'credit' ? 'Crédito' :
-                                order.payment_type == 'transfer' ? 'Transferir' : " ",
+                                order.payment_type == 'transfer' ? 'Transferencia' : " ",
                     Vuelto: "$" + order.total, // Changed to Spanish
                     Tipo: order.order_type.toLowerCase() === 'local' ? 'Local' :
                         order.order_type.toLowerCase().includes("with") ? 'Retiro ' :
@@ -494,7 +494,7 @@ function Home_Usuarios() {
                                                                     order.payment_type == 'cash' ? 'Efectivo' :
                                                                         order.payment_type == 'debit' ? 'Débito' :
                                                                             order.payment_type == 'credit' ? 'Crédito' :
-                                                                                order.payment_type == 'transfer' ? 'Transferir' : " "
+                                                                                order.payment_type == 'transfer' ? 'Transferencia' : " "
                                                                 }
                                                             </td>
                                                             <td className='b_text_w'>${order.order_details.reduce((acc, v) => acc + parseInt(v.amount) * parseInt(v.quantity), 0) - parseFloat(order.discount).toFixed(2)}</td>

@@ -332,7 +332,7 @@ const Counter_finalP = () => {
     // console.log("Payment", customerData);
     setFormErrors((prevState) => ({
       ...prevState,
-      [name]: undefined
+      amount: undefined
     }));
   };
 
@@ -569,7 +569,7 @@ const Counter_finalP = () => {
         customer_name:
           payment.firstname && payment.firstname.trim() !== ""
             ? payment.firstname
-            : payment.business_name,
+            : payment.business_name || "",
         reason: "",
         person: "",
         tip: tipAmount,

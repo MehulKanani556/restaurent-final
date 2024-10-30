@@ -60,7 +60,7 @@ function Home_detail() {
     const handleClose = () => setShow(false);
     const handleShow = (id, status) => {
         if (status == 'delivered' || status == 'finalized' || status == "cancelled") {
-            alert(`Tu pedido ha sido ${status == 'delivered' ? "Entregado" : status == 'finalized' ? "Finalizado" : status == 'cancelled' ? "Cancelado" : ''}.`)
+            alert(`No se puede Anular la venta porque el pedido actual aún no se ha preparado ni recibido.`)
         } else {
             setOrderId(id)
             setShow(true);
@@ -241,16 +241,13 @@ function Home_detail() {
     };
 
     const handleCredit = (id, status) => {
-        // console.log("Credit status:", status);
-
-        if (status === "finalized" || status === "delivered") {
-            console.log("Navigating to credit creation page");
-            navigate(`/home/client/crear/${id}`, { replace: true, state: { user } });
-        } else {
-            alert(`Tu pedido ha sido ${status == 'cancelled' ? "Cancelado" : status == 'prepared' ? "Preparado" : status == 'withdraw' ? "Retirar" : status ==  'received' ? 'Recibido' : ''}.`)
-        }
-    };
-
+        if (status === "delivered") {
+           console.log("Navigating to credit creation page");
+           navigate(`/home/client/crear/${id}`, { replace: true, state: { user } });
+       } else {
+           alert(`No se puede generar una nota de crédito si el pedido actual no ha sido entregado`)
+       }
+   };
     const handleCreditDetails = (status, orderId) => {
 
         if (status == "pending") {

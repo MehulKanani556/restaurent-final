@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const TableCard = ({ name, id, oId, no, userId, tableColor,selectedCards, getUserName, status, setTableStatus, onShowAvailableModal, handleData, handleGet, onShowOcupadoModal, isModalOpen, isOffcanvasOpen }) => {
+const TableCard = ({ name, id, oId,selectedTabNo, no,tableId, userId, tableColor,selectedCards, getUserName, status, setTableStatus, onShowAvailableModal, handleData, handleGet, onShowOcupadoModal, isModalOpen, isOffcanvasOpen }) => {
   const [isSelected, setSelected] = useState(false);
   const tableRef = useRef(null);
 
@@ -87,12 +87,12 @@ const TableCard = ({ name, id, oId, no, userId, tableColor,selectedCards, getUse
       <div className={`card-body jcard-color`} style={cardBodyStyle}>
         {(status === "busy") ? (
           <>
-            <p className='j-tbl-no-text-7 mb-0'>{no}</p>
+            <p className='j-tbl-no-text-7 mb-0'>{tableId || no}</p>
             <h5 className="card-text j-tbl-text-8 mb-1">Pedido : {oId}</h5>
             <p className="card-title j-tbl-text-9 mb-0">{getUserName(userId)}</p>
           </>
         ) : (
-          <p className='j-tbl-no-text-7 mb-0'>{no}</p>
+          <p className='j-tbl-no-text-7 mb-0'>{tableId}</p>
         )}
       </div>
     </div>

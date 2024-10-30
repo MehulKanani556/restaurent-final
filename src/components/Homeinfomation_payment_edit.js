@@ -962,8 +962,8 @@ const Homeinfomation_payment_edit = ({ item }) => {
                                         </div>
                                         <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                                             <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                                            {console.log("tabke", table)}
-                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name ? `${table.name} (${table.id})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                            
+                                            <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name ? `${table.name} (${table.table_no})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                         </div>
                                     </div>
                                     <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
