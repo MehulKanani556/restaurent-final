@@ -707,14 +707,14 @@ export default function ProductionCenter() {
         return prev.filter(v => v.production_id != productionCenterId);
       } else {
         console.log(obj1);
-        
+
         const add = {
           item_ids: menu.find(v => v.id === productionCenterId)?.items
-          .map(item => (obj1.some(obj => obj.id === item.id) ? item.id : null))
-          .filter(id => id !== null) || [],
+            .map(item => (obj1.some(obj => obj.id === item.id) ? item.id : null))
+            .filter(id => id !== null) || [],
           production_id: productionCenterId
         };
-        
+
         return [...prev, add];
       }
     });
@@ -1054,7 +1054,7 @@ export default function ProductionCenter() {
                   </Modal>
 
                   <div className="py-3 m_borbot mx-3 j-table-position-sticky-sector">
-                    
+
                     {productionCenters.map((item, index) => (
                       <div key={item.id}>
                         <div className="d-flex justify-content-between m14 align-items-center flex-wrap mb-2">
@@ -1511,12 +1511,18 @@ export default function ProductionCenter() {
                                   >
                                     <div>
                                       <div className="card m_bgblack text-white position-relative">
-                                        <img
-                                          src={`${API}/images/${ele.image}`}
-                                          className="card-img-top object-fit-cover rounded"
-                                          alt="..."
-                                          style={{ height: "162px" }}
-                                        />
+                                        {ele.image ? (
+                                          <img
+                                            src={`${API}/images/${ele.image}`}
+                                            className="card-img-top object-fit-cover rounded"
+                                            alt={ele.name}
+                                            style={{ height: "162px", objectFit: "cover" }}
+                                          />
+                                        ) : (
+                                          <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: '#374151', color: 'white' }}>
+                                            <p>{ele.name}</p>
+                                          </div>
+                                        )}
                                         <div className="card-body">
                                           <h6 className="card-title">
                                             {ele.name}
@@ -1686,12 +1692,18 @@ export default function ProductionCenter() {
 
                                   <div className="col-md-4 col-xl-3 col-sm-6 col-12 g-3" key={ele.id}>
                                     <div className="card m_bgblack text-white position-relative">
-                                      <img
-                                        src={`${API}/images/${ele.image}`}
-                                        className="card-img-top object-fit-cover rounded"
-                                        alt={ele.name}
-                                        style={{ height: "162px", objectFit: "cover" }}
-                                      />
+                                      {ele.image ? (
+                                        <img
+                                          src={`${API}/images/${ele.image}`}
+                                          className="card-img-top object-fit-cover rounded"
+                                          alt={ele.name}
+                                          style={{ height: "162px", objectFit: "cover" }}
+                                        />
+                                      ) : (
+                                        <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px",backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+                                          <p>{ele.name}</p>
+                                        </div>
+                                      )}
                                       <div className="card-body">
                                         <h6 className="card-title">{ele.name}</h6>
                                         <h6 className="card-title">$ {ele.sale_price}</h6>

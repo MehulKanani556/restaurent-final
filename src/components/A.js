@@ -835,12 +835,18 @@ export default function A() {
                                     >
                                       <div>
                                         <div className="card m_bgblack text-white position-relative">
-                                          <img
-                                            src={`${API}/images/${ele.image}`}
-                                            className="card-img-top object-fit-cover rounded"
-                                            alt="..."
-                                            style={{ height: "162px" }}
-                                          />
+                                          {ele.image ? (
+                                            <img
+                                              src={`${API}/images/${ele.image}`}
+                                              className="card-img-top object-fit-cover rounded"
+                                              alt={ele.name}
+                                              style={{ height: "162px", objectFit: "cover" }}
+                                            />
+                                          ) : (
+                                            <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: '#374151', color: 'white' }}>
+                                              <p>{ele.name}</p>
+                                            </div>
+                                          )}
                                           <div className="card-body">
                                             <h6 className="card-title">
                                               {ele.name}

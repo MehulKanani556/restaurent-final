@@ -14,12 +14,18 @@ const OrderCart = ({ image, name, price, code, addItemToCart ,id }) => {
   return (
     <div>
       <div class="card m_bgblack text-white position-relative">
-        <img
-        src={`${API}/images/${image}`}
-          class="card-img-top object-fit-cover"
-          alt="..."
-          style={{ height: "200px" }}
-        />
+      {image ? (
+          <img
+            src={`${API}/images/${image}`}
+            className="card-img-top object-fit-cover rounded"
+            alt={name}
+            style={{ height: "200px", objectFit: "cover" }}
+          />
+        ) : (
+          <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+            <p>{name}</p>
+          </div>
+        )}
         <div class="card-body">
           <h5 class="card-title j-tbl-text-16">{name}</h5>
           <h5 class="card-title j-tbl-pop-1">${price}</h5>

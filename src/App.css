@@ -1351,8 +1351,8 @@ td {
 .btn.show,
 .btn:first-child:active,
 :not(.btn-check)+.btn:active {
-  border: 1px solid transparent !important;
-  /* / border: none !important; / */
+  /* border: 1px solid transparent !important; */
+   border: none !important; 
 }
 input[placeholder],
 [placeholder],
@@ -5674,6 +5674,7 @@ select:focus-visible {
   width: 45px;
   font-size: 22px;
   border-radius: 50%;
+  position:relative;
 }
 
 .no-caret:hover {
@@ -5783,8 +5784,11 @@ select:focus-visible {
 
 .j-chat-fixed {
   position: absolute;
-  top: 20px;
-  left: 27px;
+  /* top: 17px; */
+  /* left: 28px; */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
 }
 
 .j-profile-dataa p {

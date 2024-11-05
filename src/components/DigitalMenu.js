@@ -1391,12 +1391,18 @@ export default function Articles() {
                                       >
                                         <div>
                                           <div className="card m_bgblack text-white position-relative">
+                                          {ele.image ? (
                                             <img
                                               src={`${API}/images/${ele.image}`}
                                               className="card-img-top object-fit-cover rounded"
-                                              alt="..."
-                                              style={{ height: "162px" }}
+                                              alt={ele.name}
+                                              style={{ height: "162px", objectFit: "cover" }}
                                             />
+                                          ) : (
+                                            <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+                                              <p>{ele.name}</p>
+                                            </div>
+                                          )}
                                             <div className="card-body">
                                               <h6 className="card-title">
                                                 {ele.name}

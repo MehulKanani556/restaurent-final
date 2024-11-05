@@ -333,16 +333,16 @@ const Chat = () => {
             let currentSubgroup = [];
 
             dateGroup.forEach((message) => {
-                const messageTime = new Date(message.created_at).toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    hour12: false 
+                const messageTime = new Date(message.created_at).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                 });
-                
+
                 // Start a new subgroup if:
                 // 1. Different sender
                 // 2. Same sender but time difference > 5 minutes
-                const shouldStartNewGroup = 
+                const shouldStartNewGroup =
                     currentSender !== message.sender_id ||
                     (currentTime && getTimeDifferenceInMinutes(currentTime, messageTime) > 5);
 
@@ -355,7 +355,7 @@ const Chat = () => {
                     ...message,
                     showTime: shouldStartNewGroup // Only show time for first message in group
                 });
-                
+
                 currentSender = message.sender_id;
                 currentTime = messageTime;
             });
@@ -373,16 +373,16 @@ const Chat = () => {
                             {subgroup.map((message, messageIndex) => (
                                 <div key={message.id}>
                                     {message.sender_id == userId ? (
-                                        <ChatBubble 
+                                        <ChatBubble
                                             details={{
                                                 ...message,
                                                 showTime: message.showTime
                                             }}
                                         />
                                     ) : (
-                                        message.receiver_id == userId || 
-                                        message.group_id == selectedContact?.pivot?.group_id ? (
-                                            <Home_ChatBubble 
+                                        message.receiver_id == userId ||
+                                            message.group_id == selectedContact?.pivot?.group_id ? (
+                                            <Home_ChatBubble
                                                 details={{
                                                     ...message,
                                                     showTime: message.showTime
@@ -549,18 +549,21 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                     </div>
                 ))} */}
                 {groups.map((group) => (
-                    <div className="sjcontacts-list" onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
-                        <div className={`sjcontact-item justify-content-between ${selectedContact.id === group ? 'mhighlighted' : ''}`}>
+                    <div className={`sjcontacts-list ${selectedContact?.id === group.id ? 'jchat-active' : ''}`} onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
+                        <div className={`sjcontact-item justify-content-between `}>
                             <div className='d-flex align-items-center'>
-                                <div className="sjavatar me-2" roundedCircle width="35px" height="35px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
-                                    {/* <div className="sjonline-status"></div> */}
-                                    {group.name.split(' ')
-                                        .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
-                                        .join('')}
+                                <div>
+
+                                    <div className="sjavatar me-1" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                        {/* <div className="sjonline-status"></div> */}
+                                        {group.name.split(' ')
+                                            .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
+                                            .join('')}
+                                    </div>
                                 </div>
                                 <div className="sjcontact-info ms-2">
                                     <div className="sjcontact-name">{group.name}</div>
-                                    <div className="sjcontact-message">{group?.messages[0].message}</div>
+                                    <div className="sjcontact-message">{group?.messages[0]?.message}</div>
                                 </div>
                             </div>
                             {/* {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (
@@ -590,7 +593,7 @@ const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedCon
                                                 .join('')}
                                         </div>
                                     </div>
-                                    <div className="sjcontact-info">
+                                    <div className="sjcontact-info text-break">
                                         <div className="sjcontact-name text-nowrap">{ele.name}</div>
                                         <div className="sjcontact-message">{ele.messages[0]?.message} </div>
                                     </div>

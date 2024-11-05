@@ -207,51 +207,21 @@ function Home_detail_no() {
     const handleReturn = () => {
 
         localStorage.setItem('credit', JSON.stringify(creditNote.id))
+
+        const payment = {
+            rut: paymentData?.rut,
+            firstname: paymentData?.firstname || "",
+            lastname:paymentData?.lastname || "",
+            tour:paymentData?.tour || "",
+            address:paymentData?.address || "",
+            email:paymentData?.email || "",
+            phone:paymentData?.phone || "",
+            business_name:paymentData?.business_name || "",
+            ltda:paymentData?.ltda,
+            receiptType: paymentData?.firstname? "1" : "3"
+        }
+        localStorage.setItem("payment", JSON.stringify(payment));
         navigate("/counter");
-
-        // if (!destination) {
-        //     setError('Ingrese la dirección de retorno');
-        //     return;
-        // }
-
-        // if (!(orderAlldata.some((v) => v.id == destination))) {
-        //     setError('No se encontró la orden de compra');
-        //     return;
-        // }
-
-        // setIsProcessing(true);
-        // axios
-        //     .post(
-        //         `${apiUrl}/order/getCreditUpdate/${creditNote.id}`,
-        //         {
-        //             status: "Completed",
-        //             destination: destination
-        //         },
-        //         {
-        //             headers: {
-        //                 Authorization: `Bearer ${token}`,
-        //             },
-        //         }
-        //     )
-        //     .then((response) => {
-        //         console.log(response.data);
-        //         setIsProcessing(false);
-
-        //         setShowcreditfinal(true);
-        //         setTimeout(() => {
-        //             setShowcreditfinal(false);
-        //             navigate('/home/client/detail', {
-        //                 replace: true,
-        //                 state,
-        //             });
-        //         }, 2000);
-
-        //     })
-        //     .catch((error) => {
-        //         console.error(error);
-        //         setIsProcessing(false);
-        //         setError('Hubo un error al intentar realizar el retorno');
-        //     });
         setError(null)
     }
 
@@ -348,15 +318,15 @@ function Home_detail_no() {
                         <div>
 
 
-                            <form action="">
+                        <form action="">
                                 <div className=' mx-4 mt-4 b_inputt b_home_field'>
                                     <div className='w-100 b_search text-white mb-3'>
                                         <label htmlFor="inputPassword2 " className="">Nombre</label>
-                                        <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={creditNote?.name} id="inputPassword2" placeholder="4" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                        <input type="text" className="form-control bg-gray border-0 mt-2 py-3" value={creditNote?.name} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                     </div>
                                     <div className='w-100 b_search text-white mb-3'>
                                         <label htmlFor="inputPassword2" className="">Código nota de credito</label>
-                                        <input type="text" className="form-control bg-gray  border-0 mt-2 py-3" value={creditNote?.code} id="inputPassword2" placeholder="0123456789" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                        <input type="text" className="form-control bg-gray  border-0 mt-2 py-3" value={creditNote?.code} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                     </div>
                                 </div>
                                 <div className='d-flex gap-5 mx-4 m b_inputt b_id_input b_home_field'>
@@ -366,10 +336,11 @@ function Home_detail_no() {
                                     </div>
                                     <div className='w-100 b_search text-white mb-3'>
                                         <label htmlFor="inputPassword2" className="">Correo electrónico</label>
-                                        <input type="text" className="form-control bg-gray  border-0 mt-2 py-3 " value={creditNote?.email} id="inputPassword2" placeholder="ejemplo@gmail.com" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
+                                        <input type="text" className="form-control bg-gray  border-0 mt-2 py-3 " value={creditNote?.email} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} />
                                     </div>
                                 </div>
                             </form>
+
                             <div className='ms-4'>
                                 <h6 className='text-white my-4 '>Productos</h6>
 

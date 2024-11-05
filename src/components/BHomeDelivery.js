@@ -661,7 +661,7 @@ const BHomeDelivery = () => {
         <div className="j-sidebar-nav j-bg-color">
           <Sidenav />
         </div>
-        <div className="j-counter-menu sidebar">
+        <div className="j-counter-menu sidebar" style={{ overflow: "hidden" }}>
           <div className="j-counter-header j_counter_header_last_change">
             <h2 className="text-white mb-3 sjfs-18">Mostrador</h2>
             <div className="j-menu-bg-color ">
@@ -788,7 +788,7 @@ const BHomeDelivery = () => {
             </div>
             <h3 className="text-white j-kds-body-text-1000 ak-w-100">Datos</h3>
             <div className="j-counter-price-data mt-3 ak-w-100">
-              <form className="d-flex">
+              <form className="d-flex flex-wrap w-100">
                 <div className="j-orders-type ak-w-50">
                   <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                     Tipo pedido
@@ -877,7 +877,8 @@ const BHomeDelivery = () => {
                         <div className="j-counter-order-border-fast">
                           <div className="j-counter-order-img" key={item.id}>
                             <div className="d-flex align-items-center justify-content-between">
-                              <img src={`${API}/images/${item.image}`} alt="" />
+
+                              <img src={`${API}/images/${item.image}`} alt={item.name} />
                               <h5 className="text-white j-tbl-pop-1">
                                 {item.name}
                               </h5>

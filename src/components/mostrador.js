@@ -978,13 +978,14 @@ const Mostrador = () => {
                     </label>
                     <input
                       type="text"
-                      className="form-control b-form-control"
+                      className="form-control b-form-control ak-input"
                       id="exampleFormControlInput1"
                       placeholder=""
                       // onChange={handlename}
                       value={userName}
                       disabled
                     />
+
                     {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
                   </div>
                   {/* <div className="j-orders-type ak-w-50">

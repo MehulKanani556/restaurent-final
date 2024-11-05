@@ -1115,7 +1115,7 @@ const DeliveryDots = () => {
 
                                 </div> */}
                                 <div className="j-counter-price-data">
-                                    <form className="d-flex">
+                                    <form className="d-flex flex-wrap w-100">
                                         <div className="j-orders-type ak-w-50">
                                             <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                                                 Tipo pedido

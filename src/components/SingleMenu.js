@@ -57,12 +57,18 @@ export default function SingleMenu({
         className="card text-white position-relative"
         style={{ backgroundColor: "#1F2A37" }}
       >
-        <img
-          src={`${API}/images/${image}`}
-          className="card-img-top object-fit-cover rounded"
-          alt="..."
-          style={{ height: "200px", objectFit: "cover" }}
-        />
+        {image ? (
+          <img
+            src={`${API}/images/${image}`}
+            className="card-img-top object-fit-cover rounded"
+            alt={name}
+            style={{ height: "200px", objectFit: "cover" }}
+          />
+        ) : (
+          <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+            <p>{name}</p>
+          </div>
+        )}
         <div className="card-body">
           <h6 className="card-title">{name}</h6>
           <h6 className="card-title">$ {price}</h6>

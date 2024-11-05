@@ -39,7 +39,7 @@ export default function Home_Pedidos_paymet() {
   const [show12, setShow12] = useState(false);
   const handleClose12 = () => setShow12(false);
   const [errorReason, setReasonError] = useState(null);
-  const noteInputRefs = useRef({}); 
+  const noteInputRefs = useRef({});
   const handleShow12 = async () => {
 
     // ----resons----
@@ -260,13 +260,15 @@ export default function Home_Pedidos_paymet() {
   const getItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAllDeletedAt`,{headers: {
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.get(`${apiUrl}/item/getAllDeletedAt`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setItems(response.data.items);
-      setObj1(response.data.items.filter(v=> v.deleted_at == null));
+      setObj1(response.data.items.filter(v => v.deleted_at == null));
       // setFilteredMenuItems(response.data.items);
-      setFilteredItemsMenu(response.data.items.filter(v=> v.deleted_at == null));
+      setFilteredItemsMenu(response.data.items.filter(v => v.deleted_at == null));
     } catch (error) {
       console.error(
         "Error fetching Items:",
@@ -327,14 +329,14 @@ export default function Home_Pedidos_paymet() {
     setIsProcessing(true);
     try {
       console.log(orderData.user_id);
-      
+
       const response = await axios.get(`${apiUrl}/get-user/${orderData.user_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       // console.log(response.data[0]);
-      
+
       setUser(response.data[0]);
     } catch (error) {
       console.error(
@@ -376,17 +378,17 @@ export default function Home_Pedidos_paymet() {
   const handleOrderDetails = () => {
     // Check if orderData is not null before accessing its properties
     if (orderData) {
-        const details = orderData.order_details.map((orderItem) => {
-            const matchingItem = items.find((item) => item.id === orderItem.item_id);
-            return {
-                ...orderItem,
-                image: matchingItem ? matchingItem.image : orderItem.image,
-                description: matchingItem ? matchingItem.description : orderItem.description,
-            };
-        });
-        setOrderDetails(details);
+      const details = orderData.order_details.map((orderItem) => {
+        const matchingItem = items.find((item) => item.id === orderItem.item_id);
+        return {
+          ...orderItem,
+          image: matchingItem ? matchingItem.image : orderItem.image,
+          description: matchingItem ? matchingItem.description : orderItem.description,
+        };
+      });
+      setOrderDetails(details);
     } else {
-        console.error("orderData is null, cannot handle order details.");
+      console.error("orderData is null, cannot handle order details.");
     }
   };
 
@@ -533,7 +535,8 @@ export default function Home_Pedidos_paymet() {
         `${apiUrl}/order/addItem`,
         {
           "order_id": id,
-          "order_details": selectedItemsMenu
+          "order_details": selectedItemsMenu,
+          "admin_id":admin_id
         },
         {
           headers: {
@@ -692,7 +695,7 @@ export default function Home_Pedidos_paymet() {
       }
       cartItems.push(obj)
     })
-    localStorage.setItem("tableId", JSON.stringify(orderData?.table_id)); 
+    localStorage.setItem("tableId", JSON.stringify(orderData?.table_id));
     localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
 
@@ -972,7 +975,7 @@ export default function Home_Pedidos_paymet() {
                         {/* <div className='btn a_btn_lightjamun my-3 bj-delivery-text-2 ' style={{ borderRadius: "10px" }}><span style={{ fontWeight: "600" }}>{orderData?.order_type}</span></div><br /> */}
                         <div className={`bj-delivery-text-2  b_btn1 mb-2 mt-3 p-0 text-nowrap d-flex  align-items-center justify-content-center 
                               ${pamentDone && orderData?.status.toLowerCase() === 'delivered' ? 'b_blue ' : orderData?.status.toLowerCase() === 'received' ? 'b_indigo' : orderData?.status.toLowerCase() === 'prepared' ? 'b_ora ' : orderData?.status.toLowerCase() === 'delivered' ? 'b_blue' : orderData?.status.toLowerCase() === 'finalized' ? 'b_green' : orderData?.status.toLowerCase() === 'withdraw' ? 'b_indigo' : orderData?.status.toLowerCase() === 'local' ? 'b_purple' : orderData?.status.toLowerCase() === 'cancelled' ? 'b_orange' : 'b_ora text-danger'}`}>
-                          { pamentDone && orderData?.status.toLowerCase() === 'delivered' ? 'Pagado' : orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
+                          {pamentDone && orderData?.status.toLowerCase() === 'delivered' ? 'Pagado' : orderData?.status.toLowerCase() === 'received' ? 'Recibido' : orderData?.status.toLowerCase() === 'prepared' ? 'Preparado ' : orderData?.status.toLowerCase() === 'delivered' ? 'Entregado' : orderData?.status.toLowerCase() === 'finalized' ? 'Finalizado' : orderData?.status.toLowerCase() === 'withdraw' ? 'Retirar' : orderData?.status.toLowerCase() === 'local' ? 'Local' : orderData?.status.toLowerCase() === 'cancelled' ? 'Cancelar' : ' '}
                         </div>
 
                         <div style={{ fontWeight: "600", borderRadius: "10px" }} className={`bj-delivery-text-2  b_btn1 mb-3  p-0 text-nowrap d-flex  align-items-center justify-content-center 
@@ -1042,7 +1045,7 @@ export default function Home_Pedidos_paymet() {
                     </div>
                     <div className='w-100 flex-grow-1 b_search text-white mb-3'>
                       <label htmlFor="inputPassword2" className="mb-2">Mesa</label>
-                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 "  value={table?.name ? `${table.name} (${table.table_no})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
+                      <input type="text" className="form-control bg-gray border-0 mt-2 py-2 " value={table?.name ? `${table.name} (${table.table_no})` : '-'} id="inputPassword2" placeholder="-" style={{ backgroundColor: '#242d38', borderRadius: "10px" }} disabled />
                     </div>
                   </div>
                   <div className='d-flex  flex-grow-1 gap-5 mx-4 m b_inputt b_id_input b_home_field  pt-3 '>
@@ -1233,12 +1236,18 @@ export default function Home_Pedidos_paymet() {
                       >
                         <div>
                           <div class="card m_bgblack text-white position-relative">
-                            <img
-                              src={`${API}/images/${ele.image}`}
-                              class="card-img-top object-fit-fill rounded"
-                              alt="..."
-                              style={{ height: "162px" }}
-                            />
+                            {ele.image ? (
+                              <img
+                                src={`${API}/images/${ele.image}`}
+                                className="card-img-top object-fit-cover rounded"
+                                alt={ele.name}
+                                style={{ height: "162px", objectFit: "cover" }}
+                              />
+                            ) : (
+                              <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+                                <p>{ele.name}</p>
+                              </div>
+                            )}
                             <div class="card-body">
                               <h6 class="card-title">{ele.name}</h6>
                               <h6 class="card-title">${ele.sale_price}</h6>

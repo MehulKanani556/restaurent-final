@@ -30,8 +30,8 @@ const ChatBubble = ({ className = "j-left-padding", details }) => {
                     alignItems: "flex-end",
                     justifyContent: "flex-start",
                     gap: "4px",
+                    maxWidth: "60%",
                     minWidth: "133px",
-                    maxWidth: "60%"
                 }}
             >
                 <div
@@ -130,7 +130,6 @@ const ChatBubble = ({ className = "j-left-padding", details }) => {
                 </div>
             </div>
            
-
             <div 
                 className={`sjavatar me-2 ${details.showTime ? 'roundedCircle' : ''}`} 
                 style={{ 

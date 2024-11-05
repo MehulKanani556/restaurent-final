@@ -118,7 +118,7 @@ const Counter_finalP = () => {
     if (noteInputRefs.current[index]) {
       noteInputRefs.current[index].value = newNote;
     }
-    
+
     // Debounce the state update to reduce re-renders
     const timeoutId = setTimeout(() => {
       setCartItems(prevItems => {
@@ -138,7 +138,7 @@ const Counter_finalP = () => {
         : item
     );
     setCartItems(updatedCartItems);
-    
+
     // Focus the input after state update
     setTimeout(() => {
       if (noteInputRefs.current[index]) {
@@ -150,7 +150,7 @@ const Counter_finalP = () => {
   // const handleFinishEditing = (index) => {
   //   // Get final value from ref
   //   const finalNote = noteInputRefs.current[index]?.value || "";
-    
+
   //   setCartItems(prevItems => {
   //     const updatedItems = [...prevItems];
   //     updatedItems[index] = {
@@ -185,9 +185,9 @@ const Counter_finalP = () => {
     return (
       <div>
         {item.note ? (
-          <p 
-            className="j-nota-blue" 
-            style={{ cursor: "pointer" }} 
+          <p
+            className="j-nota-blue"
+            style={{ cursor: "pointer" }}
             onClick={() => handleAddNoteClick(index)}
           >
             {item.note}
@@ -1140,22 +1140,22 @@ const Counter_finalP = () => {
                     />
                   </div>
                   <div className="mb-3 b-input-registers ak-w-50">
-                  <label
-                    htmlFor="exampleFormControlInput1"
-                    className="form-label text-white"
-                  >Quién lo registra
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control b-form-control"
-                    id="exampleFormControlInput1"
-                    placeholder=""
-                    // onChange={handlename}
-                    value={userName}
-                    disabled
-                  />
-                  {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
-                </div>
+                    <label
+                      htmlFor="exampleFormControlInput1"
+                      className="form-label text-white"
+                    >Quién lo registra
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control b-form-control ak-input"
+                      id="exampleFormControlInput1"
+                      placeholder=""
+                      // onChange={handlename}
+                      value={userName}
+                      disabled
+                    />
+                    {/* {orderTypeError && <div className="text-danger errormessage">{orderTypeError}</div>} */}
+                  </div>
                   {/* <div className="j-orders-type  ak-w-50">
                     <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                       Tipo pedido

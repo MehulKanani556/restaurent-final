@@ -282,17 +282,11 @@ console.log("previous Path: " , location);
       errors.production_center_id = "El centro de producción es obligatorio";
     }
 
-    if (
-      !formDetails.cost_price.trim() ||
-      isNaN(parseFloat(formDetails.cost_price))
-    ) {
+    if (!formDetails.cost_price.trim() || isNaN(parseFloat(formDetails.cost_price)) || parseFloat(formDetails.cost_price) <= 0) {
       errors.cost_price = "El precio de costo debe ser un número válido";
     }
 
-    if (
-      !formDetails.sale_price.trim() ||
-      isNaN(parseFloat(formDetails.sale_price))
-    ) {
+    if (!formDetails.sale_price.trim() || isNaN(parseFloat(formDetails.sale_price)) || parseFloat(formDetails.sale_price) <= 0) {
       errors.sale_price = "El precio de venta debe ser un número válido";
     } else {
       const costPrice = parseFloat(formDetails.cost_price);
@@ -311,20 +305,20 @@ console.log("previous Path: " , location);
       errors.sub_family_id = "La subfamilia es obligatoria";
     }
 
-    if(!formDetails.existingImage)
-      {
-        if (!formDetails.image) {
-          errors.image = "Se requiere una imagen";
-        } else if (formDetails.image && formDetails.image.size > 2 *  1024  *1024) {
-          errors.image = "El tamaño de la imagen debe ser inferior a 2 MB.";
-        } else if (formDetails.image) {
-          const allowedTypes = ['image/jpeg', 'image/svg+xml', 'image/png', 'image/gif'];
-          console.log(allowedTypes.includes(formDetails.image.type))
-          if (!allowedTypes.includes(formDetails.image.type)) {
-            errors.image = "El tipo de archivo no es válido. Solo se permiten archivos jpg, svg, png y gif.";
-          }
-        }
-      }
+    // if(!formDetails.existingImage)
+    //   {
+    //     if (!formDetails.image) {
+    //       errors.image = "Se requiere una imagen";
+    //     } else if (formDetails.image && formDetails.image.size > 2 *  1024  *1024) {
+    //       errors.image = "El tamaño de la imagen debe ser inferior a 2 MB.";
+    //     } else if (formDetails.image) {
+    //       const allowedTypes = ['image/jpeg', 'image/svg+xml', 'image/png', 'image/gif'];
+    //       console.log(allowedTypes.includes(formDetails.image.type))
+    //       if (!allowedTypes.includes(formDetails.image.type)) {
+    //         errors.image = "El tipo de archivo no es válido. Solo se permiten archivos jpg, svg, png y gif.";
+    //       }
+    //     }
+    //   }
 
     return errors;
   };
@@ -1381,7 +1375,7 @@ console.log("previous Path: " , location);
                           <div>
                             <img
                               src={`${API}/images/${formDetails.image}`}
-                              alt=""
+                              alt={formDetails.name}
                               className="object-fit-contain"
                               width={250}
                             />

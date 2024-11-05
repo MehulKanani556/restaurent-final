@@ -240,7 +240,7 @@ return (
                 {notifications.map(notification => (
                   <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none">
                     <div
-                      className={`offcanvas-box-1 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
+                      className={`offcanvas-box-1 w-100 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
                       style={{ height: "auto" }}
                       key={notification.id}
                     >

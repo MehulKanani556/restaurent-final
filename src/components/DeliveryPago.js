@@ -33,7 +33,7 @@ const DeliveryPago = () => {
   const [orderType, setOrderType] = useState(
     JSON.parse(localStorage.getItem("currentOrder")) || []
   );
-  const [orderTypeError,setOrderTypeError] = useState("")
+  const [orderTypeError, setOrderTypeError] = useState("")
 
   const [tableId] = useState(
     JSON.parse(localStorage.getItem("tableId")) || null
@@ -421,11 +421,11 @@ const DeliveryPago = () => {
 
   const handleOrderTypeChange = (e) => {
 
-    if(e.target.value == 0){
+    if (e.target.value == 0) {
       setOrderTypeError("Por favor seleccione un tipo de pedido");
-      }else{
-          setOrderTypeError("");
-      }
+    } else {
+      setOrderTypeError("");
+    }
     const newOrderType = e.target.value;
     const updatedOrder = { ...orderType, orderType: newOrderType };
     setOrderType(updatedOrder);
@@ -557,7 +557,7 @@ const DeliveryPago = () => {
 
     try {
       // console.log(orderData);
-      
+
       const response = await axios.post(`${apiUrl}${url}`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -1007,7 +1007,7 @@ const DeliveryPago = () => {
               <h3 className="text-white j-kds-body-text-1000 ak-w-100">Datos</h3>
               {/* <h2 className="text-white j-kds-body-text-1000">Resumen</h2> */}
               <div className="j-counter-price-data mt-3 ak-w-100">
-                <form className="d-flex">
+                <form className="d-flex flex-wrap w-100">
                   <div className="j-orders-type ak-w-50">
                     <label className="j-label-name  text-white mb-2 j-tbl-font-6 ">
                       Tipo pedido

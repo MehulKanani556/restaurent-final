@@ -50,7 +50,7 @@ const TableCounter1 = () => {
   const [personError, setPersonError] = useState("");
   const [cartError, setCartError] = useState("");
   const [itemToDelete, setItemToDelete] = useState(null);
-const [tabNo,setTabNo]= useState('');
+  const [tabNo, setTabNo] = useState('');
   /*   const [ selectedCategory, setSelectedCategory ] = useState(categories[0]); */
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
@@ -75,7 +75,7 @@ const [tabNo,setTabNo]= useState('');
     if (!(role == "admin" || role == "cashier" || role == "waitress")) {
       navigate('/dashboard')
     }
-    
+
   }, [role])
 
 
@@ -85,27 +85,27 @@ const [tabNo,setTabNo]= useState('');
   }, []);
 
 
-// get single table
+  // get single table
 
-const getTable = async (id) => {
-  setIsProcessing(true);
+  const getTable = async (id) => {
+    setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/single-table/${id}`,  {
+      const response = await axios.get(`${apiUrl}/single-table/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      if (response.data)  {
+      if (response.data) {
         const no = response.data.tables.table_no;
         setTabNo(no);
       } else {
         console.error("Response data is not a non-empty array:", response.data);
       }
-      
-    } catch{
+
+    } catch {
 
     }
-}
+  }
 
 
   /* get table data */
@@ -609,10 +609,10 @@ const getTable = async (id) => {
             }
           );
           console.log("Table status updated successfully", resTable.data);
-            localStorage.removeItem("cartItems");
-            setCartItems([]);
-            setCountsoup([]);
-            navigate("/table");
+          localStorage.removeItem("cartItems");
+          setCartItems([]);
+          setCountsoup([]);
+          navigate("/table");
         } catch (error) {
           setIsProcessing(false);
           console.log("Table status  Not updated" + error.message);
@@ -681,7 +681,7 @@ const getTable = async (id) => {
     if (noteInputRefs.current[index]) {
       noteInputRefs.current[index].value = newNote;
     }
-    
+
     // Debounce the state update to reduce re-renders
     const timeoutId = setTimeout(() => {
       setCartItems(prevItems => {
@@ -701,7 +701,7 @@ const getTable = async (id) => {
         : item
     );
     setCartItems(updatedCartItems);
-    
+
     // Focus the input after state update
     setTimeout(() => {
       if (noteInputRefs.current[index]) {
@@ -713,7 +713,7 @@ const getTable = async (id) => {
   const handleFinishEditing = (index) => {
     // Get final value from ref
     const finalNote = noteInputRefs.current[index]?.value || "";
-    
+
     setCartItems(prevItems => {
       const updatedItems = [...prevItems]; // Define updatedItems here
       updatedItems[index] = {
@@ -749,9 +749,9 @@ const getTable = async (id) => {
     return (
       <div>
         {item.note ? (
-          <p 
-            className="j-nota-blue" 
-            style={{ cursor: "pointer" }} 
+          <p
+            className="j-nota-blue"
+            style={{ cursor: "pointer" }}
             onClick={() => handleAddNoteClick(index)}
           >
             {item.note}
@@ -978,40 +978,45 @@ const getTable = async (id) => {
     if (itemToDelete) {
       removeAllItemFromCart(itemToDelete);
       handleCloseEditFam();
-      setIsProcessing(true);
-      try {
-        const response = await axios.delete(
-          `${apiUrl}/order/deleteSingle/${itemToDelete}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+      if (tableData.length > 0) {
+       
+        console.log("zdvdv");
+        
+        setIsProcessing(true);
+        try {
+          const response = await axios.delete(
+            `${apiUrl}/order/deleteSingle/${itemToDelete}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
+          );
+          if (response.data.success) {
+            setIsProcessing(false);
+            handleShowEditFamDel();
+            setTimeout(() => {
+              setShowEditFamDel(false);
+            }, 2000);
+            getTableData(tId);
           }
-        );
-        if (response.data.success) {
-          setIsProcessing(false);
-          handleShowEditFamDel();
-          setTimeout(() => {
-            setShowEditFamDel(false);
-          }, 2000);
-          getTableData(tId);
-        }
-        console.log("Product deleted successfully:", response.data);
+          console.log("Product deleted successfully:", response.data);
 
-      } catch (error) {
-        console.error(
-          "Error Delete OrderData:",
-          error.response ? error.response.data : error.message
-        );
-      } finally {
-        setIsProcessing(false);
+        } catch (error) {
+          console.error(
+            "Error Delete OrderData:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          setIsProcessing(false);
+        }
       }
     }
   };
 
-  const getUserName =   (id) => {
+  const getUserName = (id) => {
     const user = users.find(user => user.id === id);
-   
+
     if (user) {
       return user.name;
     } else {
@@ -1028,7 +1033,7 @@ const getTable = async (id) => {
           <div className="j-sidebar-nav j-bg-color">
             <Sidenav />
           </div>
-          <div className="j-counter-menu sidebar">
+          <div className="j-counter-menu sidebar" style={{ overflow: "hidden" }}>
             <div className=" j-counter-header j_counter_header_last_change">
               <h2 className="text-white mb-3 j-counter-text-1">Mostrador</h2>
               <div className="j-menu-bg-color ">
@@ -1189,7 +1194,7 @@ const getTable = async (id) => {
                       </div>
                     </div>
                     <div className="j-orders-inputs ak-w-100">
-                    <div className="w-100">
+                      <div className="w-100">
                         <div className="j-orders-inputs ak-w-100">
                           <div className="j-orders-code ak-w-50">
                             <label className="j-label-name text-white mb-2 j-tbl-btn-font-1">
@@ -1201,7 +1206,7 @@ const getTable = async (id) => {
                               value={getUserName(tableData[0].user_id)}
                               readOnly
                             />
-                           { console.log("name",getUserName(tableData[0].user_id)) }
+                            {console.log("name", getUserName(tableData[0].user_id))}
                           </div>
                           <div className="j-orders-code ak-w-50">
                             <label className="j-label-name j-tbl-btn-font-1 text-white mb-2">
@@ -1299,7 +1304,7 @@ const getTable = async (id) => {
                                       </div>
                                     </div>
                                     <div className="text-white j-order-count-why">
-                                    {item.isEditing ? (
+                                      {item.isEditing ? (
                                         <div>
                                           <input
                                             className="j-note-input"
@@ -1480,7 +1485,7 @@ const getTable = async (id) => {
                         </div>
                       </div>
                       <div className="b-product-order text-center">
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white mb-2" style={{color:"white"}} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white mb-2" style={{ color: "white" }} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
                           <path fillRule="evenodd" d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857Zm10 0A1.857 1.857 0 0 0 13 14.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 19.143v-4.286A1.857 1.857 0 0 0 19.143 13h-4.286Z" clipRule="evenodd" />
                         </svg>
                         <h6 className="h6-product-order text-white j-tbl-pop-1">

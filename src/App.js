@@ -71,11 +71,14 @@ function App() {
         <NotificationProvider>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/dd" element={<ChatComponent />} />
+          {/* <Route path="/dd" element={<ChatComponent />} /> */}
+          {/* dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
+          {/* counter */}
           <Route path="/counter" element={<Counter />} />
           <Route path="/counter/mostrador" element={<Mostrador />} />
           <Route path="/counter/payment" element={<Counter_finalP />} />
+          
           <Route path="/table" element={<Tables />} />
           <Route path="/home/client" element={<Home_client />} />
           <Route path="/home/client/detail" element={<Home_detail />} />

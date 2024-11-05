@@ -30,6 +30,7 @@ export default function Articles() {
   // Add product
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => {
+    console.log("vsvzsv");
     setShow1(false);
     // resetForm();
   };
@@ -684,19 +685,20 @@ export default function Articles() {
       errors.production_center_id = "El centro de producción es obligatorio";
     }
 
-    if (!formData.cost_price.trim() || isNaN(parseFloat(formData.cost_price))) {
-      errors.cost_price = "El precio de costo debe ser un número válido";
-    }
+    if (!formData.cost_price.trim() || isNaN(parseFloat(formData.cost_price)) || parseFloat(formData.cost_price) <= 0) {
+      errors.cost_price = "El precio de costo debe ser un número mayor que 0";
+  }
 
-    if (!formData.sale_price.trim() || isNaN(parseFloat(formData.sale_price))) {
-      errors.sale_price = "El precio de venta debe ser un número válido";
-    } else {
-      const costPrice = parseFloat(formData.cost_price);
-      const salePrice = parseFloat(formData.sale_price);
-      if (salePrice < costPrice) {
-        errors.sale_price = "El precio de venta no puede ser menor que el precio de costo";
-      }
+  if (!formData.sale_price.trim() || isNaN(parseFloat(formData.sale_price)) || parseFloat(formData.sale_price) <= 0) {
+    errors.sale_price = "El precio de venta debe ser un número mayor que 0";
+} else {
+    const costPrice = parseFloat(formData.cost_price);
+    const salePrice = parseFloat(formData.sale_price);
+    // Ensure cost_price is less than sale_price
+    if (salePrice <= costPrice) {
+        errors.sale_price = "El precio de venta debe ser mayor que el precio de costo";
     }
+}
 
     if (!formData.family_id) {
       errors.family_id = "La familia es obligatoria";
@@ -706,9 +708,9 @@ export default function Articles() {
       errors.sub_family_id = "La subfamilia es obligatoria";
     }
 
-    if (!selectedFile) {
-      errors.image = "Se requiere una imagen";
-    }
+    // if (!selectedFile) {
+    //   errors.image = "Se requiere una imagen";
+    // }
 
     // Set errors if any
     if (Object.keys(errors).length > 0) {
@@ -1735,7 +1737,7 @@ export default function Articles() {
                                 htmlFor="exampleFormControlInput8"
                                 className="form-label"
                               >
-                                Product Images
+                                Imagen del producto
                               </label>
                               {
                                 selectedFile ? (
