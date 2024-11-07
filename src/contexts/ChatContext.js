@@ -1,11 +1,11 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useCallback } from "react";
 import axios from 'axios';
 
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-    const [token,setToken] = useState(localStorage.getItem("token"));
+    const [token, setToken] = useState(localStorage.getItem("token"));
     const admin_id = localStorage.getItem("admin_id");
     const apiUrl = process.env.REACT_APP_API_URL;
     const [allUser, setAllUser] = useState([]);
@@ -14,7 +14,7 @@ export const ChatProvider = ({ children }) => {
     const [onlineUsers, setOnlineUsers] = useState();
     const [msgCount, setMsgCout] = useState(0)
     const userId = localStorage.getItem("userId");
-    
+
     useEffect(() => {
         setToken(localStorage.getItem("token"));
         if (token) {
@@ -55,6 +55,12 @@ export const ChatProvider = ({ children }) => {
             // setIsProcessing(false);
         }
     };
+    const updateToken = useCallback((newToken) => {
+        console.log(token, newToken);
+        if (!token) {
+            setToken(newToken);
+        }
+    });
 
     return (
         <ChatContext.Provider value={{
@@ -65,6 +71,8 @@ export const ChatProvider = ({ children }) => {
             msgCount,
             fetchOnlineUsers,
             fetchAllUsers,
+            updateToken,
+
         }}>
             {children}
         </ChatContext.Provider>

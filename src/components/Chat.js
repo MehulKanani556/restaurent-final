@@ -126,10 +126,11 @@ const Chat = () => {
     const [isLoading, setIsLoading] = useState(false);
     const inputTextRef = useRef(''); // Create a ref for the input text
     const inputFieldRef = useRef(null); // Create a ref for the input field
-    const { allUser, groups, groupChats, onlineUsers, fetchOnlineUsers, fetchAllUsers } = useChat();
+    const { allUser, groups, groupChats, onlineUsers, fetchOnlineUsers, fetchAllUsers,updateToken } = useChat();
     useEffect(() => {
         if (token) {
             setIsProcessing(true);
+            updateToken(token);
             fetchAllUsers();
             fetchOnlineUsers();
             setIsProcessing(false);
@@ -598,7 +599,6 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
                         </div>
                     </div>
                 ))}
-
                 <div className="j-chats-meaasges" style={{ borderTop: "1px solid #374151" }}>
 
                     {sortedContacts.map((ele) => {

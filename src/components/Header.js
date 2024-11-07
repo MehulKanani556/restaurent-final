@@ -113,7 +113,7 @@ export default function Header() {
   };
 
   const loadMoreNotifications = () => {
-    setVisibleNotifications(prev => prev + 100);
+    setVisibleNotifications(prev => prev + 50);
   };
 
   const hasMoreNotifications = notifications && notifications.length > visibleNotifications;
@@ -167,10 +167,10 @@ export default function Header() {
                 <React.Fragment key={dateKey}>
                   <p className="j-canvas-text mb-3">{dateString}</p>
                   {notifications.map(notification => (
-                    <Link 
+                    <Link
                       key={notification.id}
-                      to={notification.path || `${location.pathname}${location.search}`} 
-                      state={location.state} 
+                      to={notification.path || `${location.pathname}${location.search}`}
+                      state={location.state}
                       className="text-decoration-none"
                     >
                       <div
@@ -225,7 +225,7 @@ export default function Header() {
               ))}
               {hasMoreNotifications && (
                 <div className="text-center mt-3 mb-3">
-                  <Button 
+                  <Button
                     onClick={loadMoreNotifications}
                     variant="outline-primary"
                     className="w-75"

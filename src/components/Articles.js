@@ -8,25 +8,20 @@ import { BsThreeDots } from "react-icons/bs";
 import SingProd from "./SingProd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Loader from "./Loader";
 import { Spinner } from "react-bootstrap";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-//import { enqueueSnackbar  } from "notistack";
-import useAudioManager from "./audioManager";
 
 export default function Articles() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [token] = useState(localStorage.getItem("token"));
   const [role] = useState(localStorage.getItem("role"));
   const [admin_id] = useState(localStorage.getItem("admin_id"));
-  const [isLoading, setIsLoading] = useState(true);
   const [familyError, setFamilyError] = useState("");
   const [subFamilyError, setSubFamilyError] = useState("");
   const [subFamilySelectionError, setSubFamilySelectionError] = useState("");
   const [selectedFamilyNames, setSelectedFamilyNames] = useState([]);
   const [selectedSubFamilies, setSelectedSubFamilies] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { playNotificationSound } = useAudioManager();
   // Add product
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => {
@@ -36,20 +31,7 @@ export default function Articles() {
   };
   const handleShow1 = () => setShow1(true);
 
-  // const resetForm = () => {
-  //   formRef.current = {
-  //     name: "",
-  //     code: "",
-  //     production_center_id: "",
-  //     cost_price: "",
-  //     sale_price: "",
-  //     family_id: "",
-  //     sub_family_id: "",
-  //     description: ""
-  //   };
-  //   setSelectedFile(null);
-  //   setErrorMessages({});
-  // };
+
 
   // Add product success
   const [show1AddSuc, setShow1AddSuc] = useState(false);
@@ -435,8 +417,7 @@ export default function Articles() {
         setIsProcessing(false);
         setSubFamName("");
         setSubSelectName("");
-        //enqueueSnackbar (response.data?.notification, { variant: 'success' })
-        // playNotificationSound();;
+        
       })
       .catch(function (error) {
         console.error(
@@ -446,8 +427,7 @@ export default function Articles() {
         setSubFamilyError(
           "Error al crear la subfamilia. Por favor, inténtelo de nuevo."
         );
-        //enqueueSnackbar (error?.response?.data?.alert || errorMessage, { variant: 'error' })
-        // playNotificationSound();;
+       
       })
       .finally(() => {
         setIsProcessing(false);
