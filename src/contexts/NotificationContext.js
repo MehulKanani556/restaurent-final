@@ -21,8 +21,7 @@ export const NotificationProvider = ({ children }) => {
   });
   const fetchNotifications = useCallback(async () => {
     if (isFetching) return;
-    console.log("ddv",prevNotificationCount);
-    
+    // console.log("ddv",prevNotificationCount);    
     setIsFetching(true);
     try {
       const response = await axios.post(`${apiUrl}/notification/getAll`, 
@@ -52,16 +51,12 @@ export const NotificationProvider = ({ children }) => {
       setIsFetching(false);
     }
   }, [prevNotificationCount,token,user_id]);
-
-  const debounceFetchNotifications = useRef(null); // Create a ref for debounce
-
+  const debounceFetchNotifications = useRef(null);
   if (echo) {
     echo.channel('notifications')
       .listen('NotificationMessage', (event) => {
-        // console.log('New notification received:', event.notification);
-        if (debounceFetchNotifications.current) clearTimeout(debounceFetchNotifications.current); // Clear previous timeout
-        debounceFetchNotifications.current = setTimeout(fetchNotifications, 1000); // Set a new timeout
-        // playNotificationSound();; // Play sound when a new notification is received
+        if (debounceFetchNotifications.current) clearTimeout(debounceFetchNotifications.current); 
+        debounceFetchNotifications.current = setTimeout(fetchNotifications, 1000);
       });
   }
    const updateToken = useCallback((newToken) => {
@@ -70,32 +65,21 @@ export const NotificationProvider = ({ children }) => {
     setToken(newToken);
   }
 }, []);
-
   const handleRead = useCallback(() => {
-    // console.log(user_id, notificationCount);
-    
     const updatedData = prevNotificationCount.map(item => 
       item.id == user_id ? { ...item, count: notifications.length } : item 
     );
-    // console.log(updatedData);
-    // console.log(prevNotificationCount);
     setPrevNotificationCount(updatedData);
-    // fetchNotifications();
     localStorage.setItem('prevNotificationCount', JSON.stringify(updatedData));
-    
     setNotificationCount(0);
 }, [notificationCount, prevNotificationCount, user_id]);
-
   useEffect(() => {
     fetchNotifications();
   }, [token]);
-
   return (
     <NotificationContext.Provider value={{ notifications, notificationCount, fetchNotifications, updateToken,handleRead }}>
       {children}
     </NotificationContext.Provider>
   );
 };
-
 export const useNotifications = () => useContext(NotificationContext);
-

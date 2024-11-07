@@ -9,7 +9,6 @@ import ChatBubble from "./ChatBubble";
 import Home_ChatBubble from "./Home_ChatBubble";
 import useSocket from "../hooks/useSocket";
 import avatar from '../img/Avatar.png';
-import { useChat } from "../contexts/ChatContext";
 
 // Styles
 const styles = {
@@ -114,40 +113,39 @@ const Chat = () => {
     const [messages, setMessages] = useState([]); // Ensure messages state is defined
     const [searchTerm, setSearchTerm] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
-    // const [allUser, setAllUser] = useState([]);
-    // const [groups, setGroups] = useState([]);
-    // const [groupChats, setgroupChats] = useState([]);
+    const [allUser, setAllUser] = useState([]);
+    const [groups, setGroups] = useState([]);
+    const [groupChats, setgroupChats] = useState([]);
     const echo = useSocket();
     const apiUrl = process.env.REACT_APP_API_URL;
     const chatContainerRef = useRef(null);
     const [connection, setConnection] = useState(0)
     const [length, setLength] = useState(null);
-    // const [onlineUsers, setOnlineUsers] = useState();
+    const [onlineUsers, setOnlineUsers] = useState();
     const [isLoading, setIsLoading] = useState(false);
     const inputTextRef = useRef(''); // Create a ref for the input text
     const inputFieldRef = useRef(null); // Create a ref for the input field
-    const { allUser, groups, groupChats, onlineUsers, fetchOnlineUsers, fetchAllUsers } = useChat();
+
     useEffect(() => {
         if (token) {
             setIsProcessing(true);
             fetchAllUsers();
             fetchOnlineUsers();
-            setIsProcessing(false);
         }
     }, [token]);
 
-    // const fetchOnlineUsers = async () => {
-    //     // setIsProcessing(true);
-    //     try {
-    //         const response = await axios.get(`${apiUrl}/get-users`, {
-    //             headers: { Authorization: `Bearer ${token}` }
-    //         });
-    //         setOnlineUsers(response.data.filter((v) => v.activeStatus == '1'));
-    //     } catch (error) {
-    //         console.error("Error fetching users:", error);
-    //     }
-    //     // setIsProcessing(false);
-    // }
+    const fetchOnlineUsers = async () => {
+        // setIsProcessing(true);
+        try {
+            const response = await axios.get(`${apiUrl}/get-users`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setOnlineUsers(response.data.filter((v) => v.activeStatus == '1'));
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+        // setIsProcessing(false);
+    }
 
     // Add a separate useEffect for fetching online users periodically
     useEffect(() => {
@@ -174,6 +172,7 @@ const Chat = () => {
             }
         };
     }, [echo, selectedContact, userId]);
+
 
     const setupEchoListeners = () => {
         if (echo) {
@@ -203,20 +202,20 @@ const Chat = () => {
             // console.log("Socket connection established")
         }
     }
-    // const fetchAllUsers = async () => {
-    //     try {
-    //         const response = await axios.post(`${apiUrl}/chat/user`, { admin_id: admin_id }, {
-    //             headers: { Authorization: `Bearer ${token}` }
-    //         });
-    //         setAllUser(response.data.users);
-    //         setGroups(response.data.groups);
-    //         setgroupChats(response.data.groupChats);
-    //     } catch (error) {
-    //         console.error("Error fetching users:", error);
-    //     } finally {
-    //         setIsProcessing(false);
-    //     }
-    // };
+    const fetchAllUsers = async () => {
+        try {
+            const response = await axios.post(`${apiUrl}/chat/user`, { admin_id: admin_id }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAllUser(response.data.users);
+            setGroups(response.data.groups);
+            setgroupChats(response.data.groupChats);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     const fetchMessages = async () => {
         setIsLoading(true); // Set loading state
@@ -230,7 +229,6 @@ const Chat = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setIsLoading(false);
             setMessages(response.data);
             setLength(response.data.length)
             return response.data;
@@ -266,7 +264,6 @@ const Chat = () => {
             console.error('Error sending message:', error);
         }
     };
-
     useEffect(() => {
         if (selectedContact) {
             // console.log("SS")
@@ -476,7 +473,7 @@ const Chat = () => {
     );
 };
 
-const ContactsList = ({ groups, allUser = [], userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats, onlineUsers }) => {
+const ContactsList = ({ groups, allUser, userId, handleContactClick, selectedContact, searchTerm, setSearchTerm, groupChats, onlineUsers }) => {
     const formatDateTime = (createdAt) => {
         const messageDate = new Date(createdAt);
         const currentDate = new Date();
@@ -551,32 +548,27 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
                         </div>
                     </div>
                 ))} */}
-                {/* {console.log(groups,userId)}  */}
-                {groups && groups.map((group) => (
+                {groups.map((group) => (
                     <div className={`sjcontacts-list ${selectedContact?.id === group.id ? 'jchat-active' : ''}`} onClick={() => handleContactClick(group)} key={group.id} style={{ cursor: 'pointer' }}>
-                        <div className={`sjcontact-item  `}>
-                            <div>
-                                <div className="sjavatar me-1" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
-                                    {/* <div className="sjonline-status"></div> */}
-                                    {group.name.split(' ')
-                                        .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
-                                        .join('')}
+                        <div className={`sjcontact-item justify-content-between `}>
+                            <div className='d-flex align-items-center'>
+                                <div>
+
+                                    <div className="sjavatar me-1" roundedCircle width="32px" height="32px" style={{ backgroundColor: "#ab7171", textAlign: "center", alignContent: "center", fontWeight: "bold" }}>
+                                        {/* <div className="sjonline-status"></div> */}
+                                        {group.name.split(' ')
+                                            .map((word, i) => i < 2 ? word.charAt(0).toUpperCase() : "")
+                                            .join('')}
+                                    </div>
+                                </div>
+                                <div className="sjcontact-info ms-2">
+                                    <div className="sjcontact-name">{group.name}</div>
+                                    <div className="sjcontact-message">{group?.messages[0]?.message}</div>
                                 </div>
                             </div>
-                            <div className="sjcontact-info">
-                                <div className="sjcontact-name">{group.name}</div>
-                                <div className="sjcontact-message">{group?.messages[0]?.message}</div>
-                            </div>
-
-                            {/* {groups.filter(group => 
-                                group.messages.some(message => message.sender_id !== userId && message.read_by === "no")
-                            ).length > 0 && (
+                            {/* {groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length > 0 && (
                                 <div className="chat-circle">
-                                    <p className='mb-0'>
-                                        {groups.filter(group => 
-                                            group.messages.some(message => message.sender_id !== userId && message.read_by === "no")
-                                        ).length}
-                                    </p>
+                                    <p className='mb-0'>{groupChats.filter(message => message.sender_id != userId && message.read_by === "no").length}</p>
                                 </div>
                             )} */}
                         </div>
@@ -601,7 +593,7 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
                                                 .join('')}
                                         </div>
                                     </div>
-                                    <div className="sjcontact-info">
+                                    <div className="sjcontact-info text-break">
                                         <div className="sjcontact-name text-nowrap">{ele.name}</div>
                                         <div className="sjcontact-message">{ele.messages[0]?.message} </div>
                                     </div>

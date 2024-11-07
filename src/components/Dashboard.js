@@ -44,6 +44,7 @@ import axios from "axios";
 import Loader from "./Loader";
 import useSocket from "../hooks/useSocket";
 import * as XLSX from "xlsx-js-style";
+import { useChat } from "../contexts/ChatContext";
 // import ApexCharts from "apexcharts";
 // import ApexCharts from 'apexcharts';
 
@@ -152,18 +153,16 @@ const Dashboard = () => {
   const [allUser, setAllUser] = useState([]);
   const [groups, setGroups] = useState([]);
   const [groupChats, setgroupChats] = useState([]);
-
-
   const [deliveryData, setDeliveryData] = useState({});
-
   const [boxName, setBoxName] = useState([]);
+
+  const {fetchAllUsers} = useChat();
 
   useEffect(() => {
     if (userId) {
       // console.log(userId);
-      setupEchoListeners(userId);
+      // setupEchoListeners(userId);
       updateActiveStatus(userId);
-
     }
   }, [userId])
 
@@ -199,21 +198,6 @@ const Dashboard = () => {
           fetchAllUsers();
         });
       console.log("Socket connection established for user online");
-    }
-  };
-
-  const fetchAllUsers = async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/chat/user`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setAllUser(response.data.users);
-      setGroups(response.data.groups);
-      setgroupChats(response.data.groupChats);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
-      // setIsProcessing(false);
     }
   };
 
@@ -284,7 +268,7 @@ const Dashboard = () => {
     try {
       const response = await axios.post(
         `${apiUrl}/dashboard`,
-        {admin_id}, // You can pass any data here if needed
+        { admin_id }, // You can pass any data here if needed
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -340,7 +324,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getStatisticalData`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -361,11 +345,11 @@ const Dashboard = () => {
   const fetchPaymentMethos = async () => {
     setLoadingPayMethodData(true);
 
-    
+
     try {
       let durationData = {};
-    
-      if(selectedHastaMonth == new Date().getMonth() + 1){
+
+      if (selectedHastaMonth == new Date().getMonth() + 1) {
         if (paymentsData === 'day') {
           durationData = {
             duration: 'day',
@@ -381,16 +365,16 @@ const Dashboard = () => {
             duration: 'month',
             month: selectedHastaMonth  // Current month (1-12)
           };
-        } 
-      }else{
+        }
+      } else {
 
       }
 
-      
+
 
       const response = await axios.post(
         `${apiUrl}/getPaymentMethods`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -436,7 +420,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getTotalRevenue`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -458,7 +442,7 @@ const Dashboard = () => {
     try {
       const response = await axios.post(
         `${apiUrl}/getStatusSummary`,
-        {admin_id}, // You can pass any data here if needed
+        { admin_id }, // You can pass any data here if needed
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -498,7 +482,7 @@ const Dashboard = () => {
 
       const response = await axios.post(
         `${apiUrl}/getPopularProducts`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -537,7 +521,7 @@ const Dashboard = () => {
           month: selectBoxMonth  // Current month (1-12)
         };
       }
-      const response = await axios.post(`${apiUrl}/getBoxEntry`,  {...durationData,admin_id} , {
+      const response = await axios.post(`${apiUrl}/getBoxEntry`, { ...durationData, admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -574,7 +558,7 @@ const Dashboard = () => {
       }
       const response = await axios.post(
         `${apiUrl}/getdelivery`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -611,7 +595,7 @@ const Dashboard = () => {
       }
       const response = await axios.post(
         `${apiUrl}/cancelOrders`,
-        {...durationData,admin_id} ,
+        { ...durationData, admin_id },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -632,7 +616,7 @@ const Dashboard = () => {
     try {
       const response = await axios.post(
         `${apiUrl}/get-payments`,
-      {admin_id},
+        { admin_id },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -755,10 +739,10 @@ const Dashboard = () => {
         const currentMonth = selectedRevMonth - 1;
         const currentYear = startDate.getFullYear();
         const today = startDate.getDate(); // Get today's date
-        const cn = startDate.getMonth()+1; // Get the current month number
+        const cn = startDate.getMonth() + 1; // Get the current month number
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in the current month
         let endDay = selectedRevMonth === cn ? today : daysInMonth; // Determine the end day based on the condition
-        console.log(endDay,selectedRevMonth,cn,selectedRevMonth === cn)
+        console.log(endDay, selectedRevMonth, cn, selectedRevMonth === cn)
         for (let day = 1; day <= endDay; day++) {
           const dateString = new Date(currentYear, currentMonth, day).toLocaleDateString('en-US'); // Specify locale
           completeResults.push({ date: dateString, total: 0, quantity: 0 }); // Fill with 0 for each day of the month
@@ -821,7 +805,7 @@ const Dashboard = () => {
       const currentYear = startDate.getFullYear();
       const today = startDate.getDate(); // Get today's date
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get number of days in the current month
-      const cn = startDate.getMonth()+1; // Get the current month number
+      const cn = startDate.getMonth() + 1; // Get the current month number
 
       let endDay = selectedRevMonth == cn ? today : daysInMonth; // Determine the end day based on the condition
 
@@ -997,8 +981,8 @@ const Dashboard = () => {
       const infomation = {
         Recibido: summaryState?.received,
         Preparado: summaryState?.prepared,
-       Finalizado: summaryState?.finalized,
-       Entregado: summaryState?.delivered,
+        Finalizado: summaryState?.finalized,
+        Entregado: summaryState?.delivered,
       };
       const formattedData = Object.entries(
         infomation
@@ -1204,13 +1188,13 @@ const Dashboard = () => {
       .map((table, index) => {
 
         const box = boxName.find(box => box.id === table.box_id);
-          return {
-            Pedido: table.id,
-            Caja: box ? box.name : '',
-            Hora: new Date(table.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-            Fecha: new Date(table.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/'),
-            Estado: table.status === 'cancelled' ? 'Anulado' : table.status,
-          };
+        return {
+          Pedido: table.id,
+          Caja: box ? box.name : '',
+          Hora: new Date(table.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
+          Fecha: new Date(table.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/'),
+          Estado: table.status === 'cancelled' ? 'Anulado' : table.status,
+        };
       })
       .filter(item => item !== null);
 
@@ -1242,7 +1226,7 @@ const Dashboard = () => {
     ws["!rows"][1] = { hpt: 25 }; // Set height for column names
 
     // Auto-size columns
-    const colWidths = [{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 },{ wch: 15 }];
+    const colWidths = [{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
     ws["!cols"] = colWidths;
 
     // Add sorting functionality
@@ -1387,7 +1371,7 @@ const Dashboard = () => {
                   <div className="j-chart-head">
                     <p className="sjfs-16">Total ingresos</p>
                     <h3 className="text-white fw-bold sj-fs30">
-                    $ {stateData.total_income ? stateData.total_income.toFixed(2) : '0.00'}
+                      $ {stateData.total_income ? stateData.total_income.toFixed(2) : '0.00'}
                     </h3>
                   </div>
                   <ResponsiveContainer width="100%" height={100}>
@@ -1540,7 +1524,7 @@ const Dashboard = () => {
                           }
                         }}
                         value={selectedHastaMonth}
-                        style={{fontWeight: '500', lineHeight: '21px'}}
+                        style={{ fontWeight: '500', lineHeight: '21px' }}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1571,12 +1555,12 @@ const Dashboard = () => {
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option4"
                       onClick={() => {
-                        if(selectedHastaMonth == new Date().getMonth() + 1){
+                        if (selectedHastaMonth == new Date().getMonth() + 1) {
                           setPaymentData('day')
-                        }else{
+                        } else {
                           setPaymentData('month')
                         }
-                        }}
+                      }}
                     >
                       Día
                     </label>
@@ -1591,10 +1575,10 @@ const Dashboard = () => {
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
                       htmlFor="option5"
-                      onClick={() =>{
-                        if(selectedHastaMonth == new Date().getMonth() + 1){
+                      onClick={() => {
+                        if (selectedHastaMonth == new Date().getMonth() + 1) {
                           setPaymentData('week')
-                        }else{
+                        } else {
                           setPaymentData('month')
                         }
                       }}
@@ -1608,7 +1592,7 @@ const Dashboard = () => {
                       id="option6"
                       autoComplete="off"
                       defaultChecked
-                      checked = {paymentsData == "month"}
+                      checked={paymentsData == "month"}
                       disabled={selectedHastaMonth > new Date().getMonth() + 1}
                     />
                     <label
@@ -1719,7 +1703,7 @@ const Dashboard = () => {
                     <div className="s_dashboard-left-head  ">
                       <h2 className="text-white  sjfs-2">{Number(totalRevenue.total_revenue).toFixed(0)}$</h2>
 
-                      <p style={{fontSize: "16px",fontWeight: "400",lineHeight: "24px", textAlign: "left"}}>Ingresos totales</p>
+                      <p style={{ fontSize: "16px", fontWeight: "400", lineHeight: "24px", textAlign: "left" }}>Ingresos totales</p>
                     </div>
 
                     <div className="s_dashboard-right-head">
@@ -1738,7 +1722,7 @@ const Dashboard = () => {
                             }
                           }}
                           value={selectedRevMonth}
-                          style={{fontWeight: '500', lineHeight: '21px'}}
+                          style={{ fontWeight: '500', lineHeight: '21px' }}
                         >
                           <option value="1">Mes Enero</option>
                           <option value="2">Mes Febrero</option>
@@ -1792,7 +1776,7 @@ const Dashboard = () => {
                           id="option9"
                           autoComplete="off"
                           defaultChecked
-                          checked= {revData == "month"}
+                          checked={revData == "month"}
                           disabled={selectedRevMonth > new Date().getMonth() + 1}
                         />
                         <label
@@ -1812,58 +1796,58 @@ const Dashboard = () => {
                 </div>
                 <div className="j-payment-body">
 
-                <ResponsiveContainer width="100%" height={450}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>  
-            <defs>
-              <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="10%" stopColor="#1c64f2" stopOpacity={0.5} />
-                <stop offset="90%" stopColor="#395692" stopOpacity={0.0} />
-              </linearGradient>
-              <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="10%" stopColor="#16bdca" stopOpacity={0.5} />
-                <stop offset="90%" stopColor="#1c506a" stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgb(55, 65, 82)" horizontal={true} vertical={false} />
-            {/* {chartData[0]!=undefined && ( */}
+                  <ResponsiveContainer width="100%" height={450}>
+                    <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="10%" stopColor="#1c64f2" stopOpacity={0.5} />
+                          <stop offset="90%" stopColor="#395692" stopOpacity={0.0} />
+                        </linearGradient>
+                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="10%" stopColor="#16bdca" stopOpacity={0.5} />
+                          <stop offset="90%" stopColor="#1c506a" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgb(55, 65, 82)" horizontal={true} vertical={false} />
+                      {/* {chartData[0]!=undefined && ( */}
 
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickFormatter={(date) => {
-                const d = new Date(date);
-                // Check if revData is 'day' and return today's date
-                return revData === 'day' ? `${String(new Date().getDate()).padStart(2, '0')}` : `${String(d.getDate()).padStart(2, '0')}`;
-              }}
-              // tick={{ fill: 'white' }}
-              interval={0}
-              padding={{ left: 25, right: 10 }}
-              domain={['dataMin', 'dataMax']}
-            />
-            {/* )} */}
-            <YAxis yAxisId="left" orientation="left" stroke="#1c64f2" hide />
-            <YAxis yAxisId="right" orientation="right" stroke="#16bdca" hide />
-            <Tooltip cursor={false} formatter={(value, name) => [value, name === 'total' ? 'Total' : 'Quantity']} />
-            <Area 
-              // type="monotone"
-              dataKey="total" 
-              stroke="#1c64f2" 
-              strokeWidth={3} 
-              fill="url(#colorOrder)" 
-              dot={false} 
-              yAxisId="left"
-            />
-            <Area 
-              // type="monotone"
-              dataKey="quantity" 
-              stroke="#16bdca" 
-              strokeWidth={3} 
-              fill="url(#colorTotal)" 
-              dot={false} 
-              yAxisId="right"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+                      <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickFormatter={(date) => {
+                          const d = new Date(date);
+                          // Check if revData is 'day' and return today's date
+                          return revData === 'day' ? `${String(new Date().getDate()).padStart(2, '0')}` : `${String(d.getDate()).padStart(2, '0')}`;
+                        }}
+                        // tick={{ fill: 'white' }}
+                        interval={0}
+                        padding={{ left: 25, right: 10 }}
+                        domain={['dataMin', 'dataMax']}
+                      />
+                      {/* )} */}
+                      <YAxis yAxisId="left" orientation="left" stroke="#1c64f2" hide />
+                      <YAxis yAxisId="right" orientation="right" stroke="#16bdca" hide />
+                      <Tooltip cursor={false} formatter={(value, name) => [value, name === 'total' ? 'Total' : 'Quantity']} />
+                      <Area
+                        // type="monotone"
+                        dataKey="total"
+                        stroke="#1c64f2"
+                        strokeWidth={3}
+                        fill="url(#colorOrder)"
+                        dot={false}
+                        yAxisId="left"
+                      />
+                      <Area
+                        // type="monotone"
+                        dataKey="quantity"
+                        stroke="#16bdca"
+                        strokeWidth={3}
+                        fill="url(#colorTotal)"
+                        dot={false}
+                        yAxisId="right"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
                 <div className="j-foot-text text-end" onClick={totalrevenueReport}>
                   <button className="sjfs-14">
@@ -1896,19 +1880,19 @@ const Dashboard = () => {
                   <div className="j-summary-data2 mb-3">
                     <div className="d-flex align-items-center j-margin ak-Dstate">
                       <img src={chart4} className="jj_img me-2 ak-me1" />
-                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Recibido</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{ lineHeight: '21px' }}>Recibido</p>
                     </div>
                     <div className="d-flex align-items-center j-margin ak-Dstate">
                       <img src={chart2} className="jj_img me-2 ak-me1" />
-                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Preparado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{ lineHeight: '21px' }}>Preparado</p>
                     </div>
                     <div className="d-flex align-items-center j-margin ak-Dstate">
                       <img src={chart1} className="jj_img me-2 ak-me1" />
-                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Finalizado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{ lineHeight: '21px' }}>Finalizado</p>
                     </div>
                     <div className="d-flex align-items-center">
                       <img src={chart3} className="jj_img me-2 ak-me1" />
-                      <p className="ss_fontsize mb-0 sjfs-14" style={{lineHeight:'21px'}}>Entregado</p>
+                      <p className="ss_fontsize mb-0 sjfs-14" style={{ lineHeight: '21px' }}>Entregado</p>
                     </div>
                   </div>
                 </div>
@@ -1937,7 +1921,7 @@ const Dashboard = () => {
                           }
                         }}
                         value={selectPopMonth}
-                        style={{fontWeight: '500', lineHeight: '21px'}}
+                        style={{ fontWeight: '500', lineHeight: '21px' }}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -1994,7 +1978,7 @@ const Dashboard = () => {
                       id="option12"
                       autoComplete="off"
                       defaultChecked
-                      checked= {popData == "month"}
+                      checked={popData == "month"}
                       disabled={selectPopMonth > new Date().getMonth() + 1}
 
                     />
@@ -2038,9 +2022,9 @@ const Dashboard = () => {
                       className="j-summary-body-data scrollbox d-flex align-items-center justify-content-between"
                     >
                       <div className="d-flex align-items-center">
-                        <div className="j-order-no" style={{width: "30px"}}>#{index + 1}</div>
+                        <div className="j-order-no" style={{ width: "30px" }}>#{index + 1}</div>
                         <div className="j-order-img">
-                          <img src={`${API}/images/${item.image}`} alt={item.name} style={{borderRadius:"8px"}} />
+                          <img src={`${API}/images/${item.image}`} alt={item.name} style={{ borderRadius: "8px" }} />
                         </div>
                         <div className="j-order-data">
                           <h4 className="sjfs-16">{item.name}</h4>
@@ -2083,7 +2067,7 @@ const Dashboard = () => {
                           }
                         }}
                         value={selectDeliveryMonth}
-                        style={{fontWeight: '500', lineHeight: '21px'}}
+                        style={{ fontWeight: '500', lineHeight: '21px' }}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -2139,10 +2123,10 @@ const Dashboard = () => {
                       id="option15"
                       autoComplete="off"
                       defaultChecked
-                      checked= {deliveryDay == "month"}
+                      checked={deliveryDay == "month"}
                       disabled={selectDeliveryMonth > new Date().getMonth() + 1}
-                      
-                      
+
+
                     />
                     <label
                       className="btn btn-outline-primary j-custom-label sjfs-12"
@@ -2161,19 +2145,19 @@ const Dashboard = () => {
                   <div className="row align-items-center mt-4">
                     <div className="col-4">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Delivery</p>
+                        <p className="sjfs-16" style={{ fontWeight: "500", lineHeight: '21px' }}>Delivery</p>
                         <h5 className="sjfs-2">{deliveryData.delivery}</h5>
                       </div>
                     </div>
                     <div className="col-4 text-center">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Retiro</p>
+                        <p className="sjfs-16" style={{ fontWeight: "500", lineHeight: '21px' }}>Retiro</p>
                         <h5 className="sjfs-2">{deliveryData.withdrawal}</h5>
                       </div>
                     </div>
                     <div className="col-4 text-end">
                       <div className="j-delivery-data">
-                        <p className="sjfs-16" style={{fontWeight:"500", lineHeight:'21px'}}>Local</p>
+                        <p className="sjfs-16" style={{ fontWeight: "500", lineHeight: '21px' }}>Local</p>
                         <h5 className="sjfs-2">{deliveryData.local}</h5>
                       </div>
                     </div>
@@ -2268,7 +2252,7 @@ const Dashboard = () => {
                           }
                         }}
                         value={selectBoxMonth}
-                        style={{fontWeight: '500', lineHeight: '21px'}}
+                        style={{ fontWeight: '500', lineHeight: '21px' }}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
@@ -2418,7 +2402,7 @@ const Dashboard = () => {
                           }
                         }}
                         value={seleceCancelMonth}
-                        style={{fontWeight: '500', lineHeight: '21px'}}
+                        style={{ fontWeight: '500', lineHeight: '21px' }}
                       >
                         <option value="1">Mes Enero</option>
                         <option value="2">Mes Febrero</option>
