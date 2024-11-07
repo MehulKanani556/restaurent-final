@@ -33,6 +33,7 @@ export const EnlanceAdminPass = () => {
     },
     [conPass]
   );
+
   const validatePass = () => {
     if (pass.length < 8) {
       setErrors(prev => ({ ...prev, pass: "La contraseña debe tener al menos 8 caracteres" }));
@@ -73,9 +74,10 @@ export const EnlanceAdminPass = () => {
     if (validatePassword()) {
       try {
         const response = await axios.post(`${apiUrl}/set-password/${id}`, {
-          password: pass
+          password: pass,
+
         });
-        if (response.data) {
+        if (response.data.success) {
           setSuccessMessage("Contraseña establecida con éxito");
           setShowSuccessModal(true);
           setPass("");
@@ -86,7 +88,8 @@ export const EnlanceAdminPass = () => {
             navigate("/");
           }, 2000);
         } else {
-          setErrorMessage("Credenciales inválidas");
+          setErrorMessage(response.data.message || "Credenciales inválidas");
+
           setShowModal(true);
         }
       } catch (error) {
@@ -100,6 +103,10 @@ export const EnlanceAdminPass = () => {
             : "Error al configurar la contraseña. Por favor, inténtelo de nuevo."
         );
         setShowModal(true);
+      }
+      finally {
+        setPass("");
+        setConPass("");
       }
     }
   };
@@ -257,6 +264,7 @@ export const EnlanceAdminPass = () => {
             backdrop={true}
             keyboard={false}
             className="m_modal m_loginpop"
+            onShow={() => setTimeout(() => setShowModal(false), 2000)}
           >
             <Modal.Header closeButton className="border-0" />
             <Modal.Body>

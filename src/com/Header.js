@@ -1,18 +1,16 @@
 import axios from "axios";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Dropdown, Offcanvas, Toast } from "react-bootstrap";
 import { FaUserLarge } from "react-icons/fa6";
 import { IoCloudUpload, IoNotifications } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useSocket from "../hooks/useSocket";
 import { useNotifications } from "../contexts/NotificationContext";
-
 export default function Header() {
 
   const [email] = useState(localStorage.getItem("email"));
   const [role] = useState(localStorage.getItem("role"));
   const [token] = useState(localStorage.getItem("token"));
-  const admin_id = localStorage.getItem("admin_id");
   const user_id = localStorage.getItem("userId");
   const apiUrl = process.env.REACT_APP_API_URL;
   const [name] = useState(localStorage.getItem("name"));
@@ -21,74 +19,17 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const echo = useSocket();
-  
   const { notifications, notificationCount, handleRead } = useNotifications(); // Use the context
-  
-  const handleLogout = async () => {
-    try {
-      const responce = await axios.post(
-        `${apiUrl}/update-user/${user_id}`,
-        {
-          activeStatus: "0",
-          name: name,
-          email: email,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      if (responce.status == 200) {
-        echo.leaveChannel(`chat.${user_id}`);
-        // Clear only the current window's local storage
-        localStorage.removeItem("email");
-        localStorage.removeItem("role");
-        localStorage.removeItem("token");
-        localStorage.removeItem("name");
-        localStorage.removeItem("admin_id");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("tableId");
-        localStorage.removeItem("lastOrder");
-        localStorage.removeItem("countsoup");
-        localStorage.removeItem("tablePayment");
-        localStorage.removeItem("selectedTable");
-        localStorage.removeItem("removedItems");
-        // Redirect to the login page
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.log("not updating user", + error.message);
-    }
-  };
-
-  const logoutAfterInactivity = useCallback(() => {
-    const handleActivity = () => {
-      clearTimeout(logoutTimer);
-      logoutTimer = setTimeout(handleLogout, 60000); // 1 minute inactivity timer
-    };
-
-    let logoutTimer = setTimeout(handleLogout, 60000);
-
-    window.addEventListener("mousemove", handleActivity);
-    window.addEventListener("keydown", handleActivity);
-
-    // Cleanup effect to clear timer and remove event listeners
-    return () => {
-      clearTimeout(logoutTimer);
-      window.removeEventListener("mousemove", handleActivity);
-      window.removeEventListener("keydown", handleActivity);
-    };
-  }, [handleLogout]);
+  const [visibleNotifications, setVisibleNotifications] = useState(100); // New state for visible notifications
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/", { state: { from: location } });
-    } else {
-      logoutAfterInactivity(); // Initialize inactivity timer on mount
+      navigate('/', { state: { from: location } });
     }
-  }, [token, navigate, location, logoutAfterInactivity]);
+  }, [token, navigate, location]);
+
+
   if (!token) {
     return null;
   }
@@ -97,7 +38,27 @@ export default function Header() {
   }
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+
   const toggleShowA = () => setShowA(!showA);
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/update-user/${user_id}`,
+        { activeStatus: "0", name, email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.status == 200) {
+        echo.leaveChannel(`chat.${user_id}`);
+        ["email", "role", "token", "name", "admin_id", "userId", "tableId", "lastOrder", "countsoup", "tablePayment", "selectedTable", "removedItems"].forEach((item) =>
+          localStorage.removeItem(item)
+        );
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error updating user status:", error.message);
+    }
+  };
   const roleTranslations = {
     admin: "Admin",
     cashier: "Cajero",
@@ -105,20 +66,26 @@ export default function Header() {
     kitchen: "Cocina"
   };
   const translatedRole = roleTranslations[role] || role;
+
+  // Function to format date as DD/MM/YYYY
   const formatDate = (date) => {
     const d = new Date(date);
     return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
   };
+
+  // New function to group notifications by date
   const groupNotificationsByDate = (notifications) => {
     const grouped = {};
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to midnight for date comparison
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
     notifications.forEach(notification => {
       const notificationDate = new Date(notification.created_at);
       notificationDate.setHours(0, 0, 0, 0); // Set to midnight for comparison
       const dateKey = notificationDate.getTime();
+
       let dateString;
       if (notificationDate.getTime() === today.getTime()) {
         dateString = 'Hoy';
@@ -127,6 +94,7 @@ export default function Header() {
       } else {
         dateString = formatDate(notificationDate);
       }
+
       if (!grouped[dateKey]) {
         grouped[dateKey] = {
           dateString: dateString,
@@ -137,12 +105,19 @@ export default function Header() {
     });
     return Object.entries(grouped).sort(([a], [b]) => b - a); // Sort by date, most recent first
   };
+
   const handleNotification = () => {
     handleShow();
     setTimeout(() => {
       handleRead();
     }, 300)
   }
+
+  // Function to load more notifications
+  const loadMoreNotifications = () => {
+    setVisibleNotifications(prev => prev + 100); // Increase visible notifications by 100
+  };
+
   return (
     <section className="m_bgblack m_borbot position-sticky top-0 z-3">
       <div className=" p-3 d-flex align-items-center justify-content-between ">
@@ -188,16 +163,17 @@ export default function Header() {
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              {notifications && groupNotificationsByDate(notifications).map(([dateKey, { dateString, notifications }]) => (
+              {notifications && groupNotificationsByDate(notifications).slice(0, visibleNotifications).map(([dateKey, { dateString, notifications }]) => (
                 <React.Fragment key={dateKey}>
                   <p className="j-canvas-text mb-3">{dateString}</p>
                   {notifications.map(notification => (
-                    <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none" key={notification.id}>
+                    <Link to={notification.path || `${location.pathname}${location.search}`} state={location.state} className="text-decoration-none">
                       <div
                         className={`offcanvas-box-1 w-100 mb-3 ${notification.notification_type === "notification" ? "bg-notification" : "bg-alert"}`}
                         style={{ height: "auto" }}
-
+                        key={notification.id}
                       >
+
                         <div className="j-canvas-icon-data mb-2">
                           <svg
                             className="j-canvas-icon-small me-1"
@@ -215,6 +191,7 @@ export default function Header() {
                             />
                           </svg>
                           <h5 className="j-canvas-data-h2 mb-0">{notification.notification_type == "notification" ? "Notificación" : "Alerta"}</h5>
+
                         </div>
                         <p className="j-canvas-data-p ms-1">{notification.notification}</p>
                         <div className="j-canvas-date-time">
@@ -237,19 +214,27 @@ export default function Header() {
                             {new Date(notification.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
+
                       </div>
                     </Link>
                   ))}
+                  {visibleNotifications < notifications.length && ( // Check if there are more notifications to load
+                    <Button onClick={loadMoreNotifications} className="load-more-button">
+                      Load More
+                    </Button>
+                  )}
                 </React.Fragment>
               ))}
             </Offcanvas.Body>
           </Offcanvas>
+
           <Button onClick={toggleShowA} className="m_btn toast-button">
             <span className="fs-4">
               <IoCloudUpload />
             </span>
             <span style={{ paddingLeft: "3px" }}>Sincronizado</span>
           </Button>
+
           <Toast
             className="j-toast-bgcolor"
             style={{
@@ -272,12 +257,14 @@ export default function Header() {
               Sus datos están sincronizados correctamente con la nube
             </Toast.Body>
           </Toast>
+
           <Dropdown>
             <Dropdown.Toggle className="no-caret" id="dropdown-basic">
               <span className="m_grey">
                 <FaUserLarge />
               </span>
             </Dropdown.Toggle>
+
             <Dropdown.Menu className="j-profile-style">
               <Dropdown.Item>
                 <div className="d-flex align-items-center">

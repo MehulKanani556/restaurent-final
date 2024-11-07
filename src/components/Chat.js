@@ -108,9 +108,9 @@ const styles = {
 
 const Chat = () => {
     const [selectedContact, setSelectedContact] = useState(null);
-    const [userId, setUserId] = useState(localStorage.getItem('userId'));
+    const [userId] = useState(localStorage.getItem('userId'));
     const admin_id = localStorage.getItem('admin_id');
-    const [token, setToken] = useState(localStorage.getItem('token'));
+    const [token] = useState(localStorage.getItem('token'));
     const [messages, setMessages] = useState([]); // Ensure messages state is defined
     const [searchTerm, setSearchTerm] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
@@ -413,7 +413,18 @@ const Chat = () => {
     const getMessageDate = (createdAt) => {
         const messageDate = new Date(createdAt);
         const today = new Date();
-        // const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const isToday = messageDate.toDateString() === today.toDateString();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1); // Calculate yesterday's date
+
+        if (isToday) {
+            return "Hoy";
+        }
+        // Add check for yesterday
+        if (messageDate.toDateString() === yesterday.toDateString()) {
+            return "Ayer"; // Return "Ayer" for yesterday's date
+        }
+
         const weekDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         const daysAgo = Math.floor((today - messageDate) / (1000 * 60 * 60 * 24));
 
@@ -488,13 +499,13 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
         if (isToday) {
             return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         } else if (isYesterday) {
-            return 'Yesterday';
+            return 'Ayer';
         } else if (currentDate - messageDate < 7 * 24 * 60 * 60 * 1000) {
             // const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             return days[messageDate.getDay()];
         } else {
-            return messageDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            return messageDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) ;
         }
     };
 
@@ -563,11 +574,16 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
                                         .join('')}
                                 </div>
                             </div>
-                            <div className="sjcontact-info">
-                                <div className="sjcontact-name">{group.name}</div>
-                                <div className="sjcontact-message">{group?.messages[0]?.message}</div>
+                            <div className="sjcontact-info"style={{ minWidth: '35px' }}>
+                                <div className="sjcontact-name text-nowrap" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{group.name}</div>
+                                <div className="sjcontact-message" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {group?.messages[0]?.message}
+                                        </div>
+                               
                             </div>
-
+                            <div style={{ flexGrow: 1, textAlign: 'end', fontSize: '12px', color: '#9CA3AF' }}>
+                                <p> {group.messages[0]?.created_at ? formatDateTime(group.messages[0]?.created_at) : null}</p>
+                            </div>
                             {/* {groups.filter(group => 
                                 group.messages.some(message => message.sender_id !== userId && message.read_by === "no")
                             ).length > 0 && (
@@ -601,9 +617,11 @@ const ContactsList = ({ groups, allUser = [], userId, handleContactClick, select
                                                 .join('')}
                                         </div>
                                     </div>
-                                    <div className="sjcontact-info">
-                                        <div className="sjcontact-name text-nowrap">{ele.name}</div>
-                                        <div className="sjcontact-message">{ele.messages[0]?.message} </div>
+                                    <div className="sjcontact-info" style={{ minWidth: '35px' }}>
+                                        <div className="sjcontact-name text-nowrap" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ele.name}</div>
+                                        <div className="sjcontact-message" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {ele.messages[0]?.message}
+                                        </div>
                                     </div>
                                     <div style={{ flexGrow: 1, textAlign: 'end', fontSize: '12px', color: '#9CA3AF' }}>
                                         <p className='m-0'>
