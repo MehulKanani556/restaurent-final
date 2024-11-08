@@ -147,20 +147,20 @@ const Movimientos = () => {
                     </div>
                 </div>
                 {/* <!-- Modal 1--> */}
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="modal-header j-caja-border-bottom p-0 m-3 mb-0 pb-3">
-                                <h1 class="modal-title j-caja-pop-up-text-1" id="staticBackdropLabel">Abrir caja</h1>
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="modal-header j-caja-border-bottom p-0 m-3 mb-0 pb-3">
+                                <h1 className="modal-title j-caja-pop-up-text-1" id="staticBackdropLabel">Abrir caja</h1>
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <label htmlFor="sj" className="j-tbl-font-2 mb-1 mt-0">Monto inicial</label>
                                 <input type="text" className="sj_modelinput" value={100} />
                             </div>
-                            <div class="modal-footer sjmodenone">
-                                {/* <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> */}
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#sjstaticBackdrop" class="btn j-btn-primary text-white j-tbl-font-2">Abrir caja</button>
+                            <div className="modal-footer sjmodenone">
+                                {/* <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button> */}
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#sjstaticBackdrop" className="btn j-btn-primary text-white j-tbl-font-2">Abrir caja</button>
 
                             </div>
                         </div>
@@ -168,14 +168,14 @@ const Movimientos = () => {
                 </div>
                 {/* sect */}
                 {/* <!-- Modal 2--> */}
-                <div class="modal fade" id="sjstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmode2">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Detalles caja</h1>
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="sjstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmode2">
+                            <div className="modal-header">
+                                <h1 className="modal-title fs-5" id="staticBackdropLabel">Detalles caja</h1>
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <div>
                                     <img src={fing} alt="" />
                                     <p className="d-inline ps-2 sjtext">Caja cerrada</p>
@@ -233,44 +233,44 @@ const Movimientos = () => {
                                 <label htmlFor=" sjtext">Irregularidades</label>
                                 <input type="text" className="sj_modelinput mt-2" placeholder="$-50" />
                             </div>
-                            <div class="modal-footer sjmodenone">
-                                {/* <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> */}
-                                <button type="button" class="btn sjbtnskylight" data-bs-toggle="modal" data-bs-target="#modelstaticBackdrop">Imprimir reporte</button>
+                            <div className="modal-footer sjmodenone">
+                                {/* <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button> */}
+                                <button type="button" className="btn sjbtnskylight" data-bs-toggle="modal" data-bs-target="#modelstaticBackdrop">Imprimir reporte</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 3--> */}
-                <div class="modal fade" id="modelstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1>
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="modelstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="modal-header">
+                                <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1>
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <p>Completa el “Registro de efectivo” para comparar y detectar cualquier irregularidad en el cierre de caja</p>
                                 <label htmlFor="final">Monto final</label>
                                 <input type="text" id="final" className="sj_modelinput" placeholder="$200" /> <br />
                                 <label htmlFor="final">Monto efectivo</label>
                                 <input type="text" id="final" className="sj_modelinput" placeholder="$ 0.00" />
                             </div>
-                            <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#model1staticBackdrop" class="btn btn-primary">Confirmar</button>
+                            <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#model1staticBackdrop" className="btn btn-primary">Confirmar</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 4--> */}
-                <div class="modal fade" id="model1staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Generar reporte cajas</h1>
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="model1staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="modal-header">
+                                <h1 className="modal-title fs-5" id="staticBackdropLabel">Generar reporte cajas</h1>
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <p>Selecciona las fechas para generar el reporte</p>
                                 <div className="row pt-3">
                                     <div className="col-12 col-md-6 mb-3">
@@ -299,22 +299,22 @@ const Movimientos = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#model2staticBackdrop" class="btn btn-primary">Confirmar</button>
+                            <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#model2staticBackdrop" className="btn btn-primary">Confirmar</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 5--> */}
-                <div class="modal fade" id="model2staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="sj_modal-header">
-                                {/* <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="model2staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="sj_modal-header">
+                                {/* <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <div className="d-flex justify-content-center">
                                     <a href="#">
                                         <img src={checkbox} alt="#" className="" data-bs-toggle="modal" data-bs-target="#model4staticBackdrop" />
@@ -323,22 +323,22 @@ const Movimientos = () => {
                                 <p className="text-center pt-2 mb-0">Caja abierta</p>
                                 <p className="text-center">exitosamente</p>
                             </div>
-                            {/* <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="" class="btn btn-primary">Confirmar</button>
+                            {/* <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="" className="btn btn-primary">Confirmar</button>
                             </div> */}
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 7--> */}
-                <div class="modal fade" id="model4staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="sj_modal-header">
-                                {/* <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="model4staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="sj_modal-header">
+                                {/* <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <div className="d-flex justify-content-center">
                                     <a href="#">
                                         <img src={checkbox} alt="" data-bs-toggle="modal" data-bs-target="#model5staticBackdrop" />
@@ -347,22 +347,22 @@ const Movimientos = () => {
                                 <p className="text-center pt-2 mb-0">Caja</p>
                                 <p className="text-center">Los cambios han sido guardados exitosamente</p>
                             </div>
-                            {/* <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="" class="btn btn-primary">Confirmar</button>
+                            {/* <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="" className="btn btn-primary">Confirmar</button>
                             </div> */}
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 8--> */}
-                <div class="modal fade" id="model5staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="sj_modal-header">
-                                {/* <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="model5staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="sj_modal-header">
+                                {/* <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <div className="d-flex justify-content-center">
                                     <a href="#">
                                         <img src={checkbox} alt="" data-bs-toggle="modal" data-bs-target="#model6staticBackdrop" />
@@ -371,22 +371,22 @@ const Movimientos = () => {
                                 <p className="text-center pt-2 mb-0">Caja</p>
                                 <p className="text-center">Cierre de caja exitosamente</p>
                             </div>
-                            {/* <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="" class="btn btn-primary">Confirmar</button>
+                            {/* <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="" className="btn btn-primary">Confirmar</button>
                             </div> */}
                         </div>
                     </div>
                 </div>
                 {/* <!-- Modal 9--> */}
-                <div class="modal fade" id="model6staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="sjmodel">
-                            <div class="sj_modal-header">
-                                {/* <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
-                                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div className="modal fade" id="model6staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="sjmodel">
+                            <div className="sj_modal-header">
+                                {/* <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
+                                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <div className="d-flex justify-content-center">
                                     <a href="#">
                                         <img src={checkbox} alt="" />
@@ -395,9 +395,9 @@ const Movimientos = () => {
                                 <p className="text-center pt-2 mb-0">Caja</p>
                                 <p className="text-center">Creada exitosamente</p>
                             </div>
-                            {/* <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="" class="btn btn-primary">Confirmar</button>
+                            {/* <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="" className="btn btn-primary">Confirmar</button>
                             </div> */}
                         </div>
                     </div>

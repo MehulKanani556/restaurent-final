@@ -884,7 +884,7 @@ console.log(tId)
                         </div>
                         <Link
                           to={""}
-                          class="btn w-100 j-btn-primary text-white m-articles-text-2"
+                          className="btn w-100 j-btn-primary text-white m-articles-text-2"
                           onClick={(e) => {
                             e.preventDefault();
                             handleCreateOrder();

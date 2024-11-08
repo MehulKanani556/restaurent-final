@@ -431,18 +431,18 @@ export default function Home_Bebidas() {
                                                             <div className="d-flex justify-content-between">
                                                                 <div>
                                                                     <div className="">
-                                                                        <div class="m_group">
+                                                                        <div className="m_group">
                                                                             <svg
                                                                                 viewBox="0 0 24 24"
                                                                                 aria-hidden="true"
-                                                                                class="m_icon"
+                                                                                className="m_icon"
                                                                             >
                                                                                 <g>
                                                                                     <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
                                                                                 </g>
                                                                             </svg>
                                                                             <input
-                                                                                class="m_input"
+                                                                                className="m_input"
                                                                                 type="search"
                                                                                 placeholder="Buscar"
                                                                             />
@@ -479,20 +479,20 @@ export default function Home_Bebidas() {
                                                                 keys={index}
                                                             >
                                                                 <div>
-                                                                    <div class="card m_bgblack text-white position-relative">
+                                                                    <div className="card m_bgblack text-white position-relative">
                                                                         <img
                                                                             src={ele.image}
-                                                                            class="card-img-top object-fit-fill rounded"
+                                                                            className="card-img-top object-fit-fill rounded"
                                                                             alt="..."
                                                                             style={{ height: "162px" }}
                                                                         />
-                                                                        <div class="card-body">
-                                                                            <h6 class="card-title">{ele.name}</h6>
-                                                                            <h6 class="card-title">${ele.price}</h6>
-                                                                            <p class="card-text opacity-50">
+                                                                        <div className="card-body">
+                                                                            <h6 className="card-title">{ele.name}</h6>
+                                                                            <h6 className="card-title">${ele.price}</h6>
+                                                                            <p className="card-text opacity-50">
                                                                                 Codigo: {ele.code}
                                                                             </p>
-                                                                            <div class="btn w-100 btn-primary text-white">
+                                                                            <div className="btn w-100 btn-primary text-white">
                                                                                 <a
                                                                                     href="# "
                                                                                     className="text-white text-decoration-none"

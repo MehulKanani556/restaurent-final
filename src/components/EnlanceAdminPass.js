@@ -147,7 +147,7 @@ export const EnlanceAdminPass = () => {
                     >
                       Contraseña
                     </label>
-                    <div class="m_group " style={{ maxWidth: "360px" }}>
+                    <div className="m_group " style={{ maxWidth: "360px" }}>
                       <div className="icon-input w-100">
                         <IoMdLock className="i m18" style={{ color: "#9ca3af" }} />
                         <input
@@ -192,7 +192,7 @@ export const EnlanceAdminPass = () => {
                       Confirmar Contraseña
                     </label>
 
-                    <div class="m_group " style={{ maxWidth: "360px" }}>
+                    <div className="m_group " style={{ maxWidth: "360px" }}>
                       <div className="icon-input w-100">
                         <IoMdLock className="i m18" style={{ color: "#9ca3af" }} />
                         <input

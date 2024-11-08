@@ -640,18 +640,18 @@ const Usuarios = () => {
               <div className="d-flex justify-content-between">
                 <div className="d-flex align-items-center">
                   <div className="me-2 ">
-                    <div class="m_group ">
+                    <div className="m_group ">
                       <svg
                         viewBox="0 0 24 24"
                         aria-hidden="true"
-                        class="m_icon"
+                        className="m_icon"
                       >
                         <g>
                           <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
                         </g>
                       </svg>
                       <input
-                        class="m_input ps-5"
+                        className="m_input ps-5"
                         type="search"
                         placeholder="Buscar"
                         value={searchTerm}
@@ -718,14 +718,14 @@ const Usuarios = () => {
                       <form key={formKey}>
                         <div>
                           <div className="d-flex row">
-                            <div class="col-6">
+                            <div className="col-6">
                               <label className="mb-2">Nombre</label>
                               <div
                                 className="m_group "
                                 style={{ width: "100%" }}
                               >
                                 <svg
-                                  class="m_icon"
+                                  className="m_icon"
                                   aria-hidden="true"
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="currentColor"
@@ -739,7 +739,7 @@ const Usuarios = () => {
                                 </svg>
                                 <input
                                   ref={formRefs.name}
-                                  class="bm_input"
+                                  className="bm_input"
                                   style={{ width: "100%" }}
                                   type="text"
                                   placeholder="Escribir . . ."
@@ -754,7 +754,7 @@ const Usuarios = () => {
                                 </div>
                               )}
                             </div>
-                            <div class="col-6">
+                            <div className="col-6">
                               <div className="me-2 mb-2">
                                 <label className="mb-2">Rol</label>
                                 <div className="m_group">
@@ -794,11 +794,11 @@ const Usuarios = () => {
                             </div>
                           </div>
                           <div className="row">
-                            <div class="mt-2">
+                            <div className="mt-2">
                               <label className="mb-2">Correo</label>
                               <div className="m_group j_group">
                                 <svg
-                                  class="m_icon"
+                                  className="m_icon"
                                   aria-hidden="true"
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="currentColor"
@@ -809,7 +809,7 @@ const Usuarios = () => {
                                 </svg>
                                 <input
                                   ref={formRefs.email}
-                                  class="bm_input"
+                                  className="bm_input"
                                   type="email"
                                   name="email"
                                   // value={formData.email}
@@ -868,7 +868,7 @@ const Usuarios = () => {
                                 </div>
                               )}
                             </div>
-                            <div class="col-6">
+                            <div className="col-6">
                               <div className="mb-2 me-2">
                                 <label
                                   htmlFor="password"
@@ -1176,11 +1176,11 @@ const Usuarios = () => {
               <Modal.Body className="border-0 pb-0">
                 <div>
                   <div className="d-flex row">
-                    <div class="col-6">
+                    <div className="col-6">
                       <label className="mb-2">Nombre</label>
                       <div className="m_group " style={{ width: "100%" }}>
                         <svg
-                          class="m_icon"
+                          className="m_icon"
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="currentColor"
@@ -1195,7 +1195,7 @@ const Usuarios = () => {
 
                         <input
                           ref={formRefs.name}
-                          class="bm_input"
+                          className="bm_input"
                           style={{ width: "100%" }}
                           type="text"
                           placeholder="Escribir . . ."
@@ -1211,7 +1211,7 @@ const Usuarios = () => {
                         </div>
                       )}
                     </div>
-                    <div class="col-6">
+                    <div className="col-6">
                       <div className="me-2 mb-2">
                         <label className="mb-2">Rol</label>
                         <div className="m_group">
@@ -1244,11 +1244,11 @@ const Usuarios = () => {
                     </div>
                   </div>
                   <div className="row">
-                    <div class="mt-3 ">
+                    <div className="mt-3 ">
                       <label className="mb-2">Correo</label>
                       <div className="m_group  j_group ">
                         <svg
-                          class="m_icon"
+                          className="m_icon"
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="currentColor"
@@ -1259,7 +1259,7 @@ const Usuarios = () => {
                         </svg>
                         <input
                           ref={formRefs.email}
-                          class="bm_input"
+                          className="bm_input"
                           type="email"
                           placeholder="Escribir . . ."
                           name="email"

@@ -13,7 +13,7 @@ const OrderCart = ({ image, name, price, code, addItemToCart ,id }) => {
 
   return (
     <div>
-      <div class="card m_bgblack text-white position-relative">
+      <div className="card m_bgblack text-white position-relative">
       {image ? (
           <img
             src={`${API}/images/${image}`}
@@ -26,12 +26,12 @@ const OrderCart = ({ image, name, price, code, addItemToCart ,id }) => {
             <p>{name}</p>
           </div>
         )}
-        <div class="card-body">
-          <h5 class="card-title j-tbl-text-16">{name}</h5>
-          <h5 class="card-title j-tbl-pop-1">${price}</h5>
-          <p class="card-text opacity-75 j-tbl-btn-font-1">Codigo: {code}</p>
+        <div className="card-body">
+          <h5 className="card-title j-tbl-text-16">{name}</h5>
+          <h5 className="card-title j-tbl-pop-1">${price}</h5>
+          <p className="card-text opacity-75 j-tbl-btn-font-1">Codigo: {code}</p>
           <div
-            class="btn w-100 j-btn-primary text-white"
+            className="btn w-100 j-btn-primary text-white"
             onClick={handleAddToCart}
           >
             <Link className="text-white d-flex align-items-center justify-content-center text-decoration-none j-tbl-btn-font-1">

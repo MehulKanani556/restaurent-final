@@ -220,7 +220,7 @@ const ChatComponent = () => {
           <div className="mb-2">
             <select
               id="month-select"
-              class="form-select sjfs-14"
+              className="form-select sjfs-14"
               onChange={(e) => {
                 const selectedValue = e.target.value;
                 setSelectedRevtaMonth(selectedValue);

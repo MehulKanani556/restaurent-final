@@ -504,36 +504,36 @@ export default function Home_Detalles() {
           </div>
         </div>
         {/* model 1 */}
-        <div class="modal fade" id="sjmodelstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="sjmodel">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div className="modal fade" id="sjmodelstaticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div className="modal-dialog">
+            <div className="sjmodel">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1>
+                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
+              <div className="modal-body">
                 <p>Completa el “Registro de efectivo” para comparar y detectar cualquier irregularidad en el cierre de caja</p>
                 <label htmlFor="final">Monto final</label>
                 <input type="text" id="final" className="sj_modelinput" placeholder="$200" /> <br />
                 <label htmlFor="final">Monto efectivo</label>
                 <input type="text" id="final" className="sj_modelinput" placeholder="$ 0.00" />
               </div>
-              <div class="modal-footer sjmodenone">
-                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" data-bs-toggle="modal" data-bs-target="#sjmodel6staticBackdrop" class="btn btn-primary">Confirmar</button>
+              <div className="modal-footer sjmodenone">
+                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#sjmodel6staticBackdrop" className="btn btn-primary">Confirmar</button>
               </div>
             </div>
           </div>
         </div>
         {/* model 2 */}
-        <div class="modal fade" id="sjmodel6staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="sjmodel">
-              <div class="sj_modal-header">
-                {/* <h1 class="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div className="modal fade" id="sjmodel6staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div className="modal-dialog">
+            <div className="sjmodel">
+              <div className="sj_modal-header">
+                {/* <h1 className="modal-title fs-5" id="staticBackdropLabel">Cierre caja</h1> */}
+                <button type="button" className="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body">
+              <div className="modal-body">
                 <div className="d-flex justify-content-center">
                   <a href="#">
                     <img src={checkbox} alt="" />
@@ -542,9 +542,9 @@ export default function Home_Detalles() {
                 <p className="text-center pt-2 mb-0">Caja</p>
                 <p className="text-center">Creada exitosamente</p>
               </div>
-              {/* <div class="modal-footer sjmodenone">
-                                <button type="button" class="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="" class="btn btn-primary">Confirmar</button>
+              {/* <div className="modal-footer sjmodenone">
+                                <button type="button" className="btn sjredbtn" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="" className="btn btn-primary">Confirmar</button>
                             </div> */}
             </div>
           </div>

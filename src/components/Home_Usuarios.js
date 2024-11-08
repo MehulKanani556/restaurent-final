@@ -357,17 +357,17 @@ function Home_Usuarios() {
                     <div className='d-flex b_main_search ms-4 justify-content-between mt-3'>
                         <div>
                             <div className="">
-                                <div class="m_group">
+                                <div className="m_group">
                                     <svg
                                         viewBox="0 0 24 24"
                                         aria-hidden="true"
-                                        class="m_icon">
+                                        className="m_icon">
                                         <g>
                                             <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
                                         </g>
                                     </svg>
                                     <input
-                                        class="bm_input"
+                                        className="bm_input"
                                         type="search"
                                         placeholder="Buscar"
                                         value={searchTerm}
@@ -379,9 +379,9 @@ function Home_Usuarios() {
                         <div className='b_marg'>
                             <div className='me-4'>
                                 <Link to={"/home/usa/bhomedelivery"}>
-                                    <button type="submit" class="btn text-white bj-delivery-text-3 j-btn-primary mb-3 me-3 py-2" style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}>+ Crear pedido</button>
+                                    <button type="submit" className="btn text-white bj-delivery-text-3 j-btn-primary mb-3 me-3 py-2" style={{ backgroundColor: "#147BDE", borderRadius: '10px' }}>+ Crear pedido</button>
                                 </Link>
-                                <button type="submit" class="btn bj-delivery-text-3  bj-btn-outline-primary mb-3 py-2  " style={{ borderRadius: "10px" }} onClick={handleShow15}><BiSolidFoodMenu /> Generar reporte</button>
+                                <button type="submit" className="btn bj-delivery-text-3  bj-btn-outline-primary mb-3 py-2  " style={{ borderRadius: "10px" }} onClick={handleShow15}><BiSolidFoodMenu /> Generar reporte</button>
                             </div>
                         </div>
                     </div>

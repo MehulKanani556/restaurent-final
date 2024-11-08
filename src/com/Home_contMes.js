@@ -52,7 +52,7 @@ const Home_contMes = ({ className = "" }) => {
     <div className={`sjcontacts-container ${className}`}>
       {/* chat title */}
       <div className="j-chat-size345 d-flex jchat-padding-1 px-3  m_borbot">
-        {/* <svg class=" text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        {/* <svg className=" text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
           <path fill-rule="evenodd" d="M4 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h1v2a1 1 0 0 0 1.707.707L9.414 13H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4Z" clip-rule="evenodd" />
           <path fill-rule="evenodd" d="M8.023 17.215c.033-.03.066-.062.098-.094L10.243 15H15a3 3 0 0 0 3-3V8h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-1v2a1 1 0 0 1-1.707.707L14.586 18H9a1 1 0 0 1-.977-.785Z" clip-rule="evenodd" />
         </svg> */}
@@ -62,18 +62,18 @@ const Home_contMes = ({ className = "" }) => {
 
 
       {/* Search Bar */}
-      <div class="m_group jay-message-padding mt-2">
+      <div className="m_group jay-message-padding mt-2">
         <svg
           viewBox="0 0 24 24"
           aria-hidden="true"
-          class="mmj_icon"
+          className="mmj_icon"
         >
           <g>
             <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z" />
           </g>
         </svg>
         <input
-          class="m_input ps-5  "
+          className="m_input ps-5  "
           type="search"
           placeholder="Buscar"
         />

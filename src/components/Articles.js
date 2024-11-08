@@ -202,7 +202,7 @@ export default function Articles() {
   const fetchProductionCenters = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.post(`${apiUrl}/production-centers`,{admin_id:admin_id}, {
+      const response = await axios.post(`${apiUrl}/production-centers`, { admin_id: admin_id }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -238,7 +238,7 @@ export default function Articles() {
   const fetchAllItems = async () => {
     setIsProcessing(true);
     try {
-      const response = await axios.get(`${apiUrl}/item/getAll`,{
+      const response = await axios.get(`${apiUrl}/item/getAll`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -417,7 +417,7 @@ export default function Articles() {
         setIsProcessing(false);
         setSubFamName("");
         setSubSelectName("");
-        
+
       })
       .catch(function (error) {
         console.error(
@@ -427,7 +427,7 @@ export default function Articles() {
         setSubFamilyError(
           "Error al crear la subfamilia. Por favor, inténtelo de nuevo."
         );
-       
+
       })
       .finally(() => {
         setIsProcessing(false);
@@ -626,9 +626,9 @@ export default function Articles() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif','image/jpg'];
+      const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/gif', 'image/jpg'];
       const fileType = file.type;
-  
+
       if (!allowedTypes.includes(fileType)) {
         setErrorMessages((prevErrors) => ({
           ...prevErrors,
@@ -667,18 +667,18 @@ export default function Articles() {
 
     if (!formData.cost_price.trim() || isNaN(parseFloat(formData.cost_price)) || parseFloat(formData.cost_price) <= 0) {
       errors.cost_price = "El precio de costo debe ser un número mayor que 0";
-  }
-
-  if (!formData.sale_price.trim() || isNaN(parseFloat(formData.sale_price)) || parseFloat(formData.sale_price) <= 0) {
-    errors.sale_price = "El precio de venta debe ser un número mayor que 0";
-} else {
-    const costPrice = parseFloat(formData.cost_price);
-    const salePrice = parseFloat(formData.sale_price);
-    // Ensure cost_price is less than sale_price
-    if (salePrice <= costPrice) {
-        errors.sale_price = "El precio de venta debe ser mayor que el precio de costo";
     }
-}
+
+    if (!formData.sale_price.trim() || isNaN(parseFloat(formData.sale_price)) || parseFloat(formData.sale_price) <= 0) {
+      errors.sale_price = "El precio de venta debe ser un número mayor que 0";
+    } else {
+      const costPrice = parseFloat(formData.cost_price);
+      const salePrice = parseFloat(formData.sale_price);
+      // Ensure cost_price is less than sale_price
+      if (salePrice <= costPrice) {
+        errors.sale_price = "El precio de venta debe ser mayor que el precio de costo";
+      }
+    }
 
     if (!formData.family_id) {
       errors.family_id = "La familia es obligatoria";
@@ -714,7 +714,7 @@ export default function Articles() {
     // Create FormData object
     const formData = new FormData();
     console.log(formRef.current);
-    
+
     // Append all form fields to FormData
     Object.keys(formRef.current).forEach(key => {
       if (formRef.current[key]) { // Only append if value exists
@@ -744,7 +744,7 @@ export default function Articles() {
         setUploadedFile(response.data.file);
         handleShow1AddSuc();
         fetchAllItems();
-        
+
         // Reset form
         formRef.current = {
           name: "",
@@ -760,8 +760,8 @@ export default function Articles() {
         setErrorMessages({});
       }
     } catch (error) {
-      setErrorMessages({ 
-        general: error.response?.data?.errors?.code || "Error creating item" 
+      setErrorMessages({
+        general: error.response?.data?.errors?.code || "Error creating item"
       });
     } finally {
       setIsProcessing(false);
@@ -1462,7 +1462,7 @@ export default function Articles() {
                     <img src={require("../Image/trash-check 1.png")} alt="" />
                     <p className="mb-0 mt-2 h6">SubFamilia</p>
                     <p className="opacity-75">
-                    Ha sido eliminada Subfamilia correctamente
+                      Ha sido eliminada Subfamilia correctamente
                     </p>
                   </div>
                 </Modal.Body>

@@ -200,7 +200,7 @@ function Home_De_eme() {
                                 <div className='fs-5'> <FiClock /> <span>08:AM</span></div>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-outline-success b_new_btn">Delivery</button>
+                                <button type="button" className="btn btn-outline-success b_new_btn">Delivery</button>
                             </div>
                             <div className='mt-4'>
                                 <h5>Datos</h5>

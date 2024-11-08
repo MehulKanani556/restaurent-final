@@ -991,7 +991,7 @@ const DeliveryPago = () => {
             <div className="j_position_fixed j_b_hd_width ak-position">
               <div className="b-summary-center mb-4 align-items-center text-white d-flex justify-content-between">
                 {/* <div className="j_position_fixed j_b_hd_width"> */}
-                <h2 class="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
+                <h2 className="text-white j-kds-body-text-1000 mb-0">Resumen</h2>
                 {/* <FaXmark className="b-icon" /> */}
               </div>
               <div className="b-date-time d-flex flex-wrap column-gap-3 align-items-center justify-content-end text-white">
@@ -1083,7 +1083,7 @@ const DeliveryPago = () => {
 
                 {/* <div className="b-date-time b_date_time2  d-flex align-items-center">
                     <svg
-                      class="j-canvas-svg-i"
+                      className="j-canvas-svg-i"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -1268,7 +1268,7 @@ const DeliveryPago = () => {
                             ${(finalTotal + taxAmount + tipAmount).toFixed(2)}
                           </span>
                         </div>
-                        <div class="btn w-100 j-btn-primary text-white">
+                        <div className="btn w-100 j-btn-primary text-white">
                           <div
                             className="text-white text-decoration-none btn-primary m-articles-text-2"
                             onClick={handleSubmit}

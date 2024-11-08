@@ -110,8 +110,8 @@ function Home_retiro() {
                         </div>
                         <div>
                             <div className='me-4'>
-                                <button type="submit" class="btn btn-primary mb-3 me-3">+ Crear pedido</button>
-                                <button type="submit" class="btn btn-outline-primary mb-3 "><BiSolidFoodMenu /> Generar reporte</button>
+                                <button type="submit" className="btn btn-primary mb-3 me-3">+ Crear pedido</button>
+                                <button type="submit" className="btn btn-outline-primary mb-3 "><BiSolidFoodMenu /> Generar reporte</button>
                             </div>
                         </div>
                     </div>

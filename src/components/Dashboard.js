@@ -1511,7 +1511,7 @@ const Dashboard = () => {
                     <div>
                       <select
                         id="month-select"
-                        class="form-select sjfs-14"
+                        className="form-select sjfs-14"
                         // onChange={(e) => setSelectedHastaMonth(e.target.value)}
                         onChange={(e) => {
                           const selectedValue = e.target.value;
@@ -1710,7 +1710,7 @@ const Dashboard = () => {
                       <div className="mb-2">
                         <select
                           id="month-select"
-                          class="form-select sjfs-14"
+                          className="form-select sjfs-14"
                           onChange={(e) => {
                             const selectedValue = e.target.value;
                             setSelectedRevtaMonth(selectedValue);
@@ -1909,7 +1909,7 @@ const Dashboard = () => {
                     <div>
                       <select
                         id="month-select"
-                        class="form-select sjfs-14"
+                        className="form-select sjfs-14"
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectPopMonth(selectedValue);
@@ -2055,7 +2055,7 @@ const Dashboard = () => {
                     <div>
                       <select
                         id="month-select"
-                        class="form-select sjfs-14"
+                        className="form-select sjfs-14"
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectDeliveryMonth(selectedValue);
@@ -2240,7 +2240,7 @@ const Dashboard = () => {
                     <div>
                       <select
                         id="month-select"
-                        class="form-select sjfs-14"
+                        className="form-select sjfs-14"
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setselectBoxMonth(selectedValue);
@@ -2390,7 +2390,7 @@ const Dashboard = () => {
                     <div>
                       <select
                         id="month-select"
-                        class="form-select sjfs-14"
+                        className="form-select sjfs-14"
                         onChange={(e) => {
                           const selectedValue = e.target.value;
                           setSelectCencelMonth(selectedValue);
@@ -2478,8 +2478,8 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="j-table">
-                  <div class="table-container">
-                    <table class="table">
+                  <div className="table-container">
+                    <table className="table">
                       <thead>
                         <tr>
                           <th

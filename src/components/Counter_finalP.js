@@ -1287,7 +1287,7 @@ const Counter_finalP = () => {
                             ${(finalTotal + taxAmount + tipAmount).toFixed(2)}
                           </span>
                         </div>
-                        <div class="btn w-100 j-btn-primary text-white">
+                        <div className="btn w-100 j-btn-primary text-white">
                           <div
                             className="text-white text-decoration-none btn-primary m-articles-text-2"
                             onClick={handleSubmit}

@@ -39,7 +39,7 @@ function Home_de_information() {
                 </div>
                 <div className='flex-grow-1 sidebar overflow-y-scroll '>
                     <div className='m-4'>
-                        <button type="button" class="btn btn-outline-primary"><IoMdArrowRoundBack /> Go Back</button>
+                        <button type="button" className="btn btn-outline-primary"><IoMdArrowRoundBack /> Go Back</button>
                     </div>
                     <div className='ms-4 mt-4'>
                         <h5 className='text-white'>Domain Gonzles</h5>

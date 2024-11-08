@@ -41,7 +41,7 @@ export default function SingProd({ image, price, name, code, id }) {
 
   return (
     <div>
-      <div class="card m_bgblack text-white position-relative">
+      <div className="card m_bgblack text-white position-relative">
         {image ? (
           <img
             src={`${API}/images/${image}`}
@@ -54,11 +54,11 @@ export default function SingProd({ image, price, name, code, id }) {
             <p>{name}</p>
           </div>
         )}
-        <div class="card-body">
-          <h6 class="card-title">{name}</h6>
-          <h6 class="card-title">$ {price}</h6>
-          <p class="card-text opacity-50">Codigo: {code}</p>
-          <div class="btn w-100 btn-primary text-white">
+        <div className="card-body">
+          <h6 className="card-title">{name}</h6>
+          <h6 className="card-title">$ {price}</h6>
+          <p className="card-text opacity-50">Codigo: {code}</p>
+          <div className="btn w-100 btn-primary text-white">
             <Link className="text-white text-decoration-none" style={{ fontSize: '14px' }} onClick={handleClick} >
               <FaCartPlus /> <span className="ms-1">Añadir a mostrador</span>
             </Link>

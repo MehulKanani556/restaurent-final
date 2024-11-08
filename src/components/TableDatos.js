@@ -1216,7 +1216,7 @@ const TableDatos = () => {
 
                   <div className="b-date-time b_date_time2  d-flex align-items-center ak-w-50">
                     <svg
-                      class="j-canvas-svg-i"
+                      className="j-canvas-svg-i"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"

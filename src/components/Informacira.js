@@ -2276,7 +2276,7 @@ const Informacira = () => {
                         <Modal.Footer className="sjmodenone">
                           <button
                             type="button"
-                            class="btn sjbtnskylight"
+                            className="btn sjbtnskylight"
                             onClick={() => { setShowModal(true); handleClose17() }}
                           // onClick={handleClose17}
                           >

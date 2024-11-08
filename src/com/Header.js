@@ -285,7 +285,7 @@ export default function Header() {
                 className="j-profile-logout mt-2"
               >
                 <svg
-                  class="me-1 j-profile-icons"
+                  className="me-1 j-profile-icons"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
