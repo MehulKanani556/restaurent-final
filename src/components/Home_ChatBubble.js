@@ -113,9 +113,9 @@ const Home_ChatBubble = ({ details, receiver }) => {
               padding: "16px",
             }}
           >
-            <div className="p-2" style={{ position: "relative", lineHeight: "150%" }}>
+            <p className="p-2 m-0" style={{ position: "relative", lineHeight: "150%" }}>
               {details.message}
-            </div>
+            </p>
           </div>
           <img
             style={{

@@ -302,6 +302,13 @@ const Chat = () => {
     const handleContactClick = (contact) => {
         console.log("Selected contact:", contact); // Debugging line
         setSelectedContact(contact);
+        
+        // Use setTimeout to ensure the input field is focused after rendering
+        setTimeout(() => {
+            if (inputFieldRef.current) {
+                inputFieldRef.current.focus();
+            }
+        }, 0); // Delay of 0 milliseconds
     };
 
     const handleInputChange = (event) => {

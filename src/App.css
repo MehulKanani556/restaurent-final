@@ -857,6 +857,17 @@ input:focus-visible {
   text-decoration: none;
   margin: 0px 10px;
 }
+.m_btn_red {
+  padding: 3px 15px;
+  border-radius: 10px;
+  background-color: #FDF2F2 !important;
+  color: #771D1D !important;
+  display: flex;
+  border: none;
+  align-items: center;
+  text-decoration: none;
+  margin: 0px 10px;
+}
 
 .m_header {
   gap: 16px !important;
@@ -5938,6 +5949,9 @@ select:focus-visible {
 .j-toast-bgcolor {
   background-color: #edfafa !important;
 }
+.j-toast-bgcolor-red {
+  background-color: #FDF2F2 !important;
+}
 
 .toast-header .btn-close {
   color: #05505c;
@@ -5947,10 +5961,20 @@ select:focus-visible {
   --bs-btn-close-bg: url("./img/Vector\ \(2\).png") !important;
   margin-right: 5px;
 }
+.toast.j-toast-bgcolor-red.show .btn-close {
+  --bs-btn-close-bg: url("./img/x.png") !important;
+  margin-right: 5px;
+}
 
 .j-toast-size {
   height: 22px;
   color: #05505c;
+  width: 20px;
+  margin-right: 5px;
+}
+.j-toast-size-red {
+  height: 22px;
+  color: #771D1D;
   width: 20px;
   margin-right: 5px;
 }
@@ -5962,6 +5986,13 @@ select:focus-visible {
   color: #05505c;
   line-height: 24px;
 }
+.j-toast-text-red {
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  color: #771D1D;
+  line-height: 24px;
+}
 
 .j-toast-title {
   font-family: Inter;
@@ -5969,6 +6000,13 @@ select:focus-visible {
   font-weight: 400;
   line-height: 21px;
   color: #05505c;
+}
+.j-toast-title-red {
+  font-family: Inter;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  color: #E02424;
 }
 
 :not(.toast-button)+.toast-button:active {

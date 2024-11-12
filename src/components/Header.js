@@ -21,6 +21,7 @@ export default function Header() {
   const echo = useSocket();
   const { notifications, notificationCount, handleRead } = useNotifications();
   const [visibleNotifications, setVisibleNotifications] = useState(100);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -28,6 +29,26 @@ export default function Header() {
       navigate('/', { state: { from: location } });
     }
   }, [token, navigate, location]);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showA) {
+      const timer = setTimeout(() => {
+        setShowA(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showA]);
 
   if (!token) {
     return null;
@@ -237,15 +258,19 @@ export default function Header() {
             </Offcanvas.Body>
           </Offcanvas>
 
-          <Button onClick={toggleShowA} className="m_btn toast-button">
-            <span className="fs-4">
+          <Button
+            onClick={toggleShowA}
+            className={isOnline ? "m_btn toast-button" : "m_btn_red toast-button"}
+            style={{ backgroundColor: isOnline ? 'initial' : '' }}
+          >
+            <span className="fs-4" >
               <IoCloudUpload />
             </span>
-            <span style={{ paddingLeft: "3px" }}>Sincronizado</span>
+            <span style={{ paddingLeft: "3px" }}>{isOnline ? "Sincronizado " : "Sin señal"}</span>
           </Button>
 
           <Toast
-            className="j-toast-bgcolor"
+            className={isOnline ? "j-toast-bgcolor" : "j-toast-bgcolor-red"}
             style={{
               position: "fixed",
               top: "85px",
@@ -256,14 +281,15 @@ export default function Header() {
             show={showA}
             onClose={toggleShowA}
           >
-            <Toast.Header className="j-toast-bgcolor border-0">
+            <Toast.Header className={`${isOnline ? "j-toast-bgcolor" : "j-toast-bgcolor-red"} border-0`}>
               <span className="">
-                <IoCloudUpload className="j-toast-size" />
+                <IoCloudUpload className={` ${isOnline ? 'j-toast-size' : 'j-toast-size-red'} `} />
               </span>
-              <strong className="me-auto j-toast-text">Datos</strong>
+              <strong className={`me-auto ${isOnline ? 'j-toast-text' : 'j-toast-text-red'} `}>{isOnline ? 'Datos' : 'Datos sin señal'}</strong>
             </Toast.Header>
-            <Toast.Body className="pt-0 j-toast-title">
-              Sus datos están sincronizados correctamente con la nube
+            <Toast.Body className={`pt-0 ${isOnline ? 'j-toast-title' : 'j-toast-title-red'} `}>
+              {isOnline ? 'Sus datos están sincronizados correctamente con la nube' : 'Sus datos no es están siendo sincronizados'}
+
             </Toast.Body>
           </Toast>
 

@@ -160,7 +160,7 @@ const Sidenav = ({ children, onNavigate }) => {
             >
               <div className="j-icon sjtextsidbar">{item.icon}</div>
               <div className="j-link_text me-auto">{item.name}</div>
-              {item.badge > 0 && <div className="mt-1" style={{ width: '20px', height: "20px", borderRadius: "50%", background: "#147BDE", color: "white", textAlign: 'center', lineHeight: '20px', fontSize: '12px' }}>{item.badge}</div>}
+              {/* {item.badge > 0 && <div className="mt-1" style={{ width: '20px', height: "20px", borderRadius: "50%", background: "#147BDE", color: "white", textAlign: 'center', lineHeight: '20px', fontSize: '12px' }}>{item.badge}</div>} */}
             </Link>
           ))}
         </div>
