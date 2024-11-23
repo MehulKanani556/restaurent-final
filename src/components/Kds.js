@@ -57,16 +57,15 @@ const Kds = () => {
         'Recibido',
         'Preparado',
         'Finalizado',
-        'Entregado'
+        'Terminado'
     ]
 
     const orderTypeMapping = {
         'Recibido': 'received',
         'Preparado': 'prepared',
         'Finalizado': 'finalized',
-        'Entregado': 'delivered'
+        'Terminado': 'delivered'
     };
-
     const fetchAllItems = async () => {
         setIsProcessing(true);
         try {

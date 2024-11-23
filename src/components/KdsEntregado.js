@@ -164,10 +164,10 @@ const KdsEntregado = () => {
                     </div>
 
                     <div className="j-kds-body">
-                        <Link to={"/kds"} className='text-decoration-none'>
+                    <Link to={"/kds"} className='text-decoration-none'>
                             <div className={`j-kds-body-btn-4 j-kds-body-btn mx-3`}>
                                 <button className='d-flex align-items-center j-kds-body-text-1'>
-                                    Entregado <FaXmark className='ms-2 j-kds-body-text-1' />
+                                Terminado <FaXmark className='ms-2 j-kds-body-text-1' />
                                 </button>
                             </div>
                         </Link>

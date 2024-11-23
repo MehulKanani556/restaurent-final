@@ -114,7 +114,7 @@ function App() {
               <Route path="/kds/recibido" element={<KdsRecibido />} />
               <Route path="/kds/preparado" element={<KdsPreparado />} />
               <Route path="/kds/finalizado" element={<KdsFinalizado />} />
-              <Route path="/kds/entregado" element={<KdsEntregado />} />
+              <Route path="/kds/Terminado" element={<KdsEntregado />} />
               <Route path="/usuarios" element={<Usuarios />} />
               {/* {/ {/ <Route path="/home_mess" element={<Home_mes />} /> /} /} */}
               <Route path="/home_mess" element={<Chat />} />

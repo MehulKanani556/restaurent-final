@@ -1519,7 +1519,7 @@ export default function ProductionCenter() {
                                             style={{ height: "162px", objectFit: "cover" }}
                                           />
                                         ) : (
-                                          <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px", backgroundColor: '#374151', color: 'white' }}>
+                                          <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "162px", backgroundColor: '#374151', color: 'white' }}>
                                             <p>{ele.name}</p>
                                           </div>
                                         )}
@@ -1700,7 +1700,7 @@ export default function ProductionCenter() {
                                           style={{ height: "162px", objectFit: "cover" }}
                                         />
                                       ) : (
-                                        <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "200px",backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
+                                        <div className="d-flex justify-content-center align-items-center rounded" style={{ height: "162px",backgroundColor: 'rgb(55 65 81 / 34%)', color: 'white' }}>
                                           <p>{ele.name}</p>
                                         </div>
                                       )}
